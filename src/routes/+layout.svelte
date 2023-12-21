@@ -13,8 +13,11 @@
   import Button, { Label } from '@smui/button';
   import List, { Item, Text, Graphic, Separator, Subheader } from '@smui/list';
 
-  let drawerOpen = false;
   let active = 'Inbox';
+
+  let drawerOpen = false;
+  // let drawerVariant = "dismissible"
+  let drawerVariant = "modal"
 
   function setActive(value) {
     active = value;
@@ -24,10 +27,12 @@
 
   // 画面サイズに応じてドロワーの状態を制御する関数
   function handleResize() {
-    if (window.innerWidth > 600) {
-      drawerOpen = true; // 画面が大きい場合はドロワーを開く
+    if (window.innerWidth > 1000) {
+      drawerOpen = true;
+      // drawerVariant = 'dismissible'
     } else {
-      drawerOpen = false; // 画面が小さい場合はドロワーを閉じる
+      drawerOpen = false;
+      // drawerVariant = 'modal'
     }
   }
 
@@ -47,11 +52,13 @@
 </script>
 
 <style>
+/* These classes are only needed because the
+    drawer is in a container on the page. */
   .drawer-container {
     position: relative;
     display: flex;
-    height: 100vw;
-    max-width: 100vw;
+    height: 350px;
+    max-width: 600px;
     border: 1px solid
       var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
     overflow: hidden;
@@ -75,7 +82,7 @@
 <div class="drawer-container">
   <!-- Don't include fixed={false} if this is a page wide drawer.
         It adds a style for absolute positioning. -->
-  <Drawer variant="modal" fixed={false} bind:open={drawerOpen}>
+  <Drawer bind:variant={drawerVariant} fixed={false} bind:open={drawerOpen}>
     <Header>
       <Title>Super Mail</Title>
       <Subtitle>It's the best fake mail app drawer.</Subtitle>
@@ -145,9 +152,6 @@
     </Content>
   </Drawer>
 
-  <!-- Don't include fixed={false} if this is a page wide drawer.
-        It adds a style for absolute positioning. -->
-  <Scrim fixed={false} />
   <AppContent class="app-content">
     <main class="main-content">
       <Button on:click={() => (drawerOpen = !drawerOpen)}>
@@ -155,7 +159,10 @@
       </Button>
       <br />
       <pre class="status">Active: {active}</pre>
+      <p> { drawerVariant }</p>
+      <p> { drawerOpen }</p>
       <slot></slot>
     </main>
   </AppContent>
+
 </div>

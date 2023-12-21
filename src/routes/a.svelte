@@ -19,6 +19,7 @@
 
   let active = 'Gray Kittens';
   let drawerOpen = false;
+  let drawerVariant = "dismissible"
 
   function setActive(value) {
     active = value;
@@ -29,9 +30,11 @@
   // 画面サイズに応じてドロワーの状態を制御する関数
   function handleResize() {
     if (window.innerWidth > 600) {
-      drawerOpen = true; // 画面が大きい場合はドロワーを開く
+      drawerOpen = true;
+      drawerVariant = 'dismissible'
     } else {
-      drawerOpen = false; // 画面が小さい場合はドロワーを閉じる
+      drawerOpen = false;
+      drawerVariant = 'model'
     }
   }
 
@@ -95,7 +98,7 @@
 <div class="drawer-container">
   <!-- Don't include fixed={false} if this is a page wide drawer.
         It adds a style for absolute positioning. -->
-  <Drawer variant="modal" fixed={false} bind:drawerOpen>
+  <Drawer bind:variant={drawerVariant} fixed={false} bind:drawerOpen>
     <Header>
       <Title>Super Mail</Title>
       <Subtitle>It's the best fake mail app drawer.</Subtitle>
@@ -176,9 +179,10 @@
       <br />
       <pre class="status">Active: {active}</pre>
       <div style="height: 700px;">&nbsp;</div>
-      And some stuff at the bottom.
 
       <div id="main-content">
+        <p> { drawerVariant }</p>
+        <p> { drawerOpen }</p>
         <slot></slot>
       </div>
 
