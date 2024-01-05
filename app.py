@@ -24,12 +24,12 @@ data = {
 
 # Callbacks
 
-sharpness = st.slider('Sharpness', min_value=1, max_value=20, value=10, step=1)
+# sharpness = st.slider('Sharpness', min_value=1, max_value=20, value=10, step=1)
+sharpness = 1000
 brightness = st.slider('Brightness', min_value=-100, max_value=100, value=0, step=5)
 
 def video_frame_callback(frame):
     img = frame.to_ndarray(format='rgb24')
-    # img = img[::-1,:,:]
     img = img * (sharpness/10) + brightness
     img = np.clip(img, 0, 255)
     with lock:
@@ -52,7 +52,8 @@ ctx = webrtc_streamer(
     media_stream_constraints={
         'video': True,
         'audio': False,
-    },)
+    },
+)
 
 
 st.write(f'v: {ctx.state.playing} {ctx.state.signalling}')
