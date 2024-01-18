@@ -1,20 +1,23 @@
+import pandas as pd
 import streamlit as st
-from PIL import Image
-import numpy as np
 
-img_file_buffer = st.camera_input("Take a picture")
+data_df = pd.DataFrame(
+    {
+        "apps": [
+            "https://storage.googleapis.com/s4a-prod-share-preview/default/st_app_screenshot_image/5435b8cb-6c6c-490b-9608-799b543655d3/Home_Page.png",
+            "https://storage.googleapis.com/s4a-prod-share-preview/default/st_app_screenshot_image/ef9a7627-13f2-47e5-8f65-3f69bb38a5c2/Home_Page.png",
+            "https://storage.googleapis.com/s4a-prod-share-preview/default/st_app_screenshot_image/31b99099-8eae-4ff8-aa89-042895ed3843/Home_Page.png",
+            "https://storage.googleapis.com/s4a-prod-share-preview/default/st_app_screenshot_image/6a399b09-241e-4ae7-a31f-7640dc1d181e/Home_Page.png",
+        ],
+    }
+)
 
-if img_file_buffer is not None:
-    # To read image file buffer as a PIL Image:
-    img = Image.open(img_file_buffer)
-
-    # To convert PIL Image to numpy array:
-    img_array = np.array(img)
-
-    # Check the type of img_array:
-    # Should output: <class 'numpy.ndarray'>
-    st.write(type(img_array))
-
-    # Check the shape of img_array:
-    # Should output shape: (height, width, channels)
-    st.write(img_array.shape)
+st.data_editor(
+    data_df,
+    column_config={
+        "apps": st.column_config.ImageColumn(
+            "Preview Image", help="Streamlit app preview screenshots"
+        )
+    },
+    hide_index=True,
+)
