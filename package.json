@@ -1,0 +1,20 @@
+{
+	"name": "robiemon",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"preinstall": "npx only-allow pnpm"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"svelte": "^4.2.7",
+		"vite": "^5.0.3"
+	},
+	"type": "module",
+	"packageManager": "^pnpm@8.12.1"
+}
