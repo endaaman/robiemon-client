@@ -5,10 +5,16 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@material/circular-progress':
+    specifier: ^14.0.0
+    version: 14.0.0
   '@smui/button':
     specifier: 6.1.4
     version: 6.1.4(svelte@3.59.2)(typescript@4.9.5)
   '@smui/checkbox':
+    specifier: 6.1.4
+    version: 6.1.4(svelte@3.59.2)(typescript@4.9.5)
+  '@smui/circular-progress':
     specifier: 6.1.4
     version: 6.1.4(svelte@3.59.2)(typescript@4.9.5)
   '@smui/drawer':
@@ -266,6 +272,12 @@ packages:
       tslib: 2.6.2
     dev: false
 
+  /@material/animation@14.0.0:
+    resolution: {integrity: sha512-VlYSfUaIj/BBVtRZI8Gv0VvzikFf+XgK0Zdgsok5c1v5DDnNz5tpB8mnGrveWz0rHbp1X4+CWLKrTwNmjrw3Xw==}
+    dependencies:
+      tslib: 2.6.2
+    dev: false
+
   /@material/banner@13.0.0:
     resolution: {integrity: sha512-59M85ezhwRaa+BqguYCCaRS57fV5KQe3Ff2cU6LcQNw0UPMFW1ap0dZ+iZBv/sj+7/QcqBBShL9uu8dWKtI4Gg==}
     dependencies:
@@ -285,6 +297,12 @@ packages:
 
   /@material/base@13.0.0:
     resolution: {integrity: sha512-vFx0JryRfcvUNX3cZ2u32wUMvxzd+c/YW0LFOXNgqCDWlubHcMm0Y6Wz371LhfQo80/NE69u+/4Joo99yKnVeg==}
+    dependencies:
+      tslib: 2.6.2
+    dev: false
+
+  /@material/base@14.0.0:
+    resolution: {integrity: sha512-Ou7vS7n1H4Y10MUZyYAbt6H0t67c6urxoCgeVT7M38aQlaNUwFMODp7KT/myjYz2YULfhu3PtfSV3Sltgac9mA==}
     dependencies:
       tslib: 2.6.2
     dev: false
@@ -362,6 +380,18 @@ packages:
       '@material/progress-indicator': 13.0.0
       '@material/rtl': 13.0.0
       '@material/theme': 13.0.0
+      tslib: 2.6.2
+    dev: false
+
+  /@material/circular-progress@14.0.0:
+    resolution: {integrity: sha512-7EdkP6ty54g6qs6zzlsw29vWlUyrcSWr9b4pGGx4D/iNJww+eyxXZ07iWoNOr4uLgguauWEft2axpQiFCwFD0g==}
+    dependencies:
+      '@material/animation': 14.0.0
+      '@material/base': 14.0.0
+      '@material/feature-targeting': 14.0.0
+      '@material/progress-indicator': 14.0.0
+      '@material/rtl': 14.0.0
+      '@material/theme': 14.0.0
       tslib: 2.6.2
     dev: false
 
@@ -468,6 +498,12 @@ packages:
 
   /@material/feature-targeting@13.0.0:
     resolution: {integrity: sha512-QJClfeaA4EMyAxKJy9WR0Nx+/VwSZCkhGLUVBG9NhxqYGfl/LtaeaidrNm32vYEoNZAofN92VD2RwQTRwp/dMQ==}
+    dependencies:
+      tslib: 2.6.2
+    dev: false
+
+  /@material/feature-targeting@14.0.0:
+    resolution: {integrity: sha512-a5WGgHEq5lJeeNL5yevtgoZjBjXWy6+klfVWQEh8oyix/rMJygGgO7gEc52uv8fB8uAIoYEB3iBMOv8jRq8FeA==}
     dependencies:
       tslib: 2.6.2
     dev: false
@@ -610,6 +646,12 @@ packages:
       tslib: 2.6.2
     dev: false
 
+  /@material/progress-indicator@14.0.0:
+    resolution: {integrity: sha512-09JRTuIySxs670Tcy4jVlqCUbyrO+Ad6z3nHnAi8pYl74duco4n/9jTROV0mlFdr9NIFifnd08lKbiFLDmfJGQ==}
+    dependencies:
+      tslib: 2.6.2
+    dev: false
+
   /@material/radio@13.0.0:
     resolution: {integrity: sha512-6jeZ+dKSzBB/j2IZ7RjFl5mrB+EWnpv/x+U9w6ENLCdueM4+LKUqBAc2fC2WMycsqgoFnlB0xsO/sG+kN0J6fw==}
     dependencies:
@@ -640,6 +682,13 @@ packages:
     resolution: {integrity: sha512-nFGy3iQg7k+xLs67eb86mRFVLwa0yi7MusqRK4OM8DXcLO5yoVfUTPKpdSykcbRryp9imVHsxutox2tZawR4og==}
     dependencies:
       '@material/theme': 13.0.0
+      tslib: 2.6.2
+    dev: false
+
+  /@material/rtl@14.0.0:
+    resolution: {integrity: sha512-xl6OZYyRjuiW2hmbjV2omMV8sQtfmKAjeWnD1RMiAPLCTyOW9Lh/PYYnXjxUrNa0cRwIIbOn5J7OYXokja8puA==}
+    dependencies:
+      '@material/theme': 14.0.0
       tslib: 2.6.2
     dev: false
 
@@ -811,6 +860,13 @@ packages:
     resolution: {integrity: sha512-KAe1s0MvvfCGAwJliDVTvgAKuD3ESwhl7F7br4Iam4IPdqME2rWl8NPhKHFfaWqTG7PyCgMMngYEYuA8cLNTsA==}
     dependencies:
       '@material/feature-targeting': 13.0.0
+      tslib: 2.6.2
+    dev: false
+
+  /@material/theme@14.0.0:
+    resolution: {integrity: sha512-6/SENWNIFuXzeHMPHrYwbsXKgkvCtWuzzQ3cUu4UEt3KcQ5YpViazIM6h8ByYKZP8A9d8QpkJ0WGX5btGDcVoA==}
+    dependencies:
+      '@material/feature-targeting': 14.0.0
       tslib: 2.6.2
     dev: false
 

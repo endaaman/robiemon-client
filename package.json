@@ -10,8 +10,10 @@
 		"smui-theme": "smui-theme compile static/smui.css -i src/theme"
 	},
 	"dependencies": {
+		"@material/circular-progress": "^14.0.0",
 		"@smui/button": "6.1.4",
 		"@smui/checkbox": "6.1.4",
+		"@smui/circular-progress": "6.1.4",
 		"@smui/drawer": "6.1.4",
 		"@smui/form-field": "6.1.4",
 		"@smui/icon-button": "6.1.4",

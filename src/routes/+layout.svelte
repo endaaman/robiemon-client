@@ -1,6 +1,7 @@
 <script>
   import { browser } from '$app/environment';
   import { onMount, onDestroy } from 'svelte';
+	import { page } from '$app/stores';
 
   import Drawer, {
     AppContent,
@@ -10,44 +11,26 @@
     Subtitle,
     Scrim,
   } from '@smui/drawer';
-  import Button, { Label } from '@smui/button';
   import List, { Item, Text, Graphic, Separator, Subheader } from '@smui/list';
 
-  let active = 'Inbox';
+  let active = 'Inbox'
+  let drawerOpen = true
+  let drawerVariant = 'dismissible'
 
-  let drawerOpen = false;
-  // let drawerVariant = "dismissible"
-  let drawerVariant = "modal"
-
-  function setActive(value) {
-    active = value;
-    drawerOpen = false;
-  }
-
-
-  // 画面サイズに応じてドロワーの状態を制御する関数
   function handleResize() {
-    if (window.innerWidth > 1000) {
-      drawerOpen = true;
-      // drawerVariant = 'dismissible'
-    } else {
-      drawerOpen = false;
-      // drawerVariant = 'modal'
-    }
   }
 
-  // コンポーネントがマウントされたらリサイズイベントリスナーを追加
+
   onMount(() => {
-    window.addEventListener('resize', handleResize);
-    handleResize(); // 初期表示時の状態も設定
+    window.addEventListener('resize', handleResize)
+    // handleResize()
   });
 
-  // コンポーネントが破棄されたらイベントリスナーを削除
   onDestroy(() => {
     if (browser) {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', handleResize)
     }
-  });
+  })
 
 </script>
 
@@ -57,8 +40,8 @@
   .drawer-container {
     position: relative;
     display: flex;
-    height: 350px;
-    max-width: 600px;
+    width: 100vw;
+    height: 100vh;
     border: 1px solid
       var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
     overflow: hidden;
@@ -80,87 +63,57 @@
   }
 </style>
 <div class="drawer-container">
-  <!-- Don't include fixed={false} if this is a page wide drawer.
-        It adds a style for absolute positioning. -->
-  <Drawer bind:variant={drawerVariant} fixed={false} bind:open={drawerOpen}>
+  <Drawer bind:variant={drawerVariant} bind:open={drawerOpen}>
     <Header>
-      <Title>Super Mail</Title>
-      <Subtitle>It's the best fake mail app drawer.</Subtitle>
+      <Title>ロビえもん</Title>
+      <Subtitle>AI病理診断システム</Subtitle>
     </Header>
     <Content>
       <List>
         <Item
-          href="javascript:void(0)"
-          on:click={() => setActive('Inbox')}
-          activated={active === 'Inbox'}
+          href="/"
+          activated={ $page.route.id == '/' }
         >
-          <Graphic class="material-icons" aria-hidden="true">inbox</Graphic>
-          <Text>Inbox</Text>
+          <Graphic class="material-icons" aria-hidden="true">home</Graphic>
+          <Text>Home</Text>
         </Item>
+
+
         <Item
-          href="javascript:void(0)"
-          on:click={() => setActive('Star')}
-          activated={active === 'Star'}
+          href="/about"
+          activated={ $page.route.id == '/about' }
         >
-          <Graphic class="material-icons" aria-hidden="true">star</Graphic>
-          <Text>Star</Text>
-        </Item>
-        <Item
-          href="javascript:void(0)"
-          on:click={() => setActive('Sent Mail')}
-          activated={active === 'Sent Mail'}
-        >
-          <Graphic class="material-icons" aria-hidden="true">send</Graphic>
-          <Text>Sent Mail</Text>
-        </Item>
-        <Item
-          href="javascript:void(0)"
-          on:click={() => setActive('Drafts')}
-          activated={active === 'Drafts'}
-        >
-          <Graphic class="material-icons" aria-hidden="true">drafts</Graphic>
-          <Text>Drafts</Text>
+          <Graphic class="material-icons" aria-hidden="true">info</Graphic>
+          <Text>About</Text>
         </Item>
 
         <Separator />
-        <Subheader tag="h6">Labels</Subheader>
+
+        <Subheader tag="h6">Results</Subheader>
+
         <Item
-          href="javascript:void(0)"
-          on:click={() => setActive('Family')}
-          activated={active === 'Family'}
+          href="/results/bt"
+          activated={ $page.route.id == '/results/bt' }
         >
-          <Graphic class="material-icons" aria-hidden="true">bookmark</Graphic>
-          <Text>Family</Text>
+          <Graphic class="material-icons" aria-hidden="true">dataset</Graphic>
+          <Text>Brain tumor</Text>
         </Item>
+
         <Item
-          href="javascript:void(0)"
-          on:click={() => setActive('Friends')}
-          activated={active === 'Friends'}
+          href="/results/eosino"
+          activated={ $page.route.id == '/results/eosino' }
+          disabled={ true }
         >
-          <Graphic class="material-icons" aria-hidden="true">bookmark</Graphic>
-          <Text>Friends</Text>
+          <Graphic class="material-icons" aria-hidden="true">dataset</Graphic>
+          <Text>Eosino counter</Text>
         </Item>
-        <Item
-          href="javascript:void(0)"
-          on:click={() => setActive('Work')}
-          activated={active === 'Work'}
-        >
-          <Graphic class="material-icons" aria-hidden="true">bookmark</Graphic>
-          <Text>Work</Text>
-        </Item>
+
       </List>
     </Content>
   </Drawer>
 
   <AppContent class="app-content">
     <main class="main-content">
-      <Button on:click={() => (drawerOpen = !drawerOpen)}>
-        <Label>Toggle Drawer</Label>
-      </Button>
-      <br />
-      <pre class="status">Active: {active}</pre>
-      <p> { drawerVariant }</p>
-      <p> { drawerOpen }</p>
       <slot></slot>
     </main>
   </AppContent>
