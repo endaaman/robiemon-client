@@ -1,44 +1,91 @@
 <script>
-	import '../app.postcss';
-	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
+import '../app.postcss';
+import { initializeStores, Modal } from '@skeletonlabs/skeleton';
+import ModalPredict from './modals/predict.svelte'
+
+import {
+	AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
+	Avatar, LightSwitch,
+} from '@skeletonlabs/skeleton'
+
+
+initializeStores()
+
+const modalRegistry = {
+	predict: { ref: ModalPredict },
+};
+
+let selectedTarget = 'bt'
+
+
 </script>
 
-<!-- App Shell -->
+
+<Modal components={modalRegistry} />
+
 <AppShell>
 	<svelte:fragment slot="header">
 		<!-- App Bar -->
 		<AppBar>
 			<svelte:fragment slot="lead">
-				<strong class="text-xl uppercase">Skeleton</strong>
+				<div class="flex justify-left gap-4">
+					<img src="/oharobi.png" width="32" alt="oharobi" />
+					<strong class="text-xl uppercase">おはロビくん</strong>
+				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<a
-					class="btn btn-sm variant-ghost-surface"
-					href="https://discord.gg/EXqV7W8MtY"
-					target="_blank"
-					rel="noreferrer"
+					class="btn hover:variant-ghost text-lg"
+					href="/"
 				>
-					Discord
+					<span class="i-mdi-home align-middle"></span> Home
 				</a>
+
 				<a
-					class="btn btn-sm variant-ghost-surface"
-					href="https://twitter.com/SkeletonUI"
-					target="_blank"
-					rel="noreferrer"
+					class="btn hover:variant-ghost text-lg"
+					href="/results"
 				>
-					Twitter
+					<span class="i-mdi-table align-middle"></span> Results
 				</a>
+
 				<a
-					class="btn btn-sm variant-ghost-surface"
-					href="https://github.com/skeletonlabs/skeleton"
-					target="_blank"
-					rel="noreferrer"
+					class="btn hover:variant-ghost text-lg"
+					href="/about"
 				>
-					GitHub
+					<span class="i-mdi-info align-middle"></span> About
 				</a>
+
+				<LightSwitch />
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
 	<!-- Page Route Content -->
-	<slot />
+
+	<svelte:fragment slot="sidebarLeft">
+		<AppRail>
+			<AppRailTile bind:group={selectedTarget} name="tile-bt" value="bt" title="tile-bt">
+				<svelte:fragment slot="lead">
+					<span class="i-mdi-brain"></span>
+				</svelte:fragment>
+				<span>Brain tumor</span>
+			</AppRailTile>
+
+			<AppRailTile bind:group={selectedTarget} name="tile-eosino" value="eosino" title="tile-eosino">
+				<svelte:fragment slot="lead">
+					<span class="i-mdi-bacteria-outline"></span>
+				</svelte:fragment>
+				<span>Eosino</span>
+			</AppRailTile>
+		</AppRail>
+	</svelte:fragment>
+
+
+	<!-- (sidebarRight) -->
+	<!-- (pageHeader) -->
+
+	<div class="p-4">
+		<slot />
+	</div>
+
+	<svelte:fragment slot="pageFooter"></svelte:fragment>
 </AppShell>
