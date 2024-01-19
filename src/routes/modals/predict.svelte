@@ -19,8 +19,8 @@
 
 		<!-- <pre>{ JSON.stringify(parent, 0, 2) }</pre> -->
 
-		{#if $modalStore[0].image}
-			<img src={$modalStore[0].image} alt="">
+		{#if $modalStore[0].imageURI}
+			<img src={$modalStore[0].imageURI} alt="">
 		{:else}
 			<p>Image missing</p>
 		{/if}

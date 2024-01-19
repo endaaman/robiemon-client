@@ -1,6 +1,7 @@
 <script>
   import '../app.postcss';
   import { onMount, onDestroy, tick } from 'svelte'
+  import { PUBLIC_API_BASE } from '$env/static/public'
 
   import { Modal, getModalStore } from '@skeletonlabs/skeleton';
 
@@ -37,24 +38,39 @@
     canvas.height = videoElement.videoHeight;
     canvas.getContext('2d').drawImage(videoElement, 0, 0);
 
-    const image = canvas.toDataURL('image/png');
+    const imageURI = canvas.toDataURL('image/png')
 
     await tick();
 
     modalStore.trigger({
       type: 'component',
       component: 'predict',
-      image: image,
+      imageURI: imageURI,
       response: (r) => {
         processing = false
         if (!r) {
           console.log('Canceled')
           return
         }
-
-        console.log('DO')
+        predictImage(imageURI)
       }
     })
+
+  }
+
+  async function predictImage(imageURI) {
+    const blob = await fetch(imageURI).then(res => res.blob());
+    const formData = new FormData();
+    formData.append('image', blob, 'webcam.png');
+
+    try {
+      const response = await fetch(`${PUBLIC_API_BASE}/predict`, {
+        method: 'POST',
+        body: formData,
+      });
+    } catch (error) {
+      console.error('Upload failed', error);
+    }
 
   }
 
@@ -100,4 +116,5 @@
       Predict
     {/if}
   </button>
+  { PUBLIC_API_BASE }
 </div>
