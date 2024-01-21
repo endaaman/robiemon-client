@@ -51,10 +51,10 @@ let selectedTarget = 'bt'
 		<!-- App Bar -->
 		<AppBar>
 			<svelte:fragment slot="lead">
-				<div class="flex justify-left gap-4 align-middle text-xl items-center">
+				<a href="/" class="flex justify-left gap-4 align-middle text-xl items-center">
 					<Avatar src="/oharobi.png" width="w-12" rounded="rounded-full" />
 					<strong>ロビえもん - AI病理診断システム</strong>
-				</div>
+				<a/>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				{#each links as link}
@@ -71,8 +71,8 @@ let selectedTarget = 'bt'
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
-	<!-- Page Route Content -->
 
+	<!--
 	<svelte:fragment slot="sidebarLeft">
 		<AppRail>
 			<AppRailTile bind:group={selectedTarget} name="tile-bt" value="bt" title="tile-bt">
@@ -90,7 +90,7 @@ let selectedTarget = 'bt'
 			</AppRailTile>
 		</AppRail>
 	</svelte:fragment>
-
+	-->
 
 	<!-- (sidebarRight) -->
 	<!-- (pageHeader) -->

@@ -1,7 +1,8 @@
 <script>
   import '../app.postcss';
   import { onMount, onDestroy, tick } from 'svelte'
-  import { PUBLIC_API_BASE } from '$env/static/public'
+  import { API_BASE } from '$lib/config'
+
 
   import { Modal, getModalStore } from '@skeletonlabs/skeleton';
 
@@ -64,7 +65,7 @@
     formData.append('image', blob, 'webcam.png');
 
     try {
-      const response = await fetch(`${PUBLIC_API_BASE}/predict`, {
+      const response = await fetch(`${API_BASE}/predict`, {
         method: 'POST',
         body: formData,
       });
@@ -80,7 +81,17 @@
     if (cameras.length > 0) {
       updateStream(cameras[0].deviceId)
     }
+
+    onDestroy(async () => {
+      const stream = videoElement.srcObject;
+      const tracks = stream.getTracks();
+      tracks.forEach(function(track) {
+        track.stop()
+      })
+      videoElement.srcObject = null
+    })
   })
+
 </script>
 
 
@@ -116,5 +127,4 @@
       Predict
     {/if}
   </button>
-  { PUBLIC_API_BASE }
 </div>
