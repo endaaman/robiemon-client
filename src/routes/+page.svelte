@@ -1,14 +1,17 @@
 <script>
   import '../app.postcss';
-  import { onMount, onDestroy, tick } from 'svelte'
+  import { browser } from '$app/environment'
+  import { onMount, onDestroy, tick, afterUpdate } from 'svelte'
   import { API_BASE } from '$lib/config'
 
 
-  import { Modal, getModalStore } from '@skeletonlabs/skeleton';
+  import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
 
   const modalStore = getModalStore()
+  const toastStore = getToastStore()
 
-  let videoElement
+  let videoElement = null
+  let currentCameraId = null
   let cameras = []
   let canvas
   let processing = false
@@ -24,13 +27,31 @@
         video: { deviceId: { exact: cameraId } }
       })
       videoElement.srcObject = stream
+      currentCameraId = cameraId
     } catch (error) {
       console.error('Error accessing the webcam', error);
+      toastStore.trigger({
+        message: 'Warning: Failed to access any webcam',
+        timeout: 5000,
+        background: 'variant-filled-warning',
+      })
     }
   }
 
+  function closeStream() {
+    const stream = videoElement.srcObject;
+    stream.getTracks().forEach(function(track) {
+      track.stop()
+    })
+    videoElement.srcObject = null
+  }
+
   function handleCameraChanged(e) {
-    updateStream(e.target.value)
+    const cameraId = e.target.value
+    if (cameraId != currentCameraId) {
+      closeStream()
+      updateStream(cameraId)
+    }
   }
 
   async function handelClick() {
@@ -62,7 +83,7 @@
   async function predictImage(imageURI) {
     const blob = await fetch(imageURI).then(res => res.blob());
     const formData = new FormData();
-    formData.append('image', blob, 'webcam.png');
+    formData.append('file', blob, 'webcam.png');
 
     try {
       const response = await fetch(`${API_BASE}/predict`, {
@@ -70,27 +91,29 @@
         body: formData,
       });
     } catch (error) {
-      console.error('Upload failed', error);
+      toastStore.trigger({
+        message: 'Error: Failed to connect server.',
+        timeout: 5000,
+        background: 'variant-filled-error',
+      })
     }
-
   }
 
 
-  onMount(async () => {
-    cameras = await getCameras();
-    if (cameras.length > 0) {
-      updateStream(cameras[0].deviceId)
-    }
+  if (browser) {
+    onMount(async function() {
+      // afterUpdate(async () => {
+      cameras = await getCameras();
+      if (cameras.length > 0) {
+        updateStream(cameras[0].deviceId)
+      }
 
-    onDestroy(async () => {
-      const stream = videoElement.srcObject;
-      const tracks = stream.getTracks();
-      tracks.forEach(function(track) {
-        track.stop()
-      })
-      videoElement.srcObject = null
     })
-  })
+
+    onDestroy(async function() {
+      closeStream()
+    })
+  }
 
 </script>
 

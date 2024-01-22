@@ -1,7 +1,7 @@
 <script>
 import '../app.postcss';
 import { page } from '$app/stores';
-import { initializeStores, Modal } from '@skeletonlabs/skeleton';
+import { initializeStores, Modal, Toast  } from '@skeletonlabs/skeleton';
 import ModalPredict from './modals/predict.svelte'
 
 import {
@@ -27,10 +27,6 @@ const links = [
 	},
 ]
 
-function matchHref(href) {
-	return href === $page.route.id
-}
-
 
 initializeStores()
 
@@ -43,8 +39,8 @@ let selectedTarget = 'bt'
 
 </script>
 
-
 <Modal components={modalRegistry} />
+<Toast />
 
 <AppShell>
 	<svelte:fragment slot="header">
@@ -54,7 +50,7 @@ let selectedTarget = 'bt'
 				<a href="/" class="flex justify-left gap-4 align-middle text-xl items-center">
 					<Avatar src="/oharobi.png" width="w-12" rounded="rounded-full" />
 					<strong>ロビえもん - AI病理診断システム</strong>
-				<a/>
+				</a>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				{#each links as link}
@@ -99,5 +95,28 @@ let selectedTarget = 'bt'
 		<slot />
 	</div>
 
-	<svelte:fragment slot="pageFooter"></svelte:fragment>
+	<svelte:fragment slot="pageFooter">
+		<hr />
+		<div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
+			<span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">
+				(C) Department of Cancer Pathology, Faculty of Medicine, Hokkaido University All rights reserverd.
+			</span>
+			<!--
+			<ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
+				<li>
+					<a href="#" class="hover:underline me-4 md:me-6">About</a>
+				</li>
+				<li>
+					<a href="#" class="hover:underline me-4 md:me-6">Privacy Policy</a>
+				</li>
+				<li>
+					<a href="#" class="hover:underline me-4 md:me-6">Licensing</a>
+				</li>
+				<li>
+					<a href="#" class="hover:underline">Contact</a>
+				</li>
+			</ul>
+			-->
+		</div>
+	</svelte:fragment>
 </AppShell>
