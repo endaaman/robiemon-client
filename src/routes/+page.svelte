@@ -1,5 +1,6 @@
 <script>
   import '../app.postcss';
+  import { goto } from '$app/navigation';
   import { browser } from '$app/environment'
   import { onMount, onDestroy, tick, afterUpdate } from 'svelte'
   import { API_BASE } from '$lib/config'
@@ -89,8 +90,24 @@
       const response = await fetch(`${API_BASE}/predict`, {
         method: 'POST',
         body: formData,
-      });
+      })
+      const data = await response.json()
+      // console.log(data)
+
+      toastStore.trigger({
+        message: 'Add a new task to predict',
+        timeout: 5000,
+        background: 'variant-filled-primary',
+        action: {
+          label: 'See tasks',
+          response: () => {
+            goto('/results')
+          }
+        }
+      })
+
     } catch (error) {
+      console.log(error)
       toastStore.trigger({
         message: 'Error: Failed to connect server.',
         timeout: 5000,

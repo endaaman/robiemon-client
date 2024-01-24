@@ -1,47 +1,117 @@
 <script>
-import '../app.postcss';
-import { page } from '$app/stores';
-import { initializeStores, Modal, Toast  } from '@skeletonlabs/skeleton';
-import ModalPredict from './modals/predict.svelte'
+	import '../app.postcss';
+	import { setContext, onMount, onDestroy } from 'svelte'
+	import { writable } from 'svelte/store'
+	import {
+		AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
+		Avatar, LightSwitch,
+	} from '@skeletonlabs/skeleton'
+	import { initializeStores, Modal, Toast, getToastStore  } from '@skeletonlabs/skeleton'
+	import { page } from '$app/stores'
+  import { API_BASE } from '$lib/config'
 
-import {
-	AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
-	Avatar, LightSwitch,
-} from '@skeletonlabs/skeleton'
-
-const links = [
-	{
-		icon: 'home',
-		label: 'Home',
-		href: '/',
-	},
-	{
-		icon: 'table',
-		label: 'Result',
-		href: '/results',
-	},
-	{
-		icon: 'info',
-		label: 'About',
-		href: '/about',
-	},
-]
+	import ModalPredict from './modals/predict.svelte'
 
 
-initializeStores()
+	const links = [
+		{
+			icon: 'home',
+			label: 'Home',
+			href: '/',
+			// match: () => $page.url.pathname == '/',
+			match: () => $page.route.id === '/',
+		},
+		{
+			icon: 'table',
+			label: 'Result',
+			href: '/results',
+			// match: () => $page.url.pathname == '/results',
+			match: () => $page.route.id.startsWith('/results'),
+		},
+		{
+			icon: 'info',
+			label: 'About',
+			href: '/about',
+			// match: () => $page.url.pathname == '/about',
+			match: () => false,
+		},
+	]
 
-const modalRegistry = {
-	predict: { ref: ModalPredict },
-};
+	initializeStores()
 
-let selectedTarget = 'bt'
+	const modalRegistry = {
+		predict: { ref: ModalPredict },
+	}
+
+	const toastStore = getToastStore()
+
+	function matchHref(link, current) {
+		if (current === '/') {
+			if (link.href === '/') {
+				return true
+			}
+		}
+		return current.startsWith(link)
+	}
 
 
+  let eventSource = null
+
+  const status = writable()
+	setContext('status', status)
+  status.set({tasks: [], bt_results: []})
+
+  const connectionStatus = writable()
+  setContext('connectionStatus', connectionStatus)
+  // pending, error, connected
+	connectionStatus.set('pending')
+
+  function openConnection() {
+    eventSource = new EventSource(`${API_BASE}/status_sse`)
+
+    eventSource.addEventListener('open', (e) => {
+      console.log('open')
+      connectionStatus.set('connected')
+    })
+
+    eventSource.onmessage = function(event) {
+      console.log('onmessage')
+      const data = JSON.parse(event.data)
+			status.set(data)
+			console.log(data)
+    }
+
+    eventSource.onerror = function (err) {
+      connectionStatus.set('error')
+      console.error('EventSource failed:', err)
+      closeConnection()
+
+      toastStore.trigger({
+        message: 'Error: Failed to connect server.',
+        timeout: 5000,
+        background: 'variant-filled-error',
+      })
+    }
+  }
+
+  function closeConnection() {
+    if (eventSource) {
+      eventSource.close()
+      eventSource = null
+    }
+  }
+
+  onMount(async () => {
+    openConnection()
+  })
+
+  onDestroy(async () => {
+    closeConnection()
+  })
 </script>
 
 <Modal components={modalRegistry} />
 <Toast />
-
 <AppShell>
 	<svelte:fragment slot="header">
 		<!-- App Bar -->
@@ -56,7 +126,7 @@ let selectedTarget = 'bt'
 				{#each links as link}
 					<a
 						class="btn text-lg hover:variant-ghost"
-						class:variant-ghost="{$page.route.id === link.href}"
+						class:variant-ghost={ matchHref(link, $page.route.id) }
 						href={link.href}
 					>
 						<span class="i-mdi-{link.icon} align-middle"></span> {link.label}
