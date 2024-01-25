@@ -3,7 +3,7 @@
   import chroma from 'chroma-js'
   import { getContext  } from 'svelte'
   import { API_BASE } from '$lib/config'
-  import { SlideToggle, RangeSlider, RadioGroup, RadioItem  } from '@skeletonlabs/skeleton'
+  import { SlideToggle, RangeSlider, RadioGroup, RadioItem, getModalStore, getToastStore } from '@skeletonlabs/skeleton'
   import { Pie } from 'svelte-chartjs'
   import {
       Chart as ChartJS,
@@ -16,6 +16,8 @@
   ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale);
 
   const status = getContext('status')
+  const modalStore = getModalStore()
+  const toastStore = getToastStore()
 
   const bgColors = [
     '#1f77b4',
@@ -60,6 +62,39 @@
   $: options = updateOptions($status.bt_results)
 
   let sortDirection = 'descending'
+
+  async function handleDeleteClicked(result) {
+    modalStore.trigger({
+      type: 'confirm',
+      title: 'Delete confirm',
+      body: 'Are you sure you wish to proceed?',
+      response: async (r) => {
+        if (!r) {
+          return
+        }
+        try {
+          const response = await fetch(`${API_BASE}/results/bt/${result.id}`, {
+            method: 'DELETE',
+          })
+          toastStore.trigger({
+            message: `Result deleted.`,
+            timeout: 5000,
+            background: 'variant-filled',
+          })
+
+        } catch (error) {
+          console.log(error)
+          toastStore.trigger({
+            message: 'Error: Failed to connect server.',
+            timeout: 5000,
+            background: 'variant-filled-error',
+          })
+        } finally {
+        }
+      },
+    })
+
+  }
 
 </script>
 
@@ -146,7 +181,7 @@
               <hr>
               <div class="mt-2 flex flex-row gap-2">
                 <a class="btn btn-sm variant-filled" href="/results/bt/{result.timestamp}">Show detail</a>
-                <button class="btn btn-sm variant-filled-error">Delete</button>
+                <button class="btn btn-sm variant-filled-error" on:click={ handleDeleteClicked(result) }>Delete</button>
               </div>
             </div>
             {/if}

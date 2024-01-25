@@ -6,11 +6,10 @@
 	import {
     AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
     FileDropzone, Avatar, LightSwitch,
+    getModalStore, getToastStore,
 	} from '@skeletonlabs/skeleton'
   import { API_BASE } from '$lib/config'
 
-
-  import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
 
   const modalStore = getModalStore()
   const toastStore = getToastStore()
@@ -47,6 +46,9 @@
 
   function closeStream() {
     const stream = videoElement.srcObject;
+    if (!stream) {
+      return
+    }
     stream.getTracks().forEach(function(track) {
       track.stop()
     })
@@ -92,7 +94,6 @@
     const formData = new FormData();
     formData.append('file', blob, 'webcam.png');
 
-    console.log('start')
     try {
       const response = await fetch(`${API_BASE}/predict`, {
         method: 'POST',
