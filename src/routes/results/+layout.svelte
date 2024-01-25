@@ -20,29 +20,32 @@
 	}
 </script>
 
-<TabGroup>
-	{#each links as link}
-		<TabAnchor href={ link.href } selected={ $page.route.id === link.href }>
-			<span>{ link.label }</span>
-		</TabAnchor>
-	{/each}
-</TabGroup>
 
-<div class="mt-2">
-	{#if $connectionStatus === 'pending'}
+<div class="p-4">
+	<TabGroup>
+		{#each links as link}
+			<TabAnchor href={ link.href } selected={ $page.route.id === link.href }>
+				<span>{ link.label }</span>
+			</TabAnchor>
+		{/each}
+	</TabGroup>
 
-		<p>Loading</p>
+	<div class="mt-2">
+		{#if $connectionStatus === 'pending'}
 
-	{:else if $connectionStatus === 'error'}
+			<p>Loading</p>
 
-		<p>Failed to connect server.</p>
-		<p>Please notice to the system administrator.</p>
-		<button class="btn variant-filled" on:click={ handleReconnectClick }>Re-connect server</button>
+		{:else if $connectionStatus === 'error'}
 
-	{:else if $connectionStatus === 'connected'}
+			<p>Failed to connect server.</p>
+			<p>Please notice to the system administrator.</p>
+			<button class="btn variant-filled" on:click={ handleReconnectClick }>Re-connect server</button>
+
+		{:else if $connectionStatus === 'connected'}
 
 		<slot></slot>
 
-	{/if}
+		{/if}
+	</div>
 
 </div>

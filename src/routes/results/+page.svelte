@@ -64,10 +64,17 @@
     <div class="lg:w-1/4 md:w-1/3 sm:w-1/2 p-2">
       <a
         href="/results/{task.mode}/{task.timestamp}" class="card block"
-        class:opacity-75={ task.status !== 'done' }
+        class:opacity-75={ task.status === 'pending' }
         class:pointer-events-none={ task.status !== 'done' }
       >
-        <section class="p-4">
+        <header class="card-header">
+          <!-- <h3 class="text-sm">{format(new Date(task.timestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}</h3> -->
+          <h3 clas="text-sm">
+            {format(new Date(task.timestamp * 1000), 'yyyy-MM-dd HH:mm:ss')} -
+            {task.tag}
+          </h3>
+        </header>
+        <section class="px-4 py-2">
           <img src={`${API_BASE}/uploads/${task.image}`} alt={task.timestamp} />
         </section>
         <footer class="card-footer">
@@ -76,15 +83,27 @@
               <span class="badge variant-filled">Brain tumor</span>
             </div>
             <div class="ml-auto">
-              <span class="badge variant-ringed">
-                {#if task.status === 'pending'}
+              {#if task.status === 'pending'}
+                <span class="badge variant-ringed">
                   Pending <span class="i-mdi-clock-alert-outline align-middle ml-1"></span>
-                {:else if task.status === 'processing'}
+                </span>
+              {:else if task.status === 'processing'}
+                <span class="badge variant-ringed">
                   Processing <span class="i-mdi-loading animate-spin align-middle ml-1"></span>
-                {:else if task.status === 'done'}
+                </span>
+              {:else if task.status === 'done'}
+                <span class="badge variant-ringed">
                   Done <span class="i-mdi-check align-middle ml-1"></span>
-                {/if}
-              </span>
+                </span>
+              {:else if task.status === 'too_large'}
+                <span class="badge variant-ringed-warning text-warning-500">
+                  Too Large <span class="i-mdi-warning-outline align-middle ml-1"></span>
+                </span>
+              {:else if task.status === 'error'}
+                <span class="badge variant-ringed-error text-error-500">
+                  Error <span class="i-mdi-error-outline align-middle ml-1"></span>
+                </span>
+              {/if}
             </div>
           </div>
         </footer>

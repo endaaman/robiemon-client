@@ -3,8 +3,7 @@
   import chroma from 'chroma-js'
   import { getContext  } from 'svelte'
   import { API_BASE } from '$lib/config'
-  import { SlideToggle, RangeSlider } from '@skeletonlabs/skeleton'
-
+  import { SlideToggle, RangeSlider, RadioGroup, RadioItem  } from '@skeletonlabs/skeleton'
   import { Pie } from 'svelte-chartjs'
   import {
       Chart as ChartJS,
@@ -22,11 +21,9 @@
     '#1f77b4',
     '#ff7f0e',
     '#2ca02c',
-    '#d62728',
     '#AC64AD',
   ]
   const hoverColors = bgColors.map((c) => chroma(c).darken().hex())
-  console.log(hoverColors)
 
   function resultToChartData(result) {
     const keys = ['L', 'M', 'G', 'B']
@@ -46,18 +43,48 @@
     return format(new Date(timestamp * 1000), 'yyyy-MM-dd HH:mm:ss')
   }
 
-  let opacityHeatmap = 0
-  let thresholdHeatmap = 10
+  let options = {}
+  function updateOptions(results) {
+    results.map((r) => {
+      if (options[r.timestamp]) {
+        return
+      }
+      options[r.timestamp] = {
+          opacity: 0,
+          threshold: 10,
+      }
+    })
+    return options
+  }
+
+  $: options = updateOptions($status.bt_results)
+
+  let sortDirection = 'descending'
 
 </script>
 
+<RadioGroup>
+
+  <RadioItem bind:group={sortDirection} name="sort" value="descending">
+    <span class="i-mdi-sort-descending rotate-180 align-middle text-lg"></span>
+  </RadioItem>
+
+  <RadioItem bind:group={sortDirection} name="sort" value="ascending">
+    <span class="i-mdi-sort-ascending align-middle text-lg"></span>
+  </RadioItem>
+
+</RadioGroup>
+
 <div class="mx-auto grid">
-  {#each $status.bt_results as result, i}
+  {#each $status.bt_results as _result, _i}
+    {@const i = sortDirection === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
+    {@const result = $status.bt_results[i]}
+
     <div class="xl:w-1/2 lg:w-1/1 md:w-1/1 sm:w-1/1 py-2">
-      <div href="/results/bt/{result.timestamp}" class="card flex flex-wrap">
+      <div class="card flex flex-wrap">
 
         <section class="p-4 w-1/1 sm:w-2/3 align-middle">
-          <img src={`${API_BASE}/uploads/${result.original_image}`} alt={result.timestamp} />
+          <img src={`${API_BASE}/uploads/${result.original_image}`} alt={result.timestamp} width="100%"/>
         </section>
 
         <section class="w-1/1 sm:w-1/3 w-full flex flex-col">
@@ -68,9 +95,9 @@
               <hr />
 
               <Pie
-                class="-mt-4"
                 data={ resultToChartData(result) }
                 options={{
+                  animation: false,
                   plugins: {
                     legend: {
                       position: "right",
@@ -80,10 +107,12 @@
                   responsive: true
                 }}
               />
+
             </div>
 
-            <div class="p-4 w-1/2 sm:w-full">
-              <h3 class="mb-1">Heatmap options</h3>
+            {#if options[result.timestamp]}
+            <div class="p-4 w-1/2 sm:w-full sm:-mt-10">
+              <h3 class="my-1 mt-2">Heatmap</h3>
               <hr>
               <div class="mt-2 flex flex-row">
                 <div class="w-1/4 min-w-24">
@@ -92,7 +121,7 @@
                 <div class="w-3/4">
                   <RangeSlider
                     name="range-slider"
-                    bind:value={opacityHeatmap}
+                    bind:value={options[result.timestamp].opacity}
                     max={100} step={1}
                   ></RangeSlider>
                 </div>
@@ -105,12 +134,22 @@
                 <div class="w-3/4">
                   <RangeSlider
                     name="range-slider"
-                    bind:value={thresholdHeatmap}
+                    bind:value={options[result.timestamp].threshold}
                     max={100} step={1}
                   ></RangeSlider>
                 </div>
               </div>
+
+
+              <h3 class="my-2">Options</h3>
+              <hr>
+              <hr>
+              <div class="mt-2 flex flex-row gap-2">
+                <a class="btn btn-sm variant-filled" href="/results/bt/{result.timestamp}">Show detail</a>
+                <button class="btn btn-sm variant-filled-error">Delete</button>
+              </div>
             </div>
+            {/if}
 
           </div>
 

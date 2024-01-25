@@ -11,7 +11,6 @@
 	import { page } from '$app/stores'
   import { API_BASE } from '$lib/config'
 
-	import ModalPredict from './modals/predict.svelte'
 
 
 	const links = [
@@ -38,82 +37,7 @@
 		// 	match: () => false,
 		// },
 	]
-
-	initializeStores()
-
-	const modalRegistry = {
-		predict: { ref: ModalPredict },
-	}
-
-	const toastStore = getToastStore()
-
-	function matchHref(href, current) {
-		if (href === '/') {
-			return current === href
-		}
-		return current.startsWith(href)
-	}
-
-
-  let eventSource = null
-
-  const status = writable()
-	setContext('status', status)
-  status.set({tasks: [], bt_results: []})
-
-  const connectionStatus = writable()
-  setContext('connectionStatus', connectionStatus)
-  // pending, error, connected
-	connectionStatus.set('pending')
-
-  function openConnection() {
-    eventSource = new EventSource(`${API_BASE}/status_sse`)
-
-    eventSource.addEventListener('open', (e) => {
-      console.log('open')
-      connectionStatus.set('connected')
-    })
-
-    eventSource.onmessage = function(event) {
-      console.log('onmessage')
-      const data = JSON.parse(event.data)
-			status.set(data)
-			console.log(data)
-    }
-
-    eventSource.onerror = function (err) {
-      connectionStatus.set('error')
-      console.error('EventSource failed:', err)
-      closeConnection()
-
-      toastStore.trigger({
-        message: 'Error: Failed to connect server.',
-        timeout: 5000,
-        background: 'variant-filled-error',
-      })
-    }
-  }
-
-  function closeConnection() {
-    if (eventSource) {
-      eventSource.close()
-      eventSource = null
-    }
-  }
-
-	onMount(async () => {
-		openConnection()
-	})
-
-	onDestroy(async () => {
-		closeConnection()
-	})
-
-	let selectedTarget = 'webcam'
 </script>
-
-<Modal components={modalRegistry} />
-<Toast />
 
 <AppShell>
 	<svelte:fragment slot="header">
@@ -141,10 +65,18 @@
 		</AppBar>
 	</svelte:fragment>
 
+
+	<svelte:fragment slot="sidebarLeft">
+		<slot name="sidebar" />
+	</svelte:fragment>
+
+
 	<!-- (sidebarRight) -->
 	<!-- (pageHeader) -->
 
-  <slot />
+	<div class="p-4">
+		<slot />
+	</div>
 
 	<svelte:fragment slot="pageFooter">
 		<hr />

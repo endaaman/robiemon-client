@@ -3,6 +3,10 @@
   import { goto } from '$app/navigation';
   import { browser } from '$app/environment'
   import { onMount, onDestroy, tick, afterUpdate } from 'svelte'
+	import {
+    AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
+    FileDropzone, Avatar, LightSwitch,
+	} from '@skeletonlabs/skeleton'
   import { API_BASE } from '$lib/config'
 
 
@@ -16,6 +20,8 @@
   let cameras = []
   let canvas
   let processing = false
+  let files = []
+  let selectedTarget = 'webcam'
 
   async function getCameras() {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -55,11 +61,11 @@
     }
   }
 
-  async function handelClick() {
+  async function handlePredictClicked() {
     processing = true
-    canvas.width = videoElement.videoWidth;
-    canvas.height = videoElement.videoHeight;
-    canvas.getContext('2d').drawImage(videoElement, 0, 0);
+    canvas.width = videoElement.videoWidth
+    canvas.height = videoElement.videoHeight
+    canvas.getContext('2d').drawImage(videoElement, 0, 0)
 
     const imageURI = canvas.toDataURL('image/png')
 
@@ -70,8 +76,8 @@
       component: 'predict',
       imageURI: imageURI,
       response: (r) => {
-        processing = false
         if (!r) {
+          processing = false
           console.log('Canceled')
           return
         }
@@ -86,16 +92,17 @@
     const formData = new FormData();
     formData.append('file', blob, 'webcam.png');
 
+    console.log('start')
     try {
       const response = await fetch(`${API_BASE}/predict`, {
         method: 'POST',
         body: formData,
       })
       const data = await response.json()
-      // console.log(data)
+      console.log(data)
 
       toastStore.trigger({
-        message: 'Add a new task to predict',
+        message: `The task was accepted as "${data.tag}"`,
         timeout: 5000,
         background: 'variant-filled-primary',
         action: {
@@ -113,9 +120,32 @@
         timeout: 5000,
         background: 'variant-filled-error',
       })
+    } finally {
+      processing = false
     }
   }
 
+  function handleFilesSelected(e) {
+    let image = e.target.files[0]
+    let reader = new FileReader()
+    reader.readAsDataURL(image)
+    reader.onload = e => {
+      const imageURI = e.target.result
+      modalStore.trigger({
+        type: 'component',
+        component: 'predict',
+        imageURI: imageURI,
+        response: (r) => {
+          if (!r) {
+            processing = false
+            console.log('Canceled')
+            return
+          }
+          predictImage(imageURI)
+        }
+      })
+    }
+  }
 
   if (browser) {
     onMount(async function() {
@@ -131,40 +161,70 @@
       closeStream()
     })
   }
-
 </script>
 
 
 <style lang="scss">
-  video {
-    width: 100%;
-    height: 100%;
-  }
 </style>
 
+<div class="flex h-full">
 
-<div id="videoContainer">
-  <video bind:this={videoElement} autoplay>
-    <track kind="captions">
-  </video>
-</div>
+  <div class="flex">
+    <AppRail class="flex-none" slot="sidebar">
+      <AppRailTile bind:group={selectedTarget} name="tile-webcam" value="webcam" title="tile-webcam">
+        <svelte:fragment slot="lead">
+          <span class="i-mdi-camera"></span>
+        </svelte:fragment>
+        <span>Camera</span>
+      </AppRailTile>
 
-<canvas bind:this={canvas} class="hidden"></canvas>
+      <AppRailTile bind:group={selectedTarget} name="tile-file" value="file" title="tile-file">
+        <svelte:fragment slot="lead">
+          <span class="i-mdi-file-image"></span>
+        </svelte:fragment>
+        <span>File upload</span>
+      </AppRailTile>
+    </AppRail>
+  </div>
 
-<div class="flex justify-left gap-4 mt-4">
-  <label class="label">
-    <select class="select" on:change={ handleCameraChanged }>
-      {#each cameras as camera}
-        <option value={camera.deviceId}>{camera.label || 'Camera ' + camera.deviceId}</option>
-      {/each}
-    </select>
-  </label>
+  <div class="p-4 grow h-full flex flex-col" class:hidden={ selectedTarget !== 'webcam'}>
+    <div id="videoContainer" class="grow">
+      <video bind:this={videoElement} autoplay class="h-full">
+        <track kind="captions">
+      </video>
+    </div>
 
-  <button type="button" class="btn variant-filled w-24" on:click={handelClick}>
-    {#if processing}
-      <span class="i-mdi-loading animate-spin"></span>
-    {:else}
-      Predict
-    {/if}
-  </button>
+    <canvas bind:this={canvas} class="hidden"></canvas>
+
+    <div class="flex justify-left gap-4 mt-4">
+      <label class="label">
+        <select class="select" on:change={ handleCameraChanged }>
+          {#each cameras as camera}
+            <option value={camera.deviceId}>{camera.label || 'Camera ' + camera.deviceId}</option>
+          {/each}
+        </select>
+      </label>
+
+      <button type="button" class="btn variant-filled w-24" on:click={handlePredictClicked}>
+        {#if processing}
+          <span class="i-mdi-loading animate-spin"></span>
+        {:else}
+          Predict
+        {/if}
+      </button>
+    </div>
+  </div>
+
+
+  {#if selectedTarget === 'file'}
+    <div class="p-4">
+      <FileDropzone name="files" bind:files={files} on:change={handleFilesSelected} accept="image/*">
+        <svelte:fragment slot="lead">
+          <span class="text-4xl i-mdi-file-image"></span>
+        </svelte:fragment>
+        <svelte:fragment slot="message"><strong>Upload a file</strong> or drag and drop</svelte:fragment>
+        <svelte:fragment slot="meta">PNG, JPG, and GIF allowed.</svelte:fragment>
+      </FileDropzone>
+    </div>
+  {/if}
 </div>
