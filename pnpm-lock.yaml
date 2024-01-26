@@ -17,9 +17,18 @@ dependencies:
   date-fns:
     specifier: ^3.3.0
     version: 3.3.0
+  echarts:
+    specifier: ^5.4.3
+    version: 5.4.3
+  plotly.js-dist-min:
+    specifier: ^2.28.0
+    version: 2.28.0
   svelte-chartjs:
     specifier: ^3.1.2
     version: 3.1.2(chart.js@4.4.1)(svelte@4.2.9)
+  svelte-echarts:
+    specifier: ^0.1.1
+    version: 0.1.1(echarts@5.4.3)(svelte@4.2.9)
 
 devDependencies:
   '@egoist/tailwindcss-icons':
@@ -899,6 +908,13 @@ packages:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
     dev: true
 
+  /echarts@5.4.3:
+    resolution: {integrity: sha512-mYKxLxhzy6zyTi/FaEbJMOZU1ULGEQHaeIeuMR5L+JnJTpz+YR03mnnpBhbR4+UYJAgiXgpyTVLffPAjOTLkZA==}
+    dependencies:
+      tslib: 2.3.0
+      zrender: 5.4.4
+    dev: false
+
   /electron-to-chromium@1.4.638:
     resolution: {integrity: sha512-gpmbAG2LbfPKcDaL5m9IKutKjUx4ZRkvGNkgL/8nKqxkXsBVYykVULboWlqCrHsh3razucgDJDuKoWJmGPdItA==}
     dev: true
@@ -1411,6 +1427,10 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
+  /plotly.js-dist-min@2.28.0:
+    resolution: {integrity: sha512-TzoB4RRSL4WcbAVP9fjeZRKNnRhHLBWmXxIIMQ3O7GAwadQ/IpO6kSS0q8Ahmr6eewvKKiJeXqc4sA6oEQre/A==}
+    dev: false
+
   /postcss-import@15.1.0(postcss@8.4.33):
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
     engines: {node: '>=14.0.0'}
@@ -1672,6 +1692,16 @@ packages:
       svelte: 4.2.9
     dev: false
 
+  /svelte-echarts@0.1.1(echarts@5.4.3)(svelte@4.2.9):
+    resolution: {integrity: sha512-kLnTPz6gmRl47Oe/Vjh6sIRBYRUUmzl8uvrdMg9wFXe1ur6L/xBo3c7e5lMBQarPRteC24+XT335P/htNyihHA==}
+    peerDependencies:
+      echarts: ^5.4.3
+      svelte: ^4.0.0
+    dependencies:
+      echarts: 5.4.3
+      svelte: 4.2.9
+    dev: false
+
   /svelte-hmr@0.15.3(svelte@4.2.9):
     resolution: {integrity: sha512-41snaPswvSf8TJUhlkoJBekRrABDXDMdpNpT2tfHIv4JuhgvHqLMhEPGtaQn0BmbNSTkuz2Ed20DF2eHw0SmBQ==}
     engines: {node: ^12.20 || ^14.13.1 || >= 16}
@@ -1766,6 +1796,10 @@ packages:
   /ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
     dev: true
+
+  /tslib@2.3.0:
+    resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
+    dev: false
 
   /update-browserslist-db@1.0.13(browserslist@4.22.2):
     resolution: {integrity: sha512-xebP81SNcPuNpPP3uzeW1NYXxI3rxyJzF3pD6sH4jE7o/IX+WtSpwnVU+qIsDPyk0d3hmFQ7mjqc6AtV604hbg==}
@@ -1878,3 +1912,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zrender@5.4.4:
+    resolution: {integrity: sha512-0VxCNJ7AGOMCWeHVyTrGzUgrK4asT4ml9PEkeGirAkKNYXYzoPJCLvmyfdoOXcjTHPs10OZVMfD1Rwg16AZyYw==}
+    dependencies:
+      tslib: 2.3.0
+    dev: false

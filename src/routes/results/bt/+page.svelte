@@ -4,6 +4,7 @@
   import { getContext  } from 'svelte'
   import { API_BASE } from '$lib/config'
   import { SlideToggle, RangeSlider, RadioGroup, RadioItem, getModalStore, getToastStore } from '@skeletonlabs/skeleton'
+
   import { Pie } from 'svelte-chartjs'
   import {
       Chart as ChartJS,
@@ -13,11 +14,14 @@
       ArcElement,
       CategoryScale,
     } from 'chart.js'
-  ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale);
+  ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
+
+  import { Chart, } from 'svelte-echarts'
 
   const status = getContext('status')
   const modalStore = getModalStore()
   const toastStore = getToastStore()
+
 
   const bgColors = [
     '#1f77b4',
@@ -26,7 +30,6 @@
     '#AC64AD',
   ]
   const hoverColors = bgColors.map((c) => chroma(c).darken().hex())
-
   function resultToChartData(result) {
     const keys = ['L', 'M', 'G', 'B']
     return {
@@ -40,6 +43,23 @@
       ],
     }
   }
+
+  const chartOptions = {
+    xAxis: {
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      type: 'category',
+    },
+    yAxis: {
+      type: 'value',
+    },
+    series: [
+      {
+        data: [820, 932, 901, 934, 1290, 1330],
+        type: 'bar',
+      },
+    ],
+  }
+
 
   function timestampToTitle(timestamp) {
     return format(new Date(timestamp * 1000), 'yyyy-MM-dd HH:mm:ss')
@@ -122,72 +142,69 @@
           <img src={`${API_BASE}/uploads/${result.original_image}`} alt={result.timestamp} width="100%"/>
         </section>
 
-        <section class="w-1/1 sm:w-1/3 w-full flex flex-col">
-          <div class="flex flex-wrap">
-            <div class="p-4 w-1/2 sm:w-full">
-              <h3 class="mb-1">{ timestampToTitle(result.timestamp) }</h3>
+        <section class="p-4 w-1/1 sm:w-1/3 w-full flex sm:flex-col flex-wrap">
+          <div class="w-1/2 sm:w-full grow">
+            <h3 class="mb-1">{ timestampToTitle(result.timestamp) }</h3>
 
-              <hr />
+            <hr />
 
-              <Pie
-                data={ resultToChartData(result) }
-                options={{
-                  animation: false,
-                  plugins: {
-                    legend: {
-                      position: "right",
-                      align: "middle"
-                    },
+            <!-- <Chart options={ chartOptions } /> -->
+
+            <Pie
+              data={ resultToChartData(result) }
+              options={{
+                animation: false,
+                plugins: {
+                  legend: {
+                    position: "right",
+                    align: "middle"
                   },
                   responsive: true
-                }}
+                }
+              }}
               />
-
-            </div>
-
-            {#if options[result.timestamp]}
-            <div class="p-4 w-1/2 sm:w-full sm:-mt-10">
-              <h3 class="my-1 mt-2">Heatmap</h3>
-              <hr>
-              <div class="mt-2 flex flex-row">
-                <div class="w-1/4 min-w-24">
-                  Opacity
-                </div>
-                <div class="w-3/4">
-                  <RangeSlider
-                    name="range-slider"
-                    bind:value={options[result.timestamp].opacity}
-                    max={100} step={1}
-                  ></RangeSlider>
-                </div>
-              </div>
-
-              <div class="flex flex-row mt-2">
-                <div class="w-1/4 min-w-24">
-                  Threashold
-                </div>
-                <div class="w-3/4">
-                  <RangeSlider
-                    name="range-slider"
-                    bind:value={options[result.timestamp].threshold}
-                    max={100} step={1}
-                  ></RangeSlider>
-                </div>
-              </div>
-
-
-              <h3 class="my-2">Options</h3>
-              <hr>
-              <hr>
-              <div class="mt-2 flex flex-row gap-2">
-                <a class="btn btn-sm variant-filled" href="/results/bt/{result.timestamp}">Show detail</a>
-                <button class="btn btn-sm variant-filled-error" on:click={ handleDeleteClicked(result) }>Delete</button>
-              </div>
-            </div>
-            {/if}
-
           </div>
 
+          {#if options[result.timestamp]}
+          <div class="p-4 w-1/2 sm:w-full sm:-mt-10">
+            <h3 class="my-1 mt-2">Heatmap</h3>
+            <hr>
+            <div class="mt-2 flex flex-row">
+              <div class="w-1/4 min-w-24">
+                Opacity
+              </div>
+              <div class="w-3/4">
+                <RangeSlider
+                  name="range-slider"
+                  bind:value={options[result.timestamp].opacity}
+                  max={100} step={1}
+                ></RangeSlider>
+              </div>
+            </div>
+
+            <div class="flex flex-row mt-2">
+              <div class="w-1/4 min-w-24">
+                Threashold
+              </div>
+              <div class="w-3/4">
+                <RangeSlider
+                  name="range-slider"
+                  bind:value={options[result.timestamp].threshold}
+                  max={100} step={1}
+                ></RangeSlider>
+              </div>
+            </div>
+
+
+            <h3 class="my-2">Options</h3>
+            <hr>
+            <hr>
+            <div class="mt-2 flex flex-row gap-2">
+              <a class="btn btn-sm variant-filled" href="/results/bt/{result.timestamp}">Show detail</a>
+              <button class="btn btn-sm variant-filled-error" on:click={ handleDeleteClicked(result) }>Delete</button>
+            </div>
+          </div>
+          {/if}
 
         </section>
       </div>
