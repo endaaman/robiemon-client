@@ -3,25 +3,17 @@
   import chroma from 'chroma-js'
   import { getContext  } from 'svelte'
   import { API_BASE } from '$lib/config'
-  import { SlideToggle, RangeSlider, RadioGroup, RadioItem, getModalStore, getToastStore } from '@skeletonlabs/skeleton'
-
-  import { Pie } from 'svelte-chartjs'
   import {
-      Chart as ChartJS,
-      Title,
-      Tooltip,
-      Legend,
-      ArcElement,
-      CategoryScale,
-    } from 'chart.js'
-  ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
-
-  import { Chart, } from 'svelte-echarts'
+    SlideToggle, RangeSlider, RadioGroup, RadioItem, ConicGradient,
+    getModalStore, getToastStore
+  } from '@skeletonlabs/skeleton'
 
   const status = getContext('status')
   const modalStore = getModalStore()
   const toastStore = getToastStore()
 
+  let sortDirection = 'descending'
+  let mode = 'card'
 
   const bgColors = [
     '#1f77b4',
@@ -29,59 +21,26 @@
     '#2ca02c',
     '#AC64AD',
   ]
-  const hoverColors = bgColors.map((c) => chroma(c).darken().hex())
-  function resultToChartData(result) {
-    const keys = ['L', 'M', 'G', 'B']
-    return {
-      labels: keys.map((k) => `${k} ${parseInt(result[k]*100)}%`),
-      datasets: [
-        {
-          data: [result.L, result.M, result.G, result.B],
-          backgroundColor: bgColors,
-          hoverBackgroundColor: hoverColors,
-        },
-      ],
-    }
-  }
 
-  const chartOptions = {
-    xAxis: {
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-      type: 'category',
-    },
-    yAxis: {
-      type: 'value',
-    },
-    series: [
-      {
-        data: [820, 932, 901, 934, 1290, 1330],
-        type: 'bar',
-      },
-    ],
+  function resultToConic(result) {
+    const keys = ['L', 'M', 'G', 'B']
+    let last = 0
+    return keys.map((k, i) => {
+      const v = {
+        label: k,
+        color: bgColors[i],
+        start: last,
+        end: last + result[k] * 100,
+      }
+      last = last + result[k] * 100
+      return v
+    })
   }
 
 
   function timestampToTitle(timestamp) {
     return format(new Date(timestamp * 1000), 'yyyy-MM-dd HH:mm:ss')
   }
-
-  let options = {}
-  function updateOptions(results) {
-    results.map((r) => {
-      if (options[r.timestamp]) {
-        return
-      }
-      options[r.timestamp] = {
-          opacity: 0,
-          threshold: 10,
-      }
-    })
-    return options
-  }
-
-  $: options = updateOptions($status.bt_results)
-
-  let sortDirection = 'descending'
 
   async function handleDeleteClicked(result) {
     modalStore.trigger({
@@ -113,13 +72,11 @@
         }
       },
     })
-
   }
 
 </script>
 
 <RadioGroup>
-
   <RadioItem bind:group={sortDirection} name="sort" value="descending">
     <span class="i-mdi-sort-descending rotate-180 align-middle text-lg"></span>
   </RadioItem>
@@ -127,88 +84,48 @@
   <RadioItem bind:group={sortDirection} name="sort" value="ascending">
     <span class="i-mdi-sort-ascending align-middle text-lg"></span>
   </RadioItem>
-
 </RadioGroup>
 
-<div class="mx-auto grid">
+<RadioGroup>
+  <RadioItem bind:group={mode} name="mode" value="card">
+    <span class="i-mdi-view-grid rotate-180 align-middle text-lg"></span>
+  </RadioItem>
+
+  <RadioItem bind:group={mode} name="mode" value="table">
+    <span class="i-mdi-view-sequential align-middle text-lg"></span>
+  </RadioItem>
+</RadioGroup>
+
+<div class="grid xl:grid-cols-2 gap-4 mt-2">
   {#each $status.bt_results as _result, _i}
     {@const i = sortDirection === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
     {@const result = $status.bt_results[i]}
 
-    <div class="xl:w-1/2 lg:w-1/1 md:w-1/1 sm:w-1/1 py-2">
-      <div class="card flex flex-wrap">
+    <div class="card flex flex-wrap grow">
+      <section class="p-4 w-2/3 flex justify-center items-center ">
+        <img
+          src={`${API_BASE}/uploads/${result.original_image}`}
+          alt={result.timestamp}
+          width="100%"/>
+      </section>
 
-        <section class="p-4 w-1/1 sm:w-2/3 align-middle">
-          <img src={`${API_BASE}/uploads/${result.original_image}`} alt={result.timestamp} width="100%"/>
-        </section>
+      <section class="p-4 w-1/3 flex flex-col min-w-48">
+        <h3>{ timestampToTitle(result.timestamp) }</h3>
 
-        <section class="p-4 w-1/1 sm:w-1/3 w-full flex sm:flex-col flex-wrap">
-          <div class="w-1/2 sm:w-full grow">
-            <h3 class="mb-1">{ timestampToTitle(result.timestamp) }</h3>
+        <hr class="my-1" />
+        <div class="my-auto pt-2 pb-4">
+          <ConicGradient stops={ resultToConic(result) } legend></ConicGradient>
+        </div>
 
-            <hr />
+        <hr class="mb-1 mt-auto" />
 
-            <!-- <Chart options={ chartOptions } /> -->
-
-            <Pie
-              data={ resultToChartData(result) }
-              options={{
-                animation: false,
-                plugins: {
-                  legend: {
-                    position: "right",
-                    align: "middle"
-                  },
-                  responsive: true
-                }
-              }}
-              />
-          </div>
-
-          {#if options[result.timestamp]}
-          <div class="p-4 w-1/2 sm:w-full sm:-mt-10">
-            <h3 class="my-1 mt-2">Heatmap</h3>
-            <hr>
-            <div class="mt-2 flex flex-row">
-              <div class="w-1/4 min-w-24">
-                Opacity
-              </div>
-              <div class="w-3/4">
-                <RangeSlider
-                  name="range-slider"
-                  bind:value={options[result.timestamp].opacity}
-                  max={100} step={1}
-                ></RangeSlider>
-              </div>
-            </div>
-
-            <div class="flex flex-row mt-2">
-              <div class="w-1/4 min-w-24">
-                Threashold
-              </div>
-              <div class="w-3/4">
-                <RangeSlider
-                  name="range-slider"
-                  bind:value={options[result.timestamp].threshold}
-                  max={100} step={1}
-                ></RangeSlider>
-              </div>
-            </div>
-
-
-            <h3 class="my-2">Options</h3>
-            <hr>
-            <hr>
-            <div class="mt-2 flex flex-row gap-2">
-              <a class="btn btn-sm variant-filled" href="/results/bt/{result.timestamp}">Show detail</a>
-              <button class="btn btn-sm variant-filled-error" on:click={ handleDeleteClicked(result) }>Delete</button>
-            </div>
-          </div>
-          {/if}
-
-        </section>
-      </div>
+        <div class="mt-2 flex flex-row gap-2">
+          <a class="btn btn-sm variant-filled" href="/results/bt/{result.timestamp}">Show detail</a>
+          <button class="btn btn-sm variant-filled-error" on:click={ handleDeleteClicked(result) }>Delete</button>
+        </div>
+      </section>
     </div>
+
   {/each}
 </div>
 

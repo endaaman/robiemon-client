@@ -31,8 +31,6 @@
 		{/each}
 	</TabGroup>
 
-	{ $connection.status }
-
 	<div class="mt-2">
 		{#if $connection.status === C.CONNECTION_PENDING }
 

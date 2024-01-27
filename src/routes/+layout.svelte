@@ -122,21 +122,11 @@
 
 	onMount(async () => {
 		$connection.connect()
-
-		// connection check
-		// setInterval(() => {
-		// 	console.log()
-		// 	if ($connection.status === C.CONNECTION_DISCONNECTED) {
-		// 		$connection.connect()
-		// 	}
-		// }, 5000)
 	})
 
 	onDestroy(async () => {
 		$connection.close()
 	})
-
-	let selectedTarget = 'webcam'
 </script>
 
 <Modal components={modalRegistry} />
