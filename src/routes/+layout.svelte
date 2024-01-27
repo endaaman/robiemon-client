@@ -7,10 +7,14 @@
 		AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
 		Avatar, LightSwitch,
 	} from '@skeletonlabs/skeleton'
-	import { initializeStores, Modal, Toast, getToastStore  } from '@skeletonlabs/skeleton'
+	import { initializeStores, Modal, Toast, getToastStore, storePopup } from '@skeletonlabs/skeleton'
+	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
+
 	import { page } from '$app/stores'
 	import { API_BASE } from '$lib/config'
 	import * as C from '$lib/const'
+
+	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow })
 
 	import ModalPredict from './modals/predict.svelte'
 

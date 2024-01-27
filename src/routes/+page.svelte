@@ -8,7 +8,9 @@
     FileDropzone, Avatar, LightSwitch,
     getModalStore, getToastStore,
 	} from '@skeletonlabs/skeleton'
+
   import { API_BASE } from '$lib/config'
+	import { page } from '$app/stores'
 
 
   const modalStore = getModalStore()
@@ -103,7 +105,7 @@
       console.log(data)
 
       toastStore.trigger({
-        message: `The task was accepted as "${data.tag}"`,
+        message: `The task was accepted as "${data.hash}"`,
         timeout: 5000,
         background: 'variant-filled-primary',
         action: {
@@ -162,33 +164,38 @@
       closeStream()
     })
   }
+
+	export let data
 </script>
 
 
 <style lang="scss">
 </style>
 
+<!-- <pre>{ JSON.stringify($page, 0, 2) }</pre> -->
+<!-- <pre>{ JSON.stringify(data, 0, 2) }</pre> -->
+
 <div class="flex h-full">
 
   <div class="flex">
     <AppRail class="flex-none" slot="sidebar">
-      <AppRailTile bind:group={selectedTarget} name="tile-webcam" value="webcam" title="tile-webcam">
+      <AppRailAnchor selected={ data.mode === 'webcam' } href="/">
         <svelte:fragment slot="lead">
           <span class="i-mdi-camera"></span>
         </svelte:fragment>
         <span>Camera</span>
-      </AppRailTile>
+      </AppRailAnchor>
 
-      <AppRailTile bind:group={selectedTarget} name="tile-file" value="file" title="tile-file">
+      <AppRailAnchor selected={ data.mode === 'file' } href="/?mode=file">
         <svelte:fragment slot="lead">
           <span class="i-mdi-file-image"></span>
         </svelte:fragment>
         <span>File upload</span>
-      </AppRailTile>
+      </AppRailAnchor>
     </AppRail>
   </div>
 
-  <div class="p-4 grow h-full flex flex-col" class:hidden={ selectedTarget !== 'webcam'}>
+  <div class="p-4 grow h-full flex flex-col" class:hidden={ data.mode !== 'webcam'}>
     <div id="videoContainer" class="grow">
       <video bind:this={videoElement} autoplay class="h-full">
         <track kind="captions">
@@ -217,7 +224,7 @@
   </div>
 
 
-  {#if selectedTarget === 'file'}
+  {#if data.mode === 'file'}
     <div class="p-4">
       <FileDropzone name="files" bind:files={files} on:change={handleFilesSelected} accept="image/*">
         <svelte:fragment slot="lead">

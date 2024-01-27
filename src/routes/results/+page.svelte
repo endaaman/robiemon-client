@@ -71,7 +71,7 @@
           <!-- <h3 class="text-sm">{format(new Date(task.timestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}</h3> -->
           <h3 clas="text-sm">
             {format(new Date(task.timestamp * 1000), 'yyyy-MM-dd HH:mm:ss')} -
-            {task.tag}
+            {task.hash}
           </h3>
         </header>
         <section class="px-4 py-2">
