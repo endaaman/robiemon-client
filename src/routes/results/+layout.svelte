@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
   import { getContext  } from 'svelte'
 	import { TabGroup, Tab, TabAnchor } from '@skeletonlabs/skeleton';
+	import * as C from '$lib/const'
 
 	const links = [
 		{
@@ -13,10 +14,10 @@
 		}
 	]
 
-  const connectionStatus = getContext('connectionStatus')
+  const connection = getContext('connection')
 
 	async function handleReconnectClick() {
-		// openConnection()
+		$connection.connect()
 	}
 </script>
 
@@ -30,20 +31,22 @@
 		{/each}
 	</TabGroup>
 
+	{ $connection.status }
+
 	<div class="mt-2">
-		{#if $connectionStatus === 'pending'}
+		{#if $connection.status === C.CONNECTION_PENDING }
 
 			<p>Loading</p>
 
-		{:else if $connectionStatus === 'error'}
+		{:else if $connection.status === C.CONNECTION_DISCONNECTED }
 
 			<p>Failed to connect server.</p>
 			<p>Please notice to the system administrator.</p>
 			<button class="btn variant-filled" on:click={ handleReconnectClick }>Re-connect server</button>
 
-		{:else if $connectionStatus === 'connected'}
+		{:else if $connection.status === C.CONNECTION_CONNECTED }
 
-		<slot></slot>
+			<slot></slot>
 
 		{/if}
 	</div>

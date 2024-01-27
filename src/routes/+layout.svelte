@@ -1,7 +1,7 @@
 <script>
 	import '../app.postcss';
   import { browser } from '$app/environment'
-	import { setContext, onMount, onDestroy } from 'svelte'
+	import { setContext, onMount, onDestroy, tick } from 'svelte'
 	import { writable } from 'svelte/store'
 	import {
 		AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
@@ -9,7 +9,8 @@
 	} from '@skeletonlabs/skeleton'
 	import { initializeStores, Modal, Toast, getToastStore  } from '@skeletonlabs/skeleton'
 	import { page } from '$app/stores'
-  import { API_BASE } from '$lib/config'
+	import { API_BASE } from '$lib/config'
+	import * as C from '$lib/const'
 
 	import ModalPredict from './modals/predict.svelte'
 
@@ -55,58 +56,84 @@
 	}
 
 
-  let eventSource = null
-
+	let eventSource = null
   const status = writable()
 	setContext('status', status)
   status.set({tasks: [], bt_results: []})
 
-  const connectionStatus = writable()
-  setContext('connectionStatus', connectionStatus)
+  const connection = writable()
+  setContext('connection', connection),
   // pending, error, connected
-	connectionStatus.set('pending')
+	connection.set({
+		status: C.CONNECTION_PENDING,
+		connect() {
+			eventSource = new EventSource(`${API_BASE}/status_sse`)
 
-  function openConnection() {
-    eventSource = new EventSource(`${API_BASE}/status_sse`)
+			eventSource.addEventListener('open', (e) => {
+				$connection.status = C.CONNECTION_CONNECTED
 
-    eventSource.addEventListener('open', (e) => {
-      console.log('open')
-      connectionStatus.set('connected')
-    })
+				toastStore.trigger({
+					message: 'Connected to the AI server',
+					background: 'variant-filled-primary',
+					timeout: 2000,
+					autohide: true,
+				})
+			})
 
-    eventSource.onmessage = function(event) {
-      console.log('onmessage')
-      const data = JSON.parse(event.data)
-			status.set(data)
-			console.log(data)
-    }
+			eventSource.onmessage = function(event) {
+				console.log('status updated')
+				const data = JSON.parse(event.data)
+				status.set(data)
+				console.log(data)
+			}
 
-    eventSource.onerror = function (err) {
-      connectionStatus.set('error')
-      console.error('EventSource failed:', err)
-      closeConnection()
+			eventSource.onerror = async function (err) {
+				console.error('EventSource failed:', err)
+				$connection.close()
 
-      toastStore.trigger({
-        message: 'Error: Failed to connect server.',
-        timeout: 5000,
-        background: 'variant-filled-error',
-      })
-    }
-  }
-
-  function closeConnection() {
-    if (eventSource) {
-      eventSource.close()
-      eventSource = null
-    }
-  }
+				toastStore.trigger({
+					message: 'Failed to connect server.',
+					background: 'variant-filled-error',
+					autohide: false,
+					action: {
+						label: 'Re-connect',
+						response: () => {
+							// do nothing here
+						}
+					},
+					callback({id, status}) {
+						if (status === 'closed') {
+							setTimeout(() => {
+								$connection.connect()
+							}, 5000)
+						}
+					}
+				})
+			}
+		},
+		close() {
+			if (eventSource) {
+				eventSource.close()
+				eventSource = null
+			}
+			$connection.status = C.CONNECTION_DISCONNECTED
+		}
+	})
 
 	onMount(async () => {
-		openConnection()
+		$connection.connect()
+
+		// connection check
+		// setInterval(() => {
+		// 	console.log()
+		// 	if ($connection.status === C.CONNECTION_DISCONNECTED) {
+		// 		$connection.connect()
+		// 	}
+		// }, 5000)
 	})
 
 	onDestroy(async () => {
-		closeConnection()
+		$connection.close()
 	})
 
 	let selectedTarget = 'webcam'
