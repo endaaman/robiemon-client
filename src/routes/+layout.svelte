@@ -5,7 +5,7 @@
 	import { writable } from 'svelte/store'
 	import {
 		AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
-		Avatar, LightSwitch,
+		Avatar, LightSwitch, popup,
 	} from '@skeletonlabs/skeleton'
 	import { initializeStores, Modal, Toast, getToastStore, storePopup } from '@skeletonlabs/skeleton'
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
@@ -44,6 +44,8 @@
 
 	initializeStores()
 
+	export let data;
+
 	const modalRegistry = {
 		predict: { ref: ModalPredict },
 	}
@@ -61,7 +63,9 @@
 	let eventSource = null
   const status = writable()
 	setContext('status', status)
-  status.set({tasks: [], bt_results: []})
+  status.set(data.status || {tasks: [], bt_results: []})
+
+	let currentToast = null
 
   const connection = writable()
   setContext('connection', connection),
@@ -69,6 +73,10 @@
 	connection.set({
 		status: C.CONNECTION_PENDING,
 		connect() {
+			if (currentToast) {
+				toastStore.close(currentToast)
+				currentToast = null
+			}
 			eventSource = new EventSource(`${API_BASE}/status_sse`)
 
 			eventSource.addEventListener('open', (e) => {
@@ -93,22 +101,24 @@
 				console.error('EventSource failed:', err)
 				$connection.close()
 
-				toastStore.trigger({
+				currentToast = toastStore.trigger({
 					message: 'Failed to connect server.',
 					background: 'variant-filled-error',
 					autohide: false,
+					hideDismiss: false,
 					action: {
 						label: 'Re-connect',
-						response: () => {
-							// do nothing here
+						response: async () => {
+							setTimeout(() => {
+								$connection.connect()
+							}, 1000)
 						}
 					},
 					callback({id, status}) {
-						if (status === 'closed') {
-							setTimeout(() => {
-								$connection.connect()
-							}, 5000)
-						}
+						// if (status === 'closed') {
+						// 	currentToast = null
+						// }
+						// console.log(id, status)
 					}
 				})
 			}
@@ -134,6 +144,8 @@
 <Modal components={modalRegistry} />
 <Toast />
 
+<!-- <pre>{ JSON.stringify($status, 0, 2) }</pre> -->
+
 <AppShell>
 	<svelte:fragment slot="header">
 		<!-- App Bar -->
@@ -155,7 +167,36 @@
 					</a>
 				{/each}
 
+				<div class="inline-block min-h-[1em] w-px self-stretch bg-surface-300"></div>
+
+				{#if $connection.status === C.CONNECTION_CONNECTED}
+					<button class="btn btn-sm variant-ringed-primary" use:popup={{
+						event: 'hover',
+						target: 'popupHover',
+						placement: 'top'
+					}}>
+						<span class="i-mdi-lan-check text-primary-500"></span>
+					</button>
+					<div class="card p-4 variant-filled-surface" data-popup="popupHover">
+						<p>Connected to the AI server.</p>
+						<div class="arrow variant-filled-surface" />
+					</div>
+				{:else}
+					<button class="btn btn-sm variant-ringed-error" use:popup={{
+						event: 'hover',
+						target: 'popupHover',
+						placement: 'top'
+					}} on:click={ $connection.connect() }>
+						<span class="i-mdi-lan-disconnect text-error-500"></span>
+					</button>
+					<div class="card p-4 variant-filled-surface" data-popup="popupHover">
+						<p>Click to try to connect the AI server again</p>
+						<div class="arrow variant-filled-surface" />
+					</div>
+				{/if}
+
 				<LightSwitch />
+
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>

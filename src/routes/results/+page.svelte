@@ -56,38 +56,11 @@
 <!--   </RadioItem> -->
 <!-- </RadioGroup> -->
 
-{#if false}
-<div class="table-container">
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Timestamp</th>
-        <th>image</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {#each tasks as task, i}
-        <tr>
-          <td>{ format(new Date(task.timestamp * 1000), 'yyyy-MM-dd HH:mm:ss') }</td>
-          <td><img src={`${API_BASE}/uploads/${task.image}`} alt={task.image}/></td>
-          <td>
-            {#if task.status === 'done'}
-              <span class="i-mdi-check"></span>
-            {:else if task.status === 'processing'}
-              <span class="i-mdi-loading animate-spin"></span>
-            {:else if task.status === 'pending'}
-              <span class="i-mdi-clock-alert-outline"></span>
-            {/if}
-          </td>
-        </tr>
-      {/each}
-    </tbody>
-  </table>
-</div>
-{/if}
 
 <div class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 auto-rows-min gap-4">
+  {#if $status.tasks.length === 0}
+    <p>No tasks there.</p>
+  {/if}
   {#each $status.tasks as _task, _i}
     {@const i = sort === 'ascending' ? _i : $status.tasks.length - 1 - _i }
     {@const task = $status.tasks[i]}
