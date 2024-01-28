@@ -32,6 +32,7 @@
     "@floating-ui/dom": "^1.5.4",
     "chart.js": "^4.4.1",
     "chroma-js": "^2.4.2",
+    "cropperjs": "^1.6.1",
     "date-fns": "^3.3.0",
     "echarts": "^5.4.3",
     "plotly.js-dist-min": "^2.28.0",

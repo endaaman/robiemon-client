@@ -16,7 +16,7 @@
 
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow })
 
-	import ModalPredict from './modals/predict.svelte'
+	import ModalPredict from '$lib/modals/predict.svelte'
 
 
 	const links = [

@@ -63,7 +63,7 @@
   {#each $status.tasks as task, i}
     <div class="lg:w-1/4 md:w-1/3 sm:w-1/2 p-2">
       <a
-        href="/results/{task.mode}/{task.timestamp}" class="card block"
+        href="/results/{task.mode}/{task.timestamp}" class="card block max-h-96 h-96 flex flex-col"
         class:opacity-75={ task.status === 'pending' }
         class:pointer-events-none={ task.status !== 'done' }
       >
@@ -74,8 +74,12 @@
             {task.hash}
           </h3>
         </header>
-        <section class="px-4 py-2">
-          <img src={`${API_BASE}/uploads/${task.image}`} alt={task.timestamp} />
+        <section class="px-4 py-2 flex justify-center items-center grow">
+          <img
+            src={`${API_BASE}/uploads/${task.image}`}
+            alt={task.timestamp}
+            class="w-full object-contain block"
+          />
         </section>
         <footer class="card-footer">
           <div class="flex">

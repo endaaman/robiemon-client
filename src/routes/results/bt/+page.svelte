@@ -136,11 +136,11 @@
       {@const result = $status.bt_results[i]}
 
       <a class="card flex flex-wrap grow" href="/">
-        <section class="p-4 w-2/3 flex justify-center items-center ">
+        <section class="p-4 w-2/3 flex justify-center items-center max-h-96">
           <img
             src={`${API_BASE}/uploads/${result.original_image}`}
             alt={result.timestamp}
-            width="100%"/>
+            class="object-contain block w-full h-full" />
         </section>
 
         <section class="p-4 w-1/3 flex flex-col min-w-48">
@@ -155,7 +155,7 @@
 
           <div class="mt-2 flex flex-row gap-2">
             <a class="btn btn-sm variant-filled" href="/results/bt/{result.timestamp}">Show detail</a>
-            <button class="btn btn-sm variant-filled-error" on:click={ handleDeleteClicked(result) }>Delete</button>
+            <button class="btn btn-sm variant-filled-error" on:click={ ()=> handleDeleteClicked(result) }>Delete</button>
           </div>
         </section>
       </a>

@@ -65,6 +65,14 @@
     }
   }
 
+  function onModalResponded(data) {
+    if (!data) {
+      processing = false
+      return
+    }
+    predictImage(data)
+  }
+
   async function handlePredictClicked() {
     processing = true
     canvas.width = videoElement.videoWidth
@@ -79,14 +87,7 @@
       type: 'component',
       component: 'predict',
       imageURI: imageURI,
-      response: (r) => {
-        if (!r) {
-          processing = false
-          console.log('Canceled')
-          return
-        }
-        predictImage(imageURI)
-      }
+      response: onModalResponded,
     })
 
   }
@@ -138,14 +139,7 @@
         type: 'component',
         component: 'predict',
         imageURI: imageURI,
-        response: (r) => {
-          if (!r) {
-            processing = false
-            console.log('Canceled')
-            return
-          }
-          predictImage(imageURI)
-        }
+        response: onModalResponded,
       })
     }
   }
@@ -164,7 +158,6 @@
       closeStream()
     })
   }
-
 	export let data
 </script>
 
@@ -233,6 +226,13 @@
         <svelte:fragment slot="message"><strong>Upload a file</strong> or drag and drop</svelte:fragment>
         <svelte:fragment slot="meta">PNG, JPG, and GIF allowed.</svelte:fragment>
       </FileDropzone>
+
+
+
+
+
+
+
     </div>
   {/if}
 </div>
