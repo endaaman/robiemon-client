@@ -5,7 +5,7 @@
 	import { page } from '$app/stores'
   import { getContext  } from 'svelte'
   import {
-    SlideToggle, RangeSlider, RadioGroup, RadioItem, ConicGradient, ListBox, ListBoxItem,
+    RadioGroup, RadioItem, ConicGradient, ListBox, ListBoxItem,
     getModalStore, getToastStore,
     popup
   } from '@skeletonlabs/skeleton'
@@ -135,7 +135,7 @@
       {@const i = sort === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
       {@const result = $status.bt_results[i]}
 
-      <a class="card flex flex-wrap grow" href="/">
+      <a class="card flex flex-wrap grow" href="/results/bt/{result.timestamp}">
         <section class="p-4 w-2/3 flex justify-center items-center max-h-96">
           <img
             src={`${API_BASE}/uploads/${result.original_image}`}
@@ -155,7 +155,7 @@
 
           <div class="mt-2 flex flex-row gap-2">
             <a class="btn btn-sm variant-filled" href="/results/bt/{result.timestamp}">Show detail</a>
-            <button class="btn btn-sm variant-filled-error" on:click={ ()=> handleDeleteClicked(result) }>Delete</button>
+            <button class="btn btn-sm variant-filled-error" on:click|preventDefault={ ()=> handleDeleteClicked(result) }>Delete</button>
           </div>
         </section>
       </a>

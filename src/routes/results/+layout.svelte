@@ -14,6 +14,13 @@
 		}
 	]
 
+	function matchHref(href, current) {
+		if (href === '/results') {
+			return current === href
+		}
+		return current.startsWith(href)
+	}
+
   const connection = getContext('connection')
 
 	async function handleReconnectClick() {
@@ -25,13 +32,13 @@
 <div class="p-4">
 	<TabGroup>
 		{#each links as link}
-			<TabAnchor href={ link.href } selected={ $page.route.id === link.href }>
+			<TabAnchor href={ link.href } selected={ matchHref(link.href, $page.route.id) }>
 				<span>{ link.label }</span>
 			</TabAnchor>
 		{/each}
 	</TabGroup>
 
-	<div class="mt-2">
+	<div class="mt-4">
 		{#if $connection.status === C.CONNECTION_PENDING }
 
 			<p>Loading</p>

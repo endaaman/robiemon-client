@@ -29,7 +29,7 @@
 		// 	icon: 'predict',
 		// 	label: 'Predict',
 		// 	href: '/predict',
-		// },zza
+		// },
 		{
 			icon: 'table',
 			label: 'Result',
@@ -39,8 +39,6 @@
 		// 	icon: 'info',
 		// 	label: 'About',
 		// 	href: '/about',
-		// 	// match: () => $page.url.pathname == '/about',
-		// 	match: () => false,
 		// },
 	]
 

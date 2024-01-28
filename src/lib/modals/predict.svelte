@@ -1,11 +1,12 @@
 <script>
-	import { getModalStore } from '@skeletonlabs/skeleton';
+	import { SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
 	import { onMount, onDestroy, tick } from 'svelte'
 	import Cropper from 'cropperjs'
 	import { debounce } from '$lib'
 
 	export let parent
 	let cropper
+	let withCam
 
 	const modalStore = getModalStore()
 
@@ -44,8 +45,8 @@
 
 	function onFormSubmit() {
 		let canvas = cropper.getCroppedCanvas()
-		let data = canvas.toDataURL()
-		$modalStore[0].response(data)
+		let image = canvas.toDataURL()
+		$modalStore[0].response({ image, withCam })
 		modalStore.close()
 	}
 
@@ -78,11 +79,13 @@
 			<p>Image missing</p>
 		{/if}
 
-		<footer class="modal-footer flex mt-4">
+		<footer class="modal-footer flex mt-4 align-middle items-center">
 			<button class="btn variant-ghost-surface" on:click={handleResetClicked}>Reset</button>
 
-			<!-- "modal-footer flex justify-end space-x-2 s-umH29JP8RwpD" -->
-			<button class="btn {parent.buttonNeutral} ml-auto" on:click={parent.onClose}>{parent.buttonTextCancel}</button>
+			<div class="ml-auto" >
+				<SlideToggle name="slide" bind:checked={withCam}>Generate CAM</SlideToggle>
+			</div>
+			<button class="btn {parent.buttonNeutral} ml-2" on:click={parent.onClose}>{parent.buttonTextCancel}</button>
 			<button class="btn {parent.buttonPositive} ml-2" on:click={onFormSubmit}>Predict</button>
 		</footer>
 	</div>
