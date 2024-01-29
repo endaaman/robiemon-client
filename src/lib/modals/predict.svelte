@@ -5,9 +5,30 @@
 	import { browser } from '$app/environment'
 	import { debounce } from '$lib'
 
+	import Divider from '$lib/components/divider.svelte'
+
+	const models = [
+		{
+			label: 'EfficientNet B0',
+			value: 'bt_efficientnet_b0_f5.pt',
+		},
+		{
+			label: 'ResNet RS50',
+			value: 'bt_resnetrs50_f0.pt',
+		},
+	]
+
 	export let parent
 	let cropper
-	let withCam
+
+	let mode = 'bt'
+	let extra = {
+		bt: {
+			cam: false,
+			weight: models[0].value,
+		}
+	}
+
 
 	const modalStore = getModalStore()
 
@@ -36,7 +57,7 @@
 		window.addEventListener('resize', debounce(updateCropper, 500))
 
 		if (browser){
-			withCam = localStorage.getItem('cam');
+			extra.bt.cam = localStorage.getItem('cam');
 		}
 	})
 
@@ -50,12 +71,12 @@
 
 	function onFormSubmit() {
 		if (browser){
-			localStorage.setItem('cam', withCam)
+			localStorage.setItem('cam', extra.bt.cam)
 		}
 
 		let canvas = cropper.getCroppedCanvas()
-		let image = canvas.toDataURL()
-		$modalStore[0].response({ image, withCam })
+		let imageURI = canvas.toDataURL()
+		$modalStore[0].response({ imageURI, mode, extra })
 		modalStore.close()
 	}
 
@@ -88,14 +109,33 @@
 			<p>Image missing</p>
 		{/if}
 
-		<footer class="modal-footer flex mt-4 align-middle items-center">
+		<footer class="modal-footer flex mt-4 align-middle items-center gap-4">
 			<button class="btn variant-ghost-surface" on:click={handleResetClicked}>Reset</button>
 
-			<div class="ml-auto" >
-				<SlideToggle name="slide" bind:checked={withCam}>Generate CAM</SlideToggle>
-			</div>
-			<button class="btn {parent.buttonNeutral} ml-2" on:click={parent.onClose}>{parent.buttonTextCancel}</button>
-			<button class="btn {parent.buttonPositive} ml-2" on:click={onFormSubmit}>Predict</button>
+			<Divider />
+
+			<label class="label">
+				<select class="select variant-ghost-surface" bind:value={mode}>
+					<option value="bt">Brain tumor</option>
+					<option value="eosino" disabled>Eosino count</option>
+				</select>
+			</label>
+
+			{#if mode === 'bt'}
+				<label class="label">
+					<select class="select" bind:value={extra.bt.weight}>
+						{#each models as m}
+							<option value={m.value}>{m.label}</option>
+						{/each}
+					</select>
+				</label>
+				<SlideToggle name="bt-toggle" bind:checked={extra.bt.cam} size="sm">CAM</SlideToggle>
+			{/if}
+
+			<Divider class="ml-auto" />
+
+			<button class="btn {parent.buttonNeutral}" on:click={parent.onClose}>{parent.buttonTextCancel}</button>
+			<button class="btn {parent.buttonPositive}" on:click={onFormSubmit}>Predict</button>
 		</footer>
 	</div>
 {/if}

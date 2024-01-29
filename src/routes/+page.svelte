@@ -70,7 +70,7 @@
       processing = false
       return
     }
-    predictImage(data.image, data.withCam)
+    predictImage(data)
   }
 
   async function handlePredictClicked() {
@@ -92,14 +92,17 @@
 
   }
 
-  async function predictImage(imageURI, withCam) {
+  async function predictImage({ imageURI, mode, extra }) {
     const blob = await fetch(imageURI).then(res => res.blob());
     const formData = new FormData();
+    console.log(extra[mode])
+    for (const [key, value] of Object.entries(extra[mode])) {
+      formData.append(key, value);
+    }
     formData.append('file', blob, 'webcam.png');
-    formData.append('cam', withCam);
 
     try {
-      const response = await fetch(`${API_BASE}/predict`, {
+      const response = await fetch(`${API_BASE}/predict/${mode}`, {
         method: 'POST',
         body: formData,
       })

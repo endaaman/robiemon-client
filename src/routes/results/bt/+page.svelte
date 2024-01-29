@@ -135,10 +135,10 @@
 
           <hr class="my-1" />
           <div class="my-auto pt-2 pb-4 flex flex-row">
-            <div class="w-2/3">
+            <div class="w-2/3 md:w-1/2">
               <BtResultCircle result={ result }></BtResultCircle>
             </div>
-            <div class="w-1/3">
+            <div class="w-1/3 md:w-1/2">
               <BtResultPredictions result={ result }></BtResultPredictions>
             </div>
           </div>
