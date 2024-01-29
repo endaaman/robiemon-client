@@ -2,6 +2,7 @@
 	import { SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
 	import { onMount, onDestroy, tick } from 'svelte'
 	import Cropper from 'cropperjs'
+	import { browser } from '$app/environment'
 	import { debounce } from '$lib'
 
 	export let parent
@@ -32,7 +33,11 @@
 		await tick()
 		updateCropper()
 
-		window.addEventListener('resize', debounce(updateCropper, 500));
+		window.addEventListener('resize', debounce(updateCropper, 500))
+
+		if (browser){
+			withCam = localStorage.getItem('cam');
+		}
 	})
 
 	onDestroy(() => {
@@ -44,6 +49,10 @@
 	}
 
 	function onFormSubmit() {
+		if (browser){
+			localStorage.setItem('cam', withCam)
+		}
+
 		let canvas = cropper.getCroppedCanvas()
 		let image = canvas.toDataURL()
 		$modalStore[0].response({ image, withCam })

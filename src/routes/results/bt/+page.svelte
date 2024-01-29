@@ -11,6 +11,9 @@
   } from '@skeletonlabs/skeleton'
   import { API_BASE } from '$lib/config'
 
+  import BtResultCircle from '$lib/components/bt_result_circle.svelte';
+  import BtResultPredictions from '$lib/components/bt_result_predictions.svelte';
+
   const status = getContext('status')
   const modalStore = getModalStore()
   const toastStore = getToastStore()
@@ -19,29 +22,6 @@
 
   let sort = data.sort
   let mode = data.mode
-
-  const labels = ['L', 'M', 'G', 'B']
-
-  const labelColors = [
-    '#1f77b4',
-    '#ff7f0e',
-    '#2ca02c',
-    '#AC64AD',
-  ]
-
-  function resultToConic(result) {
-    let last = 0
-    return labels.map((k, i) => {
-      const v = {
-        label: k,
-        color: labelColors[i],
-        start: last,
-        end: last + result[k] * 100,
-      }
-      last = last + result[k] * 100
-      return v
-    })
-  }
 
 
   function timestampToTitle(timestamp) {
@@ -89,7 +69,7 @@
   }
 
   $: {
-    let query = new URLSearchParams($page.url.searchParams.toString());
+    let query = new URLSearchParams($page.url.searchParams.toString())
     if (sort === 'descending') {
       query.delete('sort');
     } else {
@@ -99,7 +79,7 @@
   }
 
   $: {
-    let query = new URLSearchParams($page.url.searchParams.toString());
+    let query = new URLSearchParams($page.url.searchParams.toString())
     if (mode === 'card') {
       query.delete('mode');
     } else {
@@ -130,33 +110,45 @@
 </RadioGroup>
 
 {#if mode === 'card'}
-  <div class="grid xl:grid-cols-2 gap-4 mt-2">
+  <div class="grid lg:grid-cols-2 gap-4 mt-2">
+
     {#each $status.bt_results as _result, _i}
       {@const i = sort === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
       {@const result = $status.bt_results[i]}
-
-      <a class="card flex flex-wrap grow" href="/results/bt/{result.timestamp}">
-        <section class="p-4 w-2/3 flex justify-center items-center max-h-96">
+      <!-- <pre>{ JSON.stringify(result, 0, 2) }</pre> -->
+      <a href="/results/bt/{result.timestamp}" class="card flex flex-wrap grow relative" >
+        <button
+          on:click|preventDefault={ ()=> handleDeleteClicked(result) }
+          class="btn btn-icon btn-icon-sm hover:variant-ringed absolute top-1 right-1"
+        >
+          <span class="i-mdi-times"></span>
+        </button>
+        <section class="p-4 xl:w-2/3 md:w-1/2 w-full flex justify-center items-center max-h-96">
           <img
             src={`${API_BASE}/uploads/${result.original_image}`}
             alt={result.timestamp}
             class="object-contain block w-full h-full" />
         </section>
 
-        <section class="p-4 w-1/3 flex flex-col min-w-48">
+        <section class="p-4 xl:w-1/3 md:w-1/2 w-full flex flex-col">
           <h3>{ timestampToTitle(result.timestamp) }</h3>
 
           <hr class="my-1" />
-          <div class="my-auto pt-2 pb-4">
-            <ConicGradient stops={ resultToConic(result) } legend></ConicGradient>
+          <div class="my-auto pt-2 pb-4 flex flex-row">
+            <div class="w-2/3">
+              <BtResultCircle result={ result }></BtResultCircle>
+            </div>
+            <div class="w-1/3">
+              <BtResultPredictions result={ result }></BtResultPredictions>
+            </div>
           </div>
 
-          <hr class="mb-1 mt-auto" />
+          <!-- <hr class="mb-1 mt-auto" /> -->
 
-          <div class="mt-2 flex flex-row gap-2">
-            <a class="btn btn-sm variant-filled" href="/results/bt/{result.timestamp}">Show detail</a>
-            <button class="btn btn-sm variant-filled-error" on:click|preventDefault={ ()=> handleDeleteClicked(result) }>Delete</button>
-          </div>
+          <!-- <div class="mt-2 flex flex-row gap-2"> -->
+          <!--   <a class="btn btn-sm variant-filled" href="/results/bt/{result.timestamp}">Show detail</a> -->
+          <!--   <button class="btn btn-sm variant-filled-error" on:click|preventDefault={ ()=> handleDeleteClicked(result) }>Delete</button> -->
+          <!-- </div> -->
         </section>
       </a>
 
@@ -169,12 +161,12 @@
     <table class="table table-compact ">
       <thead>
         <tr>
-          <th>Timestamp</th>
-          <!-- <th>Hash</th> -->
+          <th>ID</th>
           <th>Image</th>
-          <th>Prediction</th>
+          <th>PIE</th>
+          <th>Predictions</th>
           <th></th>
-          <th>Menu</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -182,44 +174,29 @@
           {@const i = sort === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
           {@const result = $status.bt_results[i]}
           <tr>
-            <td>{ timestampToTitle(result.timestamp) }</td>
+            <td>
+              <p>{ timestampToTitle(result.timestamp) }</p>
+              <p></p>
+            </td>
             <!-- <td>{result.hash}</td> -->
             <td>
               <img
                 src={`${API_BASE}/uploads/${result.original_image}`}
                 alt={result.timestamp}
-                class="h-32"
+                class="max-h-32"
               />
             </td>
             <td>
-              <ConicGradient stops={ resultToConic(result) }></ConicGradient>
+              <BtResultCircle result={ result }></BtResultCircle>
             </td>
             <td class="items-center align-middle">
-              <ul>
-                {#each labels as label, j}
-                  <li class="flex items-center align-middle p-1">
-                    <div class="w-4 h-4 rounded-full mr-2" style="background-color: {labelColors[j]};"></div>
-                    <span class="w-4">{label}</span>
-                    <span>{ parseInt(result[label] * 100) }%</span>
-                  </li>
-                {/each}
-              </ul>
+              <BtResultPredictions result={ result }></BtResultPredictions>
             </td>
             <td>
-              <button class="btn btn-sm variant-filled" use:popup={{
-                  event: 'click',
-                  target: `popup${result.id}`,
-                  placement: 'bottom',
-                }}>
-                <span class="i-mdi-dots-horizontal"></span>
-              </button>
-              <div data-popup={`popup${result.id}`} class="card w-48 shadow-xl">
-                <div class="btn-group-vertical variant-filled w-full ">
-                  <button>Detail</button>
-                  <button>Delete</button>
-                </div>
-                <div class="arrow bg-surface-800-100-token" />
-              </div>
+              <a href="/results/bt/{result.timestamp}" class="btn variant-filled">Detail</a>
+            </td>
+            <td>
+              <button type="button" on:click={()=>{ handleDeleteClicked(result) }} class="btn variant-filled-error">Delete</button>
             </td>
             <!-- <td>{result.B}</td> -->
           </tr>

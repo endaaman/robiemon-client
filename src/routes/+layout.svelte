@@ -153,7 +153,11 @@
 			<svelte:fragment slot="lead">
 				<a href="/" class="flex justify-left gap-4 align-middle text-xl items-center">
 					<Avatar src="/oharobi.png" width="w-12" rounded="rounded-full" />
-					<strong>ロビえもん - AI病理診断システム</strong>
+					<strong>
+						<span class="block md:inline">ロビえもん</span>
+						<span class="hidden md:inline mx-1">-</span>
+						<span class="block md:inline">AI病理診断システム</span>
+					</strong>
 				</a>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
