@@ -7,6 +7,9 @@
 
 	import Divider from '$lib/components/divider.svelte'
 
+	const LS_BT_CAM = 'pred_modal_bt_cam'
+	const LS_BT_WEIGHT = 'pred_modal_bt_weight'
+
 	const models = [
 		{
 			label: 'EfficientNet B0',
@@ -57,7 +60,8 @@
 		window.addEventListener('resize', debounce(updateCropper, 500))
 
 		if (browser){
-			extra.bt.cam = localStorage.getItem('cam');
+			extra.bt.cam = localStorage.getItem(LS_BT_CAM);
+			extra.bt.weight = localStorage.getItem(LS_BT_WEIGHT);
 		}
 	})
 
@@ -71,7 +75,8 @@
 
 	function onFormSubmit() {
 		if (browser){
-			localStorage.setItem('cam', extra.bt.cam)
+			localStorage.setItem(LS_BT_CAM, extra.bt.cam)
+			localStorage.setItem(LS_BT_WEIGHT, extra.bt.weight)
 		}
 
 		let canvas = cropper.getCroppedCanvas()
