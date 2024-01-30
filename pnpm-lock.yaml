@@ -50,9 +50,6 @@ dependencies:
   autoprefixer:
     specifier: 10.4.17
     version: 10.4.17(postcss@8.4.33)
-  chart.js:
-    specifier: ^4.4.1
-    version: 4.4.1
   chroma-js:
     specifier: ^2.4.2
     version: 2.4.2
@@ -86,9 +83,6 @@ dependencies:
   svelte:
     specifier: ^4.2.9
     version: 4.2.9
-  svelte-chartjs:
-    specifier: ^3.1.2
-    version: 3.1.2(chart.js@4.4.1)(svelte@4.2.9)
   svelte-echarts:
     specifier: ^0.1.1
     version: 0.1.1(echarts@5.4.3)(svelte@4.2.9)
@@ -451,10 +445,6 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
-    dev: false
-
-  /@kurkle/color@0.3.2:
-    resolution: {integrity: sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==}
     dev: false
 
   /@nodelib/fs.scandir@2.1.5:
@@ -961,13 +951,6 @@ packages:
 
   /caniuse-lite@1.0.30001579:
     resolution: {integrity: sha512-u5AUVkixruKHJjw/pj9wISlcMpgFWzSrczLZbrqBSxukQixmg0SJ5sZTpvaFvxU0HoQKd4yoyAogyrAz9pzJnA==}
-    dev: false
-
-  /chart.js@4.4.1:
-    resolution: {integrity: sha512-C74QN1bxwV1v2PEujhmKjOZ7iUM4w6BWs23Md/6aOZZSlwMzeCIDGuZay++rBgChYru7/+QFeoQW0fQoP534Dg==}
-    engines: {pnpm: '>=7'}
-    dependencies:
-      '@kurkle/color': 0.3.2
     dev: false
 
   /chokidar@3.5.3:
@@ -2306,16 +2289,6 @@ packages:
   /supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
-    dev: false
-
-  /svelte-chartjs@3.1.2(chart.js@4.4.1)(svelte@4.2.9):
-    resolution: {integrity: sha512-3+6gY2IJ9Ua8R9pk3iS1ypa7Z9OoXCJb9oPwIfTp7caJM+X+RrWnH2CTkGAq7FeSxc2nnmW08tYN88Q8Y+5M+w==}
-    peerDependencies:
-      chart.js: ^3.5.0 || ^4.0.0
-      svelte: ^3.45.0
-    dependencies:
-      chart.js: 4.4.1
-      svelte: 4.2.9
     dev: false
 
   /svelte-echarts@0.1.1(echarts@5.4.3)(svelte@4.2.9):
