@@ -116,7 +116,7 @@
       {@const i = sort === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
       {@const result = $status.bt_results[i]}
       <!-- <pre>{ JSON.stringify(result, 0, 2) }</pre> -->
-      <a href="/results/bt/{result.timestamp}" class="card flex flex-wrap grow relative" >
+      <a href="/results/bt/{result.timestamp}" class="card flex flex-row grow relative" >
         <button
           on:click|preventDefault={ ()=> handleDeleteClicked(result) }
           class="btn btn-icon btn-icon-sm hover:variant-ringed absolute top-1 right-1"
@@ -134,7 +134,7 @@
           <h3>{ timestampToTitle(result.timestamp) }</h3>
 
           <hr class="my-1" />
-          <div class="my-auto pt-2 pb-4 flex flex-row">
+          <div class="my-auto pt-2 pb-4 flex flex-row gap-4">
             <div class="w-2/3 md:w-1/2">
               <BtResultCircle result={ result }></BtResultCircle>
             </div>

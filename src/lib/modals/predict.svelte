@@ -12,12 +12,12 @@
 
 	const models = [
 		{
-			label: 'EfficientNet B0',
-			value: 'bt_efficientnet_b0_f5.pt',
-		},
-		{
 			label: 'ResNet RS50',
 			value: 'bt_resnetrs50_f0.pt',
+		},
+		{
+			label: 'EfficientNet B0',
+			value: 'bt_efficientnet_b0_f5.pt',
 		},
 	]
 
@@ -60,8 +60,12 @@
 		window.addEventListener('resize', debounce(updateCropper, 500))
 
 		if (browser){
-			extra.bt.cam = localStorage.getItem(LS_BT_CAM);
-			extra.bt.weight = localStorage.getItem(LS_BT_WEIGHT);
+			if (localStorage.hasOwnProperty(LS_BT_CAM)) {
+				extra.bt.cam = localStorage.getItem(LS_BT_CAM)
+			}
+			if (localStorage.hasOwnProperty(LS_BT_WEIGHT)) {
+				extra.bt.weight = localStorage.getItem(LS_BT_WEIGHT)
+			}
 		}
 	})
 

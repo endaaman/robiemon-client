@@ -156,7 +156,7 @@
 					<strong>
 						<span class="block md:inline">ロビえもん</span>
 						<span class="hidden md:inline mx-1">-</span>
-						<span class="block md:inline">AI病理診断システム</span>
+						<span class="block md:inline">AI病理診断支援システム</span>
 					</strong>
 				</a>
 			</svelte:fragment>
