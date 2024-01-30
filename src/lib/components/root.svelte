@@ -9,8 +9,6 @@
 	} from '@skeletonlabs/skeleton'
 	import { initializeStores, Modal, Toast, getToastStore  } from '@skeletonlabs/skeleton'
 	import { page } from '$app/stores'
-  import { API_BASE } from '$lib/config'
-
 
 
 	const links = [

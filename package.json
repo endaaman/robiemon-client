@@ -1,14 +1,17 @@
 {
-  "name": "my-skeleton-app",
+  "name": "robiemon-client",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "vite dev --host 0.0.0.0",
     "build": "vite build --mode production",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve": "node --env-file .env.production server.js"
   },
-  "devDependencies": {
+  "type": "module",
+  "dependencies": {
     "@egoist/tailwindcss-icons": "^1.7.2",
+    "@floating-ui/dom": "^1.5.4",
     "@iconify-json/lucide": "^1.1.155",
     "@iconify-json/mdi": "^1.1.64",
     "@iconify/json": "^2.2.170",
@@ -16,28 +19,27 @@
     "@skeletonlabs/skeleton": "2.7.1",
     "@skeletonlabs/tw-plugin": "0.3.1",
     "@sveltejs/adapter-auto": "^3.0.0",
+    "@sveltejs/adapter-node": "^4.0.1",
+    "@sveltejs/adapter-static": "^3.0.1",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@tailwindcss/forms": "0.5.7",
     "autoprefixer": "10.4.17",
-    "postcss": "8.4.33",
-    "sass": "^1.70.0",
-    "svelte": "^4.2.7",
-    "tailwindcss": "3.4.1",
-    "vite": "^5.0.3",
-    "vite-plugin-tailwind-purgecss": "0.2.0"
-  },
-  "type": "module",
-  "dependencies": {
-    "@floating-ui/dom": "^1.5.4",
-    "chart.js": "^4.4.1",
     "chroma-js": "^2.4.2",
     "cropperjs": "^1.6.1",
     "date-fns": "^3.3.0",
+    "dotenv": "^16.4.1",
     "echarts": "^5.4.3",
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6",
     "plotly.js-dist-min": "^2.28.0",
-    "svelte-chartjs": "^3.1.2",
+    "postcss": "8.4.33",
+    "sass": "^1.70.0",
+    "svelte": "^4.2.9",
     "svelte-echarts": "^0.1.1",
-    "three": "^0.160.1"
+    "tailwindcss": "3.4.1",
+    "three": "^0.160.1",
+    "vite": "^5.0.3",
+    "vite-plugin-tailwind-purgecss": "0.2.0"
   }
 }

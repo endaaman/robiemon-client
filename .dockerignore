@@ -1,0 +1,5 @@
+.dockerignore
+.sveltekit
+build
+README.md
+Dockerfile

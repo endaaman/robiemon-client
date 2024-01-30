@@ -7,7 +7,7 @@
     RadioGroup, RadioItem,
     tableSourceMapper, tableMapperValues
   } from '@skeletonlabs/skeleton';
-  import { API_BASE } from '$lib/config'
+  import { STATIC_BASE } from '$lib/config'
 	import { page } from '$app/stores'
   import { browser } from '$app/environment'
 
@@ -78,7 +78,7 @@
       </header>
       <section class="px-4 py-2 flex justify-center items-center grow max-h-96">
         <img
-          src={`${API_BASE}/uploads/${task.image}`}
+          src={`${STATIC_BASE}/uploads/${task.image}`}
           alt={task.timestamp}
           class="h-full object-scale-down"
         />

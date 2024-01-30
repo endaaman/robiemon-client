@@ -6,8 +6,8 @@ export default defineConfig({
 	plugins: [sveltekit(), purgeCss()],
 	server: {
 		proxy: {
-			'/uploads': 'http://localhost:8000',
-			'/cams': 'http://localhost:8000',
+			'/static': 'http://localhost:3000',
+			'/api': 'http://localhost:3000',
 		},
 	},
 });

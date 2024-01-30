@@ -1,10 +1,11 @@
 <script>
+  import * as THREE from 'three'
 	import { page } from '$app/stores'
 	import { getContext, onMount, onDestroy, tick } from 'svelte'
   import {
       RangeSlider, ConicGradient,
   } from '@skeletonlabs/skeleton'
-  import * as THREE from 'three'
+  import { STATIC_BASE } from '$lib/config'
 
   import BtResultCircle from '$lib/components/bt_result_circle.svelte';
   import BtResultPredictions from '$lib/components/bt_result_predictions.svelte';
@@ -58,7 +59,7 @@
 
     // 画像の読み込み
     const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load(`/uploads/${result.original_image}`);
+    const texture = textureLoader.load(`${STATIC_BASE}/uploads/${result.original_image}`);
 
     // メッシュの作成
     const geometry = new THREE.PlaneGeometry(5, 5);
@@ -110,10 +111,10 @@
       <!-- <canvas bind:this={canvasElement} class="w-full"></canvas> -->
       <div id="canvas" bind:this={canvasElement} style="width: 640px; height: 480;">a</div>
 
-      <img src="/uploads/{result.original_image}" alt="original_{result.timestamp}">
+      <img src="{STATIC_BASE}/uploads/{result.original_image}" alt="original_{result.timestamp}">
 
       {#if result.cam_image}
-        <img src="/cams/{result.cam_image}" alt="cam_{result.timestamp}" bind:this={camImageElement}>
+        <img src="{STATIC_BASE}/cams/{result.cam_image}" alt="cam_{result.timestamp}" bind:this={camImageElement}>
       {/if}
     </div>
     <div>

@@ -17,7 +17,7 @@
 		},
 		{
 			label: 'EfficientNet B0',
-			value: 'bt_efficientnet_b0_f5.pt',
+			value: 'bt_efficientnet_b0_f0.pt',
 		},
 	]
 

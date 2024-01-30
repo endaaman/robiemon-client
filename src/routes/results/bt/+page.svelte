@@ -9,7 +9,7 @@
     getModalStore, getToastStore,
     popup
   } from '@skeletonlabs/skeleton'
-  import { API_BASE } from '$lib/config'
+  import { API_BASE, STATIC_BASE } from '$lib/config'
 
   import BtResultCircle from '$lib/components/bt_result_circle.svelte';
   import BtResultPredictions from '$lib/components/bt_result_predictions.svelte';
@@ -125,7 +125,7 @@
         </button>
         <section class="p-4 xl:w-2/3 md:w-1/2 w-full flex justify-center items-center max-h-96">
           <img
-            src={`${API_BASE}/uploads/${result.original_image}`}
+            src={`${STATIC_BASE}/uploads/${result.original_image}`}
             alt={result.timestamp}
             class="object-contain block w-full h-full" />
         </section>
@@ -181,7 +181,7 @@
             <!-- <td>{result.hash}</td> -->
             <td>
               <img
-                src={`${API_BASE}/uploads/${result.original_image}`}
+                src={`${STATIC_BASE}/uploads/${result.original_image}`}
                 alt={result.timestamp}
                 class="max-h-32"
               />

@@ -68,7 +68,7 @@
 	<input type="file" id="imageInput" accept="image/*" on:change={ handleFilesSelected }>
 </div>
 
-{#if}
+{#if true}
 	<div>
 		<img id="image" style="max-width: 640px; height: auto;" alt="view" bind:this={ imageElement }>
 	</div>
@@ -79,8 +79,3 @@
 </div>
 
 <button on:click={ upload }>Upload Adjusted Image</button>
-
-<!-- <div class="bg-stone-700 w-full h-96 flex"> -->
-<!-- 	<!-1- <img id="image" src="http://localhost:8000/uploads/1706365947.png" alt="" bind:this={ imageElement } class="object-contain"> -1-> -->
-<!-- 	<img id="image" src="http://localhost:8000/uploads/1706427308.png" alt="" bind:this={ imageElement } class="object-scale-down"> -->
-<!-- </div> -->
