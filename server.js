@@ -8,7 +8,7 @@ const proxy = createProxyMiddleware({
   changeOrigin: true,
 })
 
-const port = 5173
+const port = 5174
 
 app.use('/api/*', proxy)
 app.use('/static/*', proxy)
