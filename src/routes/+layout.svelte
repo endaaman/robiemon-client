@@ -7,17 +7,37 @@
 		AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
 		Avatar, LightSwitch, popup,
 	} from '@skeletonlabs/skeleton'
-	import { initializeStores, Modal, Toast, getToastStore, storePopup } from '@skeletonlabs/skeleton'
+	import {
+		Modal, Toast, Drawer,
+		initializeStores, getToastStore, getDrawerStore, storePopup
+	} from '@skeletonlabs/skeleton'
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 
 	import { page } from '$app/stores'
 	import { API_BASE } from '$lib/config'
 	import * as C from '$lib/const'
 
+	import ModalPredict from '$lib/modals/predict.svelte'
+	import Title from '$lib/components/title.svelte'
+	import Footer from '$lib/components/footer.svelte'
+
+	initializeStores()
+
+
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow })
 
-	import ModalPredict from '$lib/modals/predict.svelte'
+	const drawerStore = getDrawerStore()
 
+	let currentToast = null
+	let drawerOpen = false
+
+	$: {
+		if ($page) drawerStore.close()
+	}
+
+	drawerStore.subscribe((v) => {
+		drawerOpen = v.open
+	})
 
 	const links = [
 		{
@@ -42,8 +62,6 @@
 		// },
 	]
 
-	initializeStores()
-
 	export let data;
 
 	const modalRegistry = {
@@ -63,9 +81,7 @@
 	let eventSource = null
   const status = writable()
 	setContext('status', status)
-  status.set(data.status || {tasks: [], bt_results: []})
-
-	let currentToast = null
+  status.set(data.status || {tasks: [], bt_results: [], models: []})
 
   const connection = writable()
   setContext('connection', connection),
@@ -132,6 +148,19 @@
 		}
 	})
 
+
+	function handleMenuClicked() {
+		if (drawerOpen) {
+			drawerStore.close()
+		} else {
+			drawerStore.open({
+				id: 'menu',
+				position: 'left',
+				width: 'w-[280px] md:w-[480px]',
+			})
+		}
+	}
+
 	onMount(async () => {
 		$connection.connect()
 	})
@@ -143,23 +172,45 @@
 
 <Modal components={modalRegistry} />
 <Toast />
+<Drawer>
+	{#if $drawerStore.id === 'menu'}
+		<div class="flex flex-col h-full">
+			<nav class="list-nav p-4">
+				<ul>
+					{#each links as link}
+					  <li class="my-4">
+							<a
+								class="btn text-lg"
+								class:variant-ghost={ matchHref(link.href, $page.url.pathname) }
+								href={link.href}
+							>
+								{link.label}
+							</a>
+						</li>
+					{/each}
+				</ul>
+			</nav>
+
+			<hr>
+
+				aa
+
+			<div class="mt-auto">
+				<Footer></Footer>
+			</div>
+		</div>
+	{/if}
+</Drawer>
 
 <!-- <pre>{ JSON.stringify($status, 0, 2) }</pre> -->
 
 <AppShell>
 	<svelte:fragment slot="header">
-		<!-- App Bar -->
-		<AppBar>
+		<AppBar class="hidden md:block">
 			<svelte:fragment slot="lead">
-				<a href="/" class="flex justify-left gap-4 align-middle text-xl items-center">
-					<Avatar src="/oharobi.png" width="w-12" rounded="rounded-full" />
-					<strong>
-						<span class="block md:inline">ロビえもん</span>
-						<span class="hidden md:inline mx-1">-</span>
-						<span class="block md:inline">AI病理診断支援システム</span>
-					</strong>
-				</a>
+				<Title></Title>
 			</svelte:fragment>
+
 			<svelte:fragment slot="trail">
 				{#each links as link}
 					<a
@@ -200,9 +251,24 @@
 				{/if}
 
 				<LightSwitch />
-
 			</svelte:fragment>
 		</AppBar>
+
+		<AppBar class="block md:hidden">
+			<svelte:fragment slot="lead">
+				<Title></Title>
+			</svelte:fragment>
+
+			<svelte:fragment slot="trail">
+				<button class="btn hover:variant-ringed rounded-none" on:click={ handleMenuClicked }>
+					<span class="text-3xl"
+						class:i-mdi-menu={!drawerOpen}
+						class:i-mdi-close={drawerOpen}
+					></span>
+				</button>
+			</svelte:fragment>
+		</AppBar>
+
 	</svelte:fragment>
 
 	<!-- (sidebarRight) -->
@@ -211,27 +277,8 @@
   <slot />
 
 	<svelte:fragment slot="pageFooter">
-		<hr />
-		<div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
-			<span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">
-				(C) Department of Cancer Pathology, Faculty of Medicine, Hokkaido University All rights reserverd.
-			</span>
-			<!--
-			<ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
-				<li>
-					<a href="#" class="hover:underline me-4 md:me-6">About</a>
-				</li>
-				<li>
-					<a href="#" class="hover:underline me-4 md:me-6">Privacy Policy</a>
-				</li>
-				<li>
-					<a href="#" class="hover:underline me-4 md:me-6">Licensing</a>
-				</li>
-				<li>
-					<a href="#" class="hover:underline">Contact</a>
-				</li>
-			</ul>
-			-->
+		<div class="hidden md:block">
+			<Footer></Footer>
 		</div>
 	</svelte:fragment>
 </AppShell>

@@ -1,6 +1,6 @@
 <script>
 	import { SlideToggle, getModalStore } from '@skeletonlabs/skeleton';
-	import { onMount, onDestroy, tick } from 'svelte'
+	import { getContext, onMount, onDestroy, tick } from 'svelte'
 	import Cropper from 'cropperjs'
 	import { browser } from '$app/environment'
 	import { debounce } from '$lib'
@@ -10,16 +10,7 @@
 	const LS_BT_CAM = 'pred_modal_bt_cam'
 	const LS_BT_WEIGHT = 'pred_modal_bt_weight'
 
-	const models = [
-		{
-			label: 'ResNet RS50',
-			value: 'bt_resnetrs50_f0.pt',
-		},
-		{
-			label: 'EfficientNet B0',
-			value: 'bt_efficientnet_b0_f0.pt',
-		},
-	]
+  const status = getContext('status')
 
 	export let parent
 	let cropper
@@ -28,7 +19,7 @@
 	let extra = {
 		bt: {
 			cam: false,
-			weight: models[0].value,
+			weight: '',
 		}
 	}
 
@@ -107,8 +98,6 @@
 	<div class="card p-4 shadow-xl max-w-full h-max w-modal-wide" style="max-height: calc(100vh - 80px);">
 		<header class="text-2xl font-bold mb-4">Image confimation</header>
 
-		<!-- <pre>{ JSON.stringify(parent, 0, 2) }</pre> -->
-
 		{#if $modalStore[0].imageURI}
 			<div class="flex" style="max-height: calc(100vh - 220px);">
 				<img id="img" src={$modalStore[0].imageURI} alt="" class="object-scale-down">
@@ -130,9 +119,10 @@
 			</label>
 
 			{#if mode === 'bt'}
+				<!-- <pre>{ JSON.stringify(extra, 0, 2) }</pre> -->
 				<label class="label">
 					<select class="select" bind:value={extra.bt.weight}>
-						{#each models as m}
+						{#each $status.models as m}
 							<option value={m.value}>{m.label}</option>
 						{/each}
 					</select>
