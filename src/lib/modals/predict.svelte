@@ -44,7 +44,6 @@
 	function updateCropper() {
 		closeCropper()
 		const imageElement = document.getElementById('img')
-		console.log(imageElement)
 		cropper = new Cropper(imageElement, {
 			autoCropArea: 1,
 			// aspectRatio: 16 / 9,

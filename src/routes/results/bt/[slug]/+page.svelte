@@ -109,7 +109,7 @@
   <div class="mt-4 grid grid-cols-3 auto-rows-min gap-4">
     <div class="col-span-2">
       <!-- <canvas bind:this={canvasElement} class="w-full"></canvas> -->
-      <div id="canvas" bind:this={canvasElement} style="width: 640px; height: 480;">a</div>
+      <div id="canvas" bind:this={canvasElement} style="width: 640px; height: 480;"></div>
 
       <img src="{STATIC_BASE}/uploads/{result.original_image}" alt="original_{result.timestamp}">
 
