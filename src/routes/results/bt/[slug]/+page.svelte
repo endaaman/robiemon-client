@@ -1,5 +1,4 @@
 <script>
-  import * as THREE from 'three'
 	import { page } from '$app/stores'
 	import { getContext, onMount, onDestroy, tick } from 'svelte'
   import {

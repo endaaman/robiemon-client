@@ -1,5 +1,6 @@
 <script>
 	import '../../app.postcss';
+	import 'cropperjs/dist/cropper.min.css'
 	import { SlideToggle, getModalStore, RangeSlider } from '@skeletonlabs/skeleton';
 	import { getContext, onMount, onDestroy, tick } from 'svelte'
 	import Cropper from 'cropperjs'
