@@ -17,15 +17,16 @@
 	let imageElement
 	let cropperWidth
 	let cropperHeight
-	let scale = 1.0
 
 	let mode = 'bt'
 	let extra = {
 		bt: {
-			cam: false,
-			weight: '',
+			cam: browser ? localStorage.getItem(LS_PRED_BT_CAM) === 'on' : false,
+			weight: browser ? localStorage.getItem(LS_PRED_BT_WEIGHT) : '',
 		}
 	}
+	let scale = browser ? parseFloat(localStorage.getItem(LS_PRED_SCALE)) : 1.0
+
 
 	const modalStore = getModalStore()
 
@@ -54,18 +55,6 @@
 		}
 
 		window.addEventListener('resize', debounce(updateCropper, 500))
-
-		if (browser){
-			if (localStorage.hasOwnProperty(LS_PRED_BT_WEIGHT)) {
-				extra.bt.weight = localStorage.getItem(LS_PRED_BT_WEIGHT)
-			}
-			if (localStorage.hasOwnProperty(LS_PRED_BT_CAM)) {
-				extra.bt.cam = localStorage.getItem(LS_PRED_BT_CAM) === 'on'
-			}
-			if (localStorage.hasOwnProperty(LS_PRED_SCALE)) {
-				scale = localStorage.getItem(LS_PRED_SCALE)
-			}
-		}
 	})
 
 	onDestroy(() => {
@@ -76,17 +65,9 @@
 		updateCropper()
 	}
 
-	function handleWeightChanged(e) {
-		localStorage.setItem(LS_PRED_BT_WEIGHT, e.target.value)
-	}
-
-	function handleCamChanged(e) {
-		localStorage.setItem(LS_PRED_BT_CAM, e.target.checked ? 'on' : 'off')
-	}
-	function handleScaleChanged(e) {
-		console.log(e.target.value)
-		localStorage.setItem(LS_PRED_SCALE, e.target.value)
-	}
+	$: localStorage.setItem(LS_PRED_BT_WEIGHT, extra.bt.weight)
+	$: localStorage.setItem(LS_PRED_BT_CAM, extra.bt.cam ? 'on' : 'off')
+	$: localStorage.setItem(LS_PRED_SCALE, ''+scale)
 	function handleScaleSelected(e) {
 		if (e.target.value) {
 			scale = e.target.value
@@ -129,8 +110,8 @@
 				<label class="label">
 					<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
 						<div class="input-group-shim">Scale</div>
-						<input type="number" placeholder="Amount" class="w-[160px]"
-							bind:value={ scale } on:change={ handleScaleChanged } />
+						<input type="number" placeholder="Scale" class="w-[160px]" step='0.001'
+							bind:value={ scale } />
 						<select on:change={ handleScaleSelected }>
 							<option>...</option>
 							<option value="1.0">VS (1.0)</option>
@@ -150,7 +131,7 @@
 					<!-- </div> -->
 				</label>
 
-				<button class="btn variant-filled-surface">Reset</button>
+				<button class="btn variant-filled-surface" on:click={ handleResetClicked }>Reset</button>
 			</div>
 		</header>
 
@@ -177,14 +158,14 @@
 			{#if mode === 'bt'}
 				<!-- <pre>{ JSON.stringify(extra, 0, 2) }</pre> -->
 				<label class="label">
-					<select class="select" bind:value={extra.bt.weight} on:change={ handleWeightChanged }>
+					<select class="select" bind:value={extra.bt.weight}>
 						{#each $status.models as m}
 							<option value={m.weight}>{m.label}</option>
 						{/each}
 					</select>
 				</label>
 				<SlideToggle name="bt-toggle" size="sm"
-					bind:checked={ extra.bt.cam } on:change={ handleCamChanged }
+					bind:checked={ extra.bt.cam }
 				>CAM</SlideToggle>
 
 			{/if}
