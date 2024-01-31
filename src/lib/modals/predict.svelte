@@ -132,7 +132,7 @@
 							bind:value={ scale } />
 						<select on:change={ handleScaleSelected }>
 							{#each scales as s}
-								<option value={s.scale}>{s.label} ({s.scale})</option>
+								<option value={s.scale} selected={scale == s.scale}>{s.label} ({s.scale})</option>
 							{/each}
 						</select>
 					</div>
