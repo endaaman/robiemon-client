@@ -12,6 +12,25 @@
 
   const status = getContext('status')
 
+	const scales = [
+		{
+			label: 'VS',
+			scale: 1.0,
+		}, {
+			label: '10人鏡 x20',
+			scale: 0.941,
+		}, {
+			label: '10人鏡 x10',
+			scale: 1.8813,
+		}, {
+			label: 'HY-2307 x20',
+			scale: 2.185,
+		}, {
+			label: 'HY-2307 x20',
+			scale: 4.371,
+		},
+	]
+
 	export let parent
 	let cropper
 	let imageElement
@@ -112,10 +131,9 @@
 						<input type="number" placeholder="Scale" class="w-[160px]" step='0.001'
 							bind:value={ scale } />
 						<select on:change={ handleScaleSelected }>
-							<option>...</option>
-							<option value="1.0">VS (1.0)</option>
-							<option value="2.185">x20 (2.185)</option>
-							<option value="4.371">x10 (4.371)</option>
+							{#each scales as s}
+								<option value={s.scale}>{s.label} ({s.scale})</option>
+							{/each}
 						</select>
 					</div>
 
