@@ -3,6 +3,9 @@
     ConicGradient,
   } from '@skeletonlabs/skeleton'
 
+  let clazz = ''
+  export {clazz as class};
+
   export let result
 
   const labels = ['L', 'M', 'G', 'B']
@@ -29,4 +32,4 @@
   }
 </script>
 
-<ConicGradient stops={ resultToConic(result) }></ConicGradient>
+<ConicGradient stops={ resultToConic(result) } class="{clazz}"></ConicGradient>

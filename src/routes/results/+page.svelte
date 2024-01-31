@@ -3,15 +3,16 @@
   import { onMount, onDestroy, tick, setContext, getContext  } from 'svelte'
 	import { writable } from 'svelte/store'
   import {
-    getToastStore, Table,
+    getToastStore, getModalStore,
     RadioGroup, RadioItem,
     tableSourceMapper, tableMapperValues
   } from '@skeletonlabs/skeleton';
-  import { STATIC_BASE } from '$lib/config'
+  import { API_BASE, STATIC_BASE } from '$lib/config'
 	import { page } from '$app/stores'
   import { browser } from '$app/environment'
 
   const toastStore = getToastStore()
+  const modalStore = getModalStore()
 
   export let data
 
@@ -30,8 +31,35 @@
 
   const status = getContext('status')
 
-  function handleReconnectClick() {
-    console.log('reconnecr')
+  async function handleDeleteClicked(task) {
+    modalStore.trigger({
+      type: 'confirm',
+      title: 'Delete confirm',
+      body: 'Are you sure you wish to proceed?',
+      response: async (r) => {
+        if (!r) {
+          return
+        }
+        try {
+          const response = await fetch(`${API_BASE}/tasks/${task.timestamp}`, {
+            method: 'DELETE',
+          })
+          toastStore.trigger({
+            message: `Task deleted.`,
+            timeout: 5000,
+            background: 'variant-filled',
+          })
+
+        } catch (error) {
+          console.log(error)
+          toastStore.trigger({
+            message: 'Error: Failed to connect server.',
+            timeout: 5000,
+            background: 'variant-filled-error',
+          })
+        }
+      },
+    })
   }
 </script>
 
@@ -46,17 +74,6 @@
   </RadioItem>
 </RadioGroup>
 
-<!-- <RadioGroup> -->
-<!--   <RadioItem bind:group={mode} name="mode" value="card"> -->
-<!--     <span class="i-mdi-view-grid rotate-180 align-middle text-lg"></span> -->
-<!--   </RadioItem> -->
-
-<!--   <RadioItem bind:group={mode} name="mode" value="table"> -->
-<!--     <span class="i-mdi-view-sequential align-middle text-lg"></span> -->
-<!--   </RadioItem> -->
-<!-- </RadioGroup> -->
-
-
 <div class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 auto-rows-min gap-4">
   {#if $status.tasks.length === 0}
     <p>No tasks there.</p>
@@ -65,15 +82,22 @@
     {@const i = sort === 'ascending' ? _i : $status.tasks.length - 1 - _i }
     {@const task = $status.tasks[i]}
     <a
-      href="/results/{task.mode}/{task.timestamp}" class="card flex flex-col"
+      href="/results/{task.mode}/{task.timestamp}" class="card flex flex-col relative"
       class:opacity-75={ task.status === 'pending' }
       class:pointer-events-none={ task.status !== 'done' }
     >
+      <button
+        on:click|preventDefault={ ()=> handleDeleteClicked(task) }
+        class="btn btn-icon btn-icon-sm hover:variant-ringed absolute top-1 right-1"
+      >
+        <span class="i-mdi-close"></span>
+      </button>
+
       <header class="card-header">
         <!-- <h3 class="text-sm">{format(new Date(task.timestamp * 1000), 'yyyy-MM-dd HH:mm:ss')}</h3> -->
         <h3 clas="text-sm">
           {format(new Date(task.timestamp * 1000), 'yyyy-MM-dd HH:mm:ss')} -
-          {task.hash}
+          {task.name}
         </h3>
       </header>
       <section class="px-4 py-2 flex justify-center items-center grow max-h-96">

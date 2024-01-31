@@ -5,11 +5,12 @@
   import { onMount, onDestroy, tick, afterUpdate } from 'svelte'
 	import {
     AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
-    FileDropzone, Avatar, LightSwitch,
+    FileDropzone, Avatar, LightSwitch, RangeSlider,
     getModalStore, getToastStore,
 	} from '@skeletonlabs/skeleton'
 
   import { API_BASE } from '$lib/config'
+  import { LS_BRIGHTNESS } from '$lib/const'
 	import { page } from '$app/stores'
 
 
@@ -22,7 +23,12 @@
   let canvas
   let processing = false
   let files = []
-  let selectedTarget = 'webcam'
+  let brightness = 100
+
+  $: if (currentCameraId && videoElement) {
+    videoElement.style.filter = `brightness(${brightness}%)`
+    localStorage.setItem(LS_BRIGHTNESS, brightness)
+	}
 
   async function getCameras() {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -77,7 +83,9 @@
     processing = true
     canvas.width = videoElement.videoWidth
     canvas.height = videoElement.videoHeight
-    canvas.getContext('2d').drawImage(videoElement, 0, 0)
+    const context = canvas.getContext('2d')
+    context.filter = getComputedStyle(videoElement).filter
+    context.drawImage(videoElement, 0, 0)
 
     const imageURI = canvas.toDataURL('image/png')
 
@@ -92,14 +100,14 @@
 
   }
 
-  async function predictImage({ imageURI, mode, extra }) {
+  async function predictImage({ imageURI, scale, mode, extra }) {
     const blob = await fetch(imageURI).then(res => res.blob());
     const formData = new FormData();
-    console.log(extra[mode])
     for (const [key, value] of Object.entries(extra[mode])) {
       formData.append(key, value);
     }
     formData.append('file', blob, 'webcam.png');
+    formData.append('scale', scale);
 
     try {
       const response = await fetch(`${API_BASE}/predict/${mode}`, {
@@ -110,7 +118,7 @@
       console.log(data)
 
       toastStore.trigger({
-        message: `The task was accepted as "${data.hash}"`,
+        message: `The task was accepted as "${data.name}"`,
         timeout: 5000,
         background: 'variant-filled-primary',
         action: {
@@ -150,6 +158,10 @@
 
   if (browser) {
     onMount(async function() {
+      if (localStorage.hasOwnProperty(LS_BRIGHTNESS)) {
+        brightness = localStorage.getItem(LS_BRIGHTNESS)
+      }
+
       // afterUpdate(async () => {
       cameras = await getCameras();
       if (cameras.length > 0) {
@@ -197,11 +209,11 @@
       <video bind:this={videoElement} autoplay class="h-full">
         <track kind="captions">
       </video>
+      <canvas bind:this={canvas} class="hidden"></canvas>
     </div>
 
-    <canvas bind:this={canvas} class="hidden"></canvas>
 
-    <div class="flex justify-left gap-4 mt-4">
+    <div class="flex flex-row gap-4 mt-4 items-center">
       <label class="label">
         <select class="select" on:change={ handleCameraChanged }>
           {#each cameras as camera}
@@ -209,6 +221,11 @@
           {/each}
         </select>
       </label>
+
+      <RangeSlider
+        name="range-slider"
+        min={0} max={200} step={1} bind:value={ brightness }
+      ></RangeSlider>
 
       <button type="button" class="btn variant-filled w-24" on:click={handlePredictClicked}>
         {#if processing}

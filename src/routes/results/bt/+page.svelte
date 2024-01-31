@@ -5,7 +5,7 @@
 	import { page } from '$app/stores'
   import { getContext  } from 'svelte'
   import {
-    RadioGroup, RadioItem, ConicGradient, ListBox, ListBoxItem,
+    RadioGroup, RadioItem, ListBox, ListBoxItem,
     getModalStore, getToastStore,
     popup
   } from '@skeletonlabs/skeleton'
@@ -23,6 +23,14 @@
   let sort = data.sort
   let mode = data.mode
 
+  function weightNameToLabel(weight) {
+    const m = $status.models.find((m)=> m.weight === weight)
+    if (m) {
+      console.log(m)
+      return m.label
+    }
+    return weight
+  }
 
   function timestampToTitle(timestamp) {
     return format(new Date(timestamp * 1000), 'yyyy-MM-dd HH:mm:ss')
@@ -110,37 +118,51 @@
 </RadioGroup>
 
 {#if mode === 'card'}
-  <div class="grid lg:grid-cols-2 gap-4 mt-2">
 
+  <div class="grid lg:grid-cols-2 gap-4 mt-2">
     {#each $status.bt_results as _result, _i}
       {@const i = sort === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
       {@const result = $status.bt_results[i]}
-      <!-- <pre>{ JSON.stringify(result, 0, 2) }</pre> -->
-      <a href="/results/bt/{result.timestamp}" class="card flex flex-row grow relative" >
+      <!-- <pre>{ JSON.stringify($status.models, 0, 2) }</pre> -->
+      <a href="/results/bt/{result.timestamp}" class="card flex flex-row grow relative gap-4 p-4" >
         <button
           on:click|preventDefault={ ()=> handleDeleteClicked(result) }
           class="btn btn-icon btn-icon-sm hover:variant-ringed absolute top-1 right-1"
         >
-          <span class="i-mdi-times"></span>
+          <span class="i-mdi-close"></span>
         </button>
-        <section class="p-4 xl:w-2/3 md:w-1/2 w-full flex justify-center items-center max-h-96">
+        <section class="xl:w-2/3 md:w-1/2 w-full flex justify-center items-center max-h-96">
           <img
             src={`${STATIC_BASE}/uploads/${result.original_image}`}
             alt={result.timestamp}
             class="object-contain block w-full h-full" />
         </section>
 
-        <section class="p-4 xl:w-1/3 md:w-1/2 w-full flex flex-col">
-          <h3>{ timestampToTitle(result.timestamp) }</h3>
+        <section class="xl:w-1/3 md:w-1/2 w-full flex flex-col">
+          <h3>
+            <span>{ result.name }</span>
+            <span class="text-sm">({ timestampToTitle(result.timestamp) })</span>
+          </h3>
 
           <hr class="my-1" />
           <div class="my-auto pt-2 pb-4 flex flex-row gap-4">
-            <div class="w-2/3 md:w-1/2">
-              <BtResultCircle result={ result }></BtResultCircle>
+            <div class="w-2/3 sm:w-1/2 flex flex-col">
+              <BtResultCircle result={ result } class="my-auto"></BtResultCircle>
             </div>
-            <div class="w-1/3 md:w-1/2">
+            <div class="w-1/3 sm:w-1/2">
               <BtResultPredictions result={ result }></BtResultPredictions>
             </div>
+          </div>
+
+          <hr class="my-2" />
+          <div>
+            {#if result.cam_image }
+              <span class="chip variant-filled">With CAM</span>
+            {:else}
+              <span class="chip variant-filled chip-disabled">No CAM</span>
+            {/if}
+
+            <span class="chip variant-soft">{ weightNameToLabel(result.weight) }</span>
           </div>
 
           <!-- <hr class="mb-1 mt-auto" /> -->

@@ -5,7 +5,7 @@
 	import { writable } from 'svelte/store'
 	import {
 		AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
-		Avatar, LightSwitch, popup,
+		Avatar, LightSwitch,
 	} from '@skeletonlabs/skeleton'
 	import {
 		Modal, Toast, Drawer,
@@ -20,6 +20,7 @@
 	import ModalPredict from '$lib/modals/predict.svelte'
 	import Title from '$lib/components/title.svelte'
 	import Footer from '$lib/components/footer.svelte'
+	import ConnectionButton from '$lib/components/connection_button.svelte'
 
 	initializeStores()
 
@@ -191,12 +192,16 @@
 				</ul>
 			</nav>
 
-			<hr>
-
-				aa
 
 			<div class="mt-auto">
-				<Footer></Footer>
+				<div class="flex flex-row gap-4 justify-center my-4">
+					<ConnectionButton></ConnectionButton>
+					<LightSwitch />
+				</div>
+
+				<hr />
+
+				<Footer class="p-4"></Footer>
 			</div>
 		</div>
 	{/if}
@@ -223,34 +228,9 @@
 				{/each}
 
 				<div class="inline-block min-h-[1em] w-px self-stretch bg-surface-300"></div>
-
-				{#if $connection.status === C.CONNECTION_CONNECTED}
-					<button class="btn btn-sm variant-ringed-primary" use:popup={{
-						event: 'hover',
-						target: 'popupHover',
-						placement: 'top'
-					}}>
-						<span class="i-mdi-lan-check text-primary-500"></span>
-					</button>
-					<div class="card p-4 variant-filled-surface" data-popup="popupHover">
-						<p>Connected to the AI server.</p>
-						<div class="arrow variant-filled-surface" />
-					</div>
-				{:else}
-					<button class="btn btn-sm variant-ringed-error" use:popup={{
-						event: 'hover',
-						target: 'popupHover',
-						placement: 'top'
-					}} on:click={ $connection.connect() }>
-						<span class="i-mdi-lan-disconnect text-error-500"></span>
-					</button>
-					<div class="card p-4 variant-filled-surface" data-popup="popupHover">
-						<p>Click to try to connect the AI server again</p>
-						<div class="arrow variant-filled-surface" />
-					</div>
-				{/if}
-
+				<ConnectionButton></ConnectionButton>
 				<LightSwitch />
+
 			</svelte:fragment>
 		</AppBar>
 
@@ -278,7 +258,8 @@
 
 	<svelte:fragment slot="pageFooter">
 		<div class="hidden md:block">
-			<Footer></Footer>
+			<hr>
+			<Footer class="p-4"></Footer>
 		</div>
 	</svelte:fragment>
 </AppShell>
