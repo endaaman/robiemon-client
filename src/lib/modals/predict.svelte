@@ -114,8 +114,8 @@
 						<select on:change={ handleScaleSelected }>
 							<option>...</option>
 							<option value="1.0">VS (1.0)</option>
-							<option value="0.846">x10 (0.846)</option>
-							<option value="0.423">x20 (0.423)</option>
+							<option value="2.185">x20 (2.185)</option>
+							<option value="4.371">x10 (4.371)</option>
 						</select>
 					</div>
 
