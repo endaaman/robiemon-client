@@ -86,7 +86,7 @@
 
 
 <style global>
-	/* @import "cropperjs/dist/cropper.css"; */
+	@import "cropperjs/dist/cropper.css";
 
 	#img {
 		/* This rule is very important, please don't ignore this */
@@ -104,7 +104,6 @@
 	<div id="pred-modal" class="card p-4 shadow-xl max-w-full h-max w-modal-wide" style="max-height: calc(100vh - 80px);">
 		<header class="mb-4 flex flex-row align-middle items-center">
 			<h3 class="text-2xl font-bold">Image prediction</h3>
-
 
 			<div class="ml-auto flex flex-row gap-4">
 				<label class="label">
