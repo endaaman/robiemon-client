@@ -204,13 +204,11 @@
     </AppRail>
   </div>
 
-  <div class="p-4 grow h-full flex flex-col bg-primary-100" class:hidden={ data.mode !== 'webcam'}>
-    <div id="videoContainer" class="grow h-full w-full" style="max-height: calc(100vh - 200px);">
-      <video bind:this={videoElement} autoplay class="h-full w-full">
-        <track kind="captions">
-      </video>
-      <canvas bind:this={canvas} class="hidden"></canvas>
-    </div>
+  <div class="p-4 grow h-full flex flex-col" class:hidden={ data.mode !== 'webcam'}>
+    <video bind:this={videoElement} autoplay class="object-left-top" style="max-height: calc(100vh - 160px);">
+      <track kind="captions">
+    </video>
+    <canvas bind:this={canvas} class="hidden"></canvas>
 
     <div class="flex flex-row gap-4 mt-4 items-center">
       <label class="label">
