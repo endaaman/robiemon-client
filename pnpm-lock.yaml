@@ -23,9 +23,6 @@ dependencies:
   '@iconify/svelte':
     specifier: ^3.1.6
     version: 3.1.6(svelte@4.2.9)
-  '@jsuites/cropper':
-    specifier: ^1.6.2
-    version: 1.6.2
   '@skeletonlabs/skeleton':
     specifier: 2.7.1
     version: 2.7.1(svelte@4.2.9)
@@ -445,12 +442,6 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
-    dev: false
-
-  /@jsuites/cropper@1.6.2:
-    resolution: {integrity: sha512-sFyqLAxvZMXCYZEq7Kv3BhFl117BvBsnyAYCo9G816gBsOmX3dJuy87GtOfwpio2NYpPv8zwwLOXy7iX23KuLg==}
-    dependencies:
-      jsuites: 4.17.7
     dev: false
 
   /@nodelib/fs.scandir@2.1.5:
@@ -1631,10 +1622,6 @@ packages:
   /jiti@1.21.0:
     resolution: {integrity: sha512-gFqAIbuKyyso/3G2qhiO2OM6shY6EPP/R0+mkDbyspxKazh8BXDC5FiFsUjlczgdNz/vfra0da2y+aHrusLG/Q==}
     hasBin: true
-    dev: false
-
-  /jsuites@4.17.7:
-    resolution: {integrity: sha512-qxR9bXsrN2a5nz1hhJjBwKafIg/dFVJY3AZbm1Idvo6rI98t8tlH9oIZVr6nNMGisVbD44HNtLr1juYHlsXpmg==}
     dev: false
 
   /kleur@4.1.5:
