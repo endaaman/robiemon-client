@@ -33,15 +33,18 @@
 
 <div class="grid grid-cols-3 auto-rows-min gap-4 pt-4">
 
-  <div class="col-span-2 relative">
-    <img src={imagePath} alt="original_{result.timestamp}" on:load={ handleImageLoaded }>
+  <div class="col-span-2">
 
-    {#if camPath}
-      <div
-        class="absolute left-0 top-0 mix-blend-multiply"
+    <div class="relative">
+      <img src={imagePath} alt="original_{result.timestamp}" on:load={ handleImageLoaded }>
+      {#if camPath}
+        <div
+          class="absolute left-0 top-0 mix-blend-multiply"
           style="background-image: url({camPath}); opacity: {opacity/100}; width: {imageWidth}px; height: {imageHeight}px;"
-      ></div>
-    {/if}
+        ></div>
+      {/if}
+    </div>
+
   </div>
 
   <div>

@@ -14,7 +14,7 @@
 
 	const scales = [
 		{
-			label: 'VS',
+			label: 'VS x20 440nm/px',
 			scale: 1.0,
 		}, {
 			label: '10人鏡 x20',
