@@ -16,6 +16,13 @@
   const camPath = result.cam_image ? `${STATIC_BASE}/cams/${result.cam_image}` : ""
 
   let opacity = 0
+  let imageWidth = 0
+  let imageHeight = 0
+  function handleImageLoaded(e) {
+    imageWidth = e.target.clientWidth
+    imageHeight = e.target.clientHeight
+  }
+
 </script>
 
 <style>
@@ -27,14 +34,13 @@
 <div class="grid grid-cols-3 auto-rows-min gap-4 pt-4">
 
   <div class="col-span-2 relative">
-    <img
-      src={imagePath} alt="original_{result.timestamp}"
-    >
+    <img src={imagePath} alt="original_{result.timestamp}" on:load={ handleImageLoaded }>
 
     {#if camPath}
       <div
-        class="absolute inset-0"
-        style="background-image: url({camPath}); mix-blend-mode: multiply; opacity: {opacity/100}"></div>
+        class="absolute left-0 top-0 mix-blend-multiply"
+          style="background-image: url({camPath}); opacity: {opacity/100}; width: {imageWidth}px; height: {imageHeight}px;"
+      ></div>
     {/if}
   </div>
 
