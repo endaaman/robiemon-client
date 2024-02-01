@@ -57,6 +57,9 @@
 
 	function updateCropper() {
 		closeCropper()
+		if (!imageElement) {
+			return
+		}
 		cropper = new Cropper(imageElement, {
 			autoCropArea: 1,
 			highlight: false,

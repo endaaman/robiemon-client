@@ -1,11 +1,12 @@
 <script>
-	import { page } from '$app/stores'
+  import { browser } from '$app/environment'
   import format from 'date-fns/format'
 	import { getContext, onMount, onDestroy, tick } from 'svelte'
   import {
       RangeSlider, ConicGradient,
   } from '@skeletonlabs/skeleton'
   import { STATIC_BASE } from '$lib/config'
+	import { debounce } from '$lib'
 
   import BtResultCircle from '$lib/components/bt_result_circle.svelte';
   import BtResultPredictions from '$lib/components/bt_result_predictions.svelte';
@@ -15,13 +16,22 @@
   const imagePath = `${STATIC_BASE}/uploads/${result.original_image}`
   const camPath = result.cam_image ? `${STATIC_BASE}/cams/${result.cam_image}` : ""
 
+  let imageElement
   let opacity = 0
   let imageWidth = 0
   let imageHeight = 0
-  function handleImageLoaded(e) {
-    imageWidth = e.target.clientWidth
-    imageHeight = e.target.clientHeight
+  function handleImageLoaded() {
+    if (imageElement) {
+      imageWidth = imageElement.clientWidth
+      imageHeight = imageElement.clientHeight
+    }
   }
+
+	onMount(async () => {
+		if (browser) {
+      window.addEventListener('resize', handleImageLoaded)
+		}
+	})
 
 </script>
 
@@ -34,13 +44,12 @@
 <div class="grid grid-cols-3 auto-rows-min gap-4 pt-4">
 
   <div class="col-span-2">
-
-    <div class="relative">
-      <img src={imagePath} alt="original_{result.timestamp}" on:load={ handleImageLoaded }>
+    <div class="relative w-full">
+      <img src={imagePath} alt="original_{result.timestamp}" on:load={ handleImageLoaded } bind:this={ imageElement }>
       {#if camPath}
         <div
           class="absolute left-0 top-0 mix-blend-multiply"
-          style="background-image: url({camPath}); opacity: {opacity/100}; width: {imageWidth}px; height: {imageHeight}px;"
+          style="background-size: 100% 100%; background-image: url({camPath}); opacity: {opacity/100}; width: {imageWidth}px; height: {imageHeight}px;"
         ></div>
       {/if}
     </div>
