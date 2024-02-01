@@ -115,6 +115,19 @@
 		display: block;
 		max-width: 100%;
 	}
+
+	#input-scale::-webkit-outer-spin-button,
+	#input-scale::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	#input-scale[type=number] {
+		-moz-appearance: textfield;
+		appearance: textfield;
+	}
+	#input-scale:focus {
+		outline: none;
+	}
 </style>
 
 
@@ -128,7 +141,7 @@
 				<label class="label">
 					<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
 						<div class="input-group-shim">Scale</div>
-						<input type="number" placeholder="Scale" class="w-[160px]" step='0.001'
+						<input id="input-scale" type="number" placeholder="Scale" class="w-[120px]" step='0.001'
 							bind:value={ scale } />
 						<select on:change={ handleScaleSelected }>
 							{#each scales as s}

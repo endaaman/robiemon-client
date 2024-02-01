@@ -57,9 +57,9 @@
 			href: '/results',
 		},
 		// {
-		// 	icon: 'info',
-		// 	label: 'About',
-		// 	href: '/about',
+		// 	icon: 'setting',
+		// 	label: 'Setting',
+		// 	href: '/setting',
 		// },
 	]
 
@@ -183,7 +183,7 @@
 					  <li class="my-4">
 							<a
 								class="btn text-lg"
-								class:variant-ghost={ matchHref(link.href, $page.url.pathname) }
+								class:variant-soft-primary={ matchHref(link.href, $page.url.pathname) }
 								href={link.href}
 							>
 								{link.label}
@@ -220,8 +220,8 @@
 			<svelte:fragment slot="trail">
 				{#each links as link}
 					<a
-						class="btn text-lg hover:variant-ghost"
-						class:variant-ghost={ matchHref(link.href, $page.url.pathname) }
+						class="btn text-lg hover:variant-soft-primary"
+						class:variant-soft-primary={ matchHref(link.href, $page.url.pathname) }
 						href={link.href}
 					>
 						<span class="i-mdi-{link.icon} align-middle"></span> {link.label}
