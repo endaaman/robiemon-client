@@ -119,7 +119,7 @@
 
       toastStore.trigger({
         message: `The task was accepted as "${data.name}"`,
-        timeout: 5000,
+        timeout: 7000,
         background: 'variant-filled-primary',
         action: {
           label: 'See tasks',

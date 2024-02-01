@@ -1,6 +1,5 @@
 <script>
   import format from 'date-fns/format'
-  import chroma from 'chroma-js'
   import { goto } from '$app/navigation';
 	import { page } from '$app/stores'
   import { getContext  } from 'svelte'

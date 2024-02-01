@@ -1,5 +1,6 @@
 <script>
   import format from 'date-fns/format'
+  import { goto } from '$app/navigation';
   import { onMount, onDestroy, tick, setContext, getContext  } from 'svelte'
 	import { writable } from 'svelte/store'
   import {
@@ -15,7 +16,6 @@
   const modalStore = getModalStore()
 
   export let data
-
   let sort = data.sort
 
   function formatDate(d) {
@@ -61,8 +61,18 @@
       },
     })
   }
-</script>
 
+  $: {
+    let query = new URLSearchParams($page.url.searchParams.toString())
+    if (sort === 'descending') {
+      query.delete('sort');
+    } else {
+      query.set('sort', sort);
+    }
+    goto(`?${query.toString()}`)
+  }
+
+</script>
 
 <RadioGroup>
   <RadioItem bind:group={sort} name="sort" value="descending">

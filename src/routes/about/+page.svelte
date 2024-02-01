@@ -1,81 +1,80 @@
 <script>
-	import { setContext, onMount, onDestroy, tick } from 'svelte'
-	import Cropper from 'cropperjs'
-
-	let cropper
-
-	onMount(() => {
-		return
-		const image = document.getElementById('image');
-		cropper = new Cropper(image, {
-			// aspectRatio: 16 / 9,
-			aspectRatio: image.width/image.height,
-			crop(event) {
-				console.log('event', event)
-				// console.log(event.detail.x);
-				// console.log(event.detail.y);
-				// console.log(event.detail.width);
-				// console.log(event.detail.height);
-				// console.log(event.detail.rotate);
-				// console.log(event.detail.scaleX);
-				// console.log(event.detail.scaleY);
-			},
-		});
-	})
-
-	onDestroy(() => {
-		if (cropper) {
-			cropper.destroy()
-		}
-	})
-
-	let imageElement
-	let brightness = 50
-
-	function handleFilesSelected(e) {
-		let file = e.target.files[0]
-		if (file) {
-			const reader = new FileReader();
-			reader.readAsDataURL(file);
-			reader.onload = function(event) {
-				image.src = event.target.result;
-				image.style.filter = `brightness(${brightness}%)`;
-			};
-		}
-	}
-
-	$: {
-		if (imageElement) {
-			imageElement.style.filter = `brightness(${brightness}%)`;
-		}
-	}
-
-	function upload() {
-		const canvas = document.createElement('canvas');
-		const ctx = canvas.getContext('2d');
-		canvas.width = image.width;
-		canvas.height = image.height;
-		ctx.filter = image.style.filter;
-		ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-		const imageData = canvas.toDataURL('image/png');
-	}
-
+	import { RangeSlider } from "@skeletonlabs/skeleton";
+	let opacity = 0
 </script>
+
+<style>
+	img {
+		/* mask-mode: alpha; */
+
+		/* mask-image: linear-gradient(black, transparent); */
+		mask-image: url(/static/cams/1706761653.png);
+		/* mask-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/sun.svg); */
+		mask-mode: alpha;
+
+		mask-position: center;
+		mask-repeat: no-repeat;
+	}
+
+	.bg {
+		background-image: url('/static/cams/1706761653.png');
+	}
+
+	#image-container {
+		position: relative;
+
+    /* background-image: url("/static/uploads/1706761653.png"); */
+    /* position: absolute; */
+    /* top: 0; */
+    /* left: 0; */
+    /* width: 600px; */
+    /* height: 400px; */
+    /* z-index: 1; */
+	}
+
+	#image-cam {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+		z-index: 2;
+
+    background-image: url(/static/cams/1706761653.png);
+		/* background-color: red; */
+    mix-blend-mode: multiply;
+
+	}
+</style>
+
 
 <h1>About</h1>
 
-<div>
-	<input type="file" id="imageInput" accept="image/*" on:change={ handleFilesSelected }>
-</div>
+<div class="p-4">
+	<div class="grid grid-cols-3 auto-rows-min gap-4">
+		<div class="col-span-2">
 
-{#if true}
-	<div>
-		<img id="image" style="max-width: 640px; height: auto;" alt="view" bind:this={ imageElement }>
+			<div id="image-container">
+				<img src="/static/uploads/1706761653.png" alt="org">
+				<!-- <img id="image-cam" src="/static/cams/1706761653.png" alt="cam" style="opacity: {opacity/100};"> -->
+				<div id="image-cam" style="opacity: {opacity/100};"></div>
+			</div>
+
+			<!-- <div class="bg w-[300px] h-[200px]"></div> -->
+
+			<hr>
+		</div>
+		<div class="bg-primary-100">
+
+      <RangeSlider
+        name="opacity-slider"
+        min={0} max={100} step={1} bind:value={ opacity }
+      ></RangeSlider>
+
+		</div>
 	</div>
-{/if}
-
-<div>
-	<input type="range" id="brightnessSlider" min="0" max="200" bind:value={ brightness }>
 </div>
 
-<button on:click={ upload }>Upload Adjusted Image</button>
+<!-- <img src="/static/cams/1706761653.png" alt="" -->
+<!-- 	class="w-[600px]" style=""> -->
+

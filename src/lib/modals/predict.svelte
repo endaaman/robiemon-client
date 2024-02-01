@@ -26,7 +26,7 @@
 			label: 'HY-2307 x20',
 			scale: 2.185,
 		}, {
-			label: 'HY-2307 x20',
+			label: 'HY-2307 x10',
 			scale: 4.371,
 		},
 	]
