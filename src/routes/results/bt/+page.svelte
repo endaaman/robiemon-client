@@ -25,7 +25,6 @@
   function weightNameToLabel(weight) {
     const m = $status.models.find((m)=> m.weight === weight)
     if (m) {
-      console.log(m)
       return m.label
     }
     return weight
