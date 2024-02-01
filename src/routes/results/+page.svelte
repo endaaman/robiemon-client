@@ -18,17 +18,6 @@
   export let data
   let sort = data.sort
 
-  function formatDate(d) {
-    return d.toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-    })
-    .split('/')
-    .join('-');
-  }
-
   const status = getContext('status')
 
   async function handleDeleteClicked(task) {
