@@ -23,6 +23,9 @@
 			label: '10人鏡 x10',
 			scale: 1.8813,
 		}, {
+			label: 'HY-2307 x40',
+			scale: 1.093,
+		}, {
 			label: 'HY-2307 x20',
 			scale: 2.185,
 		}, {

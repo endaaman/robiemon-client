@@ -83,6 +83,7 @@
     processing = true
     canvas.width = videoElement.videoWidth
     canvas.height = videoElement.videoHeight
+    console.log(videoElement.videoWidth, videoElement.videoHeight)
     const context = canvas.getContext('2d')
     context.filter = getComputedStyle(videoElement).filter
     context.drawImage(videoElement, 0, 0)
