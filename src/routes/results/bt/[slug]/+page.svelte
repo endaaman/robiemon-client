@@ -6,6 +6,7 @@
 	const status = getContext('status')
 
   let result = null
+  let models = $status.models
 
 	$: result = $status.bt_results.find((r) => {
 		return r.timestamp === parseInt($page.params.slug)
@@ -18,8 +19,8 @@
 	<span>Back to list</span>
 </a>
 
-{#if result}
-  <Loaded { result }></Loaded>
+{#if result && models.length > 0}
+  <Loaded { result } { models }></Loaded>
 {:else}
 	<p>Not found</p>
 {/if}

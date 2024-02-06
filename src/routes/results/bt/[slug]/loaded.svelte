@@ -12,6 +12,7 @@
   import BtResultPredictions from '$lib/components/bt_result_predictions.svelte';
 
 	export let result;
+	export let models;
 
   const imagePath = `${STATIC_BASE}/uploads/${result.original_image}`
   const camPath = result.cam_image ? `${STATIC_BASE}/cams/${result.cam_image}` : ""
@@ -31,7 +32,15 @@
 		if (browser) {
       window.addEventListener('resize', handleImageLoaded)
 		}
-	})
+  })
+
+  function get_model_name() {
+    const m = models.find((m)=> m.weight === result.weight)
+    if (m) {
+      return m.label
+    }
+    return result.weight
+  }
 
 </script>
 
@@ -42,7 +51,6 @@
 <!-- <pre>{ JSON.stringify($page, 0, 2) }</pre> -->
 
 <div class="grid grid-cols-3 auto-rows-min gap-4 pt-4">
-
   <div class="col-span-2">
     <div class="relative w-full">
       <img src={imagePath} alt="original_{result.timestamp}" on:load={ handleImageLoaded } bind:this={ imageElement }>
@@ -98,6 +106,11 @@
     <div class="flex flex-row my-2">
       <div class="w-24 font-semibold">Name</div>
       <div class="w-full"> { result.name } </div>
+    </div>
+
+    <div class="flex flex-row my-2">
+      <div class="w-24 font-semibold">Model</div>
+      <div class="w-full"> { get_model_name() } </div>
     </div>
 
     <div class="flex flex-row my-2">
