@@ -82,7 +82,7 @@
 	let eventSource = null
   const status = writable()
 	setContext('status', status)
-  status.set(data.status || {tasks: [], bt_results: [], models: []})
+  status.set(data.status || {tasks: [], bt_results: [], bt_weights: []})
 
   const connection = writable()
   setContext('connection', connection),

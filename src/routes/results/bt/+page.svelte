@@ -23,7 +23,7 @@
   let mode = data.mode
 
   function weightNameToLabel(weight) {
-    const m = $status.models.find((m)=> m.weight === weight)
+    const m = $status.bt_weights.find((m)=> m.weight === weight)
     if (m) {
       return m.label
     }
@@ -121,7 +121,6 @@
     {#each $status.bt_results as _result, _i}
       {@const i = sort === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
       {@const result = $status.bt_results[i]}
-      <!-- <pre>{ JSON.stringify($status.models, 0, 2) }</pre> -->
       <a href="/results/bt/{result.timestamp}" class="card flex flex-row grow relative gap-4 p-4" >
         <button
           on:click|preventDefault={ ()=> handleDeleteClicked(result) }

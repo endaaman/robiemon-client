@@ -106,9 +106,14 @@
 		modalStore.close()
 	}
 
+  function onKeyDown(e) {
+		if (e.key === 'Escape') {
+			e.preventDefault()
+			$modalStore[0].response(false)
+			modalStore.close()
+		}
+  }
 </script>
-
-
 
 <style global>
 	@import "cropperjs/dist/cropper.css";
@@ -136,6 +141,7 @@
 	}
 </style>
 
+<svelte:window on:keydown={onKeyDown} />
 
 {#if $modalStore[0]}
 	<!-- <div class="card p-4 shadow-xl" > -->
@@ -195,7 +201,7 @@
 				<!-- <pre>{ JSON.stringify(extra, 0, 2) }</pre> -->
 				<label class="label">
 					<select class="select" bind:value={extra.bt.weight}>
-						{#each $status.models as m}
+						{#each $status.bt_weights as m}
 							<option value={m.weight}>{m.label}</option>
 						{/each}
 					</select>

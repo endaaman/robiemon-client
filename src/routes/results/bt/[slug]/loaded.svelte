@@ -12,7 +12,7 @@
   import BtResultPredictions from '$lib/components/bt_result_predictions.svelte';
 
 	export let result;
-	export let models;
+	export let weights;
 
   const imagePath = `${STATIC_BASE}/uploads/${result.original_image}`
   const camPath = result.cam_image ? `${STATIC_BASE}/cams/${result.cam_image}` : ""
@@ -35,7 +35,7 @@
   })
 
   function get_model_name() {
-    const m = models.find((m)=> m.weight === result.weight)
+    const m = weights.find((m)=> m.weight === result.weight)
     if (m) {
       return m.label
     }
