@@ -8,6 +8,7 @@
 	import { debounce } from '$lib'
 	import Divider from '$lib/components/divider.svelte'
 	import { LS_PRED_BT_WEIGHT, LS_PRED_BT_CAM, LS_PRED_SCALE } from '$lib/const'
+  import { API_BASE } from '$lib/config'
 
 
   const status = getContext('status')
@@ -37,8 +38,7 @@
 	export let parent
 	let cropper
 	let imageElement
-	let cropperWidth
-	let cropperHeight
+  let processing = false
 
 	let mode = 'bt'
 	let extra = {
@@ -99,10 +99,17 @@
 		}
 	}
 
-	function onFormSubmit() {
-		let canvas = cropper.getCroppedCanvas()
-		let imageURI = canvas.toDataURL()
-		$modalStore[0].response({ imageURI, scale, mode, extra })
+	async function onFormSubmit() {
+		processing = true
+		let task = null
+    try {
+			task = await predictImage()
+    } catch (error) {
+			$modalStore[0].response('error')
+    } finally {
+      processing = false
+    }
+		$modalStore[0].response(task)
 		modalStore.close()
 	}
 
@@ -112,6 +119,25 @@
 			$modalStore[0].response(false)
 			modalStore.close()
 		}
+  }
+
+  async function predictImage() {
+		let canvas = cropper.getCroppedCanvas()
+		let imageURI = canvas.toDataURL()
+
+    const blob = await fetch(imageURI).then(res => res.blob());
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(extra[mode])) {
+      formData.append(key, value);
+    }
+    formData.append('file', blob, 'webcam.png');
+    formData.append('scale', scale);
+
+		const response = await fetch(`${API_BASE}/predict/${mode}`, {
+			method: 'POST',
+			body: formData,
+		})
+		return await response.json()
   }
 </script>
 
@@ -209,14 +235,18 @@
 				<SlideToggle name="bt-toggle" size="sm"
 					bind:checked={ extra.bt.cam }
 				>CAM</SlideToggle>
-
 			{/if}
-
 
 			<Divider class="ml-auto" />
 
 			<button class="btn {parent.buttonNeutral}" on:click={parent.onClose}>{parent.buttonTextCancel}</button>
-			<button class="btn {parent.buttonPositive}" on:click={onFormSubmit}>Predict</button>
+			<button class="btn {parent.buttonPositive} w-24" on:click={onFormSubmit}>
+        {#if processing}
+          <span class="i-mdi-loading animate-spin"></span>
+        {:else}
+          Predict
+        {/if}
+			</button>
 		</footer>
 	</div>
 {/if}

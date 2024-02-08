@@ -9,7 +9,6 @@
     getModalStore, getToastStore,
 	} from '@skeletonlabs/skeleton'
 
-  import { API_BASE } from '$lib/config'
   import { LS_BRIGHTNESS } from '$lib/const'
 	import { page } from '$app/stores'
 
@@ -21,7 +20,6 @@
   let currentCameraId = null
   let cameras = []
   let canvas
-  let processing = false
   let files = []
   let brightness = 100
 
@@ -71,17 +69,44 @@
     }
   }
 
-  function onModalResponded(data) {
-    console.log('close',data)
-    if (!data) {
-      processing = false
+  function onModalResponded(result) {
+    if (result === 'error') {
+      toastStore.trigger({
+        message: 'Error: Something went wrong.',
+        timeout: 5000,
+        background: 'variant-filled-error',
+      })
+    }
+
+    if (result) {
+      toastStore.trigger({
+        message: `The task was accepted as "${result.name}"`,
+        // timeout: 7000,
+        autohide: false,
+        background: 'variant-filled-primary',
+        action: {
+          label: 'See tasks',
+          response: () => {
+            goto('/results')
+          }
+        }
+      })
       return
     }
-    predictImage(data)
+  }
+
+
+  function openPredictModal(imageURI) {
+    const m = modalStore.trigger({
+      type: 'component',
+      component: 'predict',
+      imageURI: imageURI,
+      response: onModalResponded,
+    })
+    console.log(m)
   }
 
   async function handlePredictClicked() {
-    processing = true
     canvas.width = videoElement.videoWidth
     canvas.height = videoElement.videoHeight
     const context = canvas.getContext('2d')
@@ -92,55 +117,9 @@
 
     await tick();
 
-    modalStore.trigger({
-      type: 'component',
-      component: 'predict',
-      imageURI: imageURI,
-      response: onModalResponded,
-    })
-
+    openPredictModal(imageURI)
   }
 
-  async function predictImage({ imageURI, scale, mode, extra }) {
-    const blob = await fetch(imageURI).then(res => res.blob());
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(extra[mode])) {
-      formData.append(key, value);
-    }
-    formData.append('file', blob, 'webcam.png');
-    formData.append('scale', scale);
-
-    try {
-      const response = await fetch(`${API_BASE}/predict/${mode}`, {
-        method: 'POST',
-        body: formData,
-      })
-      const data = await response.json()
-      console.log(data)
-
-      toastStore.trigger({
-        message: `The task was accepted as "${data.name}"`,
-        timeout: 7000,
-        background: 'variant-filled-primary',
-        action: {
-          label: 'See tasks',
-          response: () => {
-            goto('/results')
-          }
-        }
-      })
-
-    } catch (error) {
-      console.log(error)
-      toastStore.trigger({
-        message: 'Error: Failed to connect server.',
-        timeout: 5000,
-        background: 'variant-filled-error',
-      })
-    } finally {
-      processing = false
-    }
-  }
 
   function handleFilesSelected(e) {
     let image = e.target.files[0]
@@ -148,12 +127,7 @@
     reader.readAsDataURL(image)
     reader.onload = e => {
       const imageURI = e.target.result
-      modalStore.trigger({
-        type: 'component',
-        component: 'predict',
-        imageURI: imageURI,
-        response: onModalResponded,
-      })
+      openPredictModal(imageURI)
     }
   }
 
@@ -226,12 +200,8 @@
         min={0} max={200} step={1} bind:value={ brightness }
       ></RangeSlider>
 
-      <button type="button" class="btn variant-filled w-24" on:click={handlePredictClicked}>
-        {#if processing}
-          <span class="i-mdi-loading animate-spin"></span>
-        {:else}
-          Predict
-        {/if}
+      <button type="button" class="btn variant-filled" on:click={handlePredictClicked}>
+        Predict
       </button>
     </div>
   </div>

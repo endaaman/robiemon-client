@@ -5,10 +5,12 @@
 
 	const status = getContext('status')
 
-  let result = null
+	let result = null
+	let loading = true
   let weights = $status.bt_weights
 
 	$: result = $status.bt_results.find((r) => {
+		loading = false
 		return r.timestamp === parseInt($page.params.slug)
   })
 </script>
@@ -19,8 +21,9 @@
 	<span>Back to list</span>
 </a>
 
-{#if result && weights.length > 0}
-  <Loaded { result } { weights }></Loaded>
+{#if result }
+  <Loaded { result }></Loaded>
 {:else}
+	{ loading }
 	<p>Not found</p>
 {/if}

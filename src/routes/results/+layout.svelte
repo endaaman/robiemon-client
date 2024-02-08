@@ -41,7 +41,7 @@
 	<div class="mt-4">
 		{#if $connection.status === C.CONNECTION_PENDING }
 
-			<p>Loading</p>
+			<p>Loading..</p>
 
 		{:else if $connection.status === C.CONNECTION_DISCONNECTED }
 
