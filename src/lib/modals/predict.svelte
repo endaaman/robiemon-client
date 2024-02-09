@@ -39,7 +39,6 @@
 	let cropper
 	let imageElement
   let processing = false
-
 	let mode = 'bt'
 	let extra = {
 		bt: {
@@ -49,8 +48,18 @@
 	}
 	let scale = browser ? parseFloat(localStorage.getItem(LS_PRED_SCALE)) : 1.0
 
+	let imageWidth
+	let imageHeight
 
 	const modalStore = getModalStore()
+
+
+  function handleImageLoaded() {
+    if (imageElement) {
+      imageWidth = imageElement.clientWidth
+      imageHeight = imageElement.clientHeight
+    }
+  }
 
 	function closeCropper() {
 		if (cropper) {
@@ -205,8 +214,11 @@
 
 		{#if $modalStore[0].imageURI}
 			<div class="flex" style="max-height: calc(100vh - 240px);">
-				<img id="img" src={$modalStore[0].imageURI} alt="original"
+				<img
+					id="img" alt="original"
+					src={$modalStore[0].imageURI}
 					class="object-scale-down"
+					on:load={ handleImageLoaded }
 					bind:this={ imageElement }
 					>
 			</div>
