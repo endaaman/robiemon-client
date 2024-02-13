@@ -1,9 +1,10 @@
 <script>
-  import { browser } from '$app/environment'
   import format from 'date-fns/format'
+  import { browser } from '$app/environment'
+  import { goto } from '$app/navigation';
 	import { getContext, onMount, onDestroy, tick } from 'svelte'
   import {
-      RangeSlider, ConicGradient, getToastStore,
+      RangeSlider, ConicGradient, getToastStore, getModalStore,
   } from '@skeletonlabs/skeleton'
   import { API_BASE, STATIC_BASE } from '$lib/config'
 	import { debounce } from '$lib'
@@ -16,10 +17,14 @@
 
 	const status = getContext('status')
 
-  const imagePath = `${STATIC_BASE}/uploads/${result.original_image}`
-  const camPath = result.cam_image ? `${STATIC_BASE}/cams/${result.cam_image}` : ""
+  const imagePath = `${STATIC_BASE}/uploads/${result.timestamp}.png`
+  const camPath = result.cam ? `${STATIC_BASE}/cams/${result.timestamp}.png` : ""
 
   const toastStore = getToastStore()
+  const modalStore = getModalStore()
+
+  let naturalWidth = 0
+  let naturalHeight = 0
 
   let imageElement
   let opacity = 0
@@ -101,6 +106,40 @@
     editingMemo = false
   }
 
+  function onModalResponded(result) {
+    if (result === 'error') {
+      toastStore.trigger({
+        message: 'Error: Something went wrong.',
+        timeout: 5000,
+        background: 'variant-filled-error',
+      })
+    }
+
+    if (result) {
+      toastStore.trigger({
+        message: `The task was accepted as "${result.name}"`,
+        // timeout: 7000,
+        autohide: false,
+        background: 'variant-filled-primary',
+        action: {
+          label: 'See tasks',
+          response: () => {
+            goto('/results')
+          }
+        }
+      })
+      return
+    }
+  }
+
+  function handleRepredictClicked(e) {
+    modalStore.trigger({
+      type: 'component',
+      component: 'predict',
+      imageURI: imagePath,
+      response: onModalResponded,
+    })
+  }
 
 	onMount(async () => {
 		if (browser) {
@@ -115,10 +154,17 @@
 <!-- <pre>{ JSON.stringify(data, 0, 2) }</pre> -->
 <!-- <pre>{ JSON.stringify($page, 0, 2) }</pre> -->
 
-<div class="grid grid-cols-3 auto-rows-min gap-4 pt-4">
+<div class="grid grid-cols-3 gap-4 mt-4">
   <div class="col-span-2">
     <div class="relative w-full">
-      <img src={imagePath} alt="original_{result.timestamp}" on:load={ handleImageLoaded } bind:this={ imageElement }>
+      <img
+        src={imagePath}
+        alt="original_{result.timestamp}"
+        on:load={ handleImageLoaded }
+        bind:this={ imageElement }
+        bind:naturalWidth={ naturalWidth }
+        bind:naturalHeight={ naturalHeight }
+      >
       {#if camPath}
         <div
           class="absolute left-0 top-0 mix-blend-multiply"
@@ -144,16 +190,17 @@
       </div>
     </section>
 
-    <!-- <section> -->
-    <!--   <h3>UMAP Presentasion</h3> -->
-    <!--   <hr class="my-2" /> -->
+    <section>
+      <h3>UMAP Presentasion</h3>
+      <hr class="my-2" />
 
-    <!--   <div class="w-full"> -->
-    <!--     <button class="btn btn-sm variant-filled w-full" disabled>Show UMAP</button> -->
-    <!--   </div> -->
-    <!-- </section> -->
+      <div class="flex flex-row w-full gap-2">
+        <button class="btn btn-sm variant-filled block" on:click={ handleRepredictClicked }>Re-predict</button>
+        <button class="btn btn-sm variant-filled block" disabled>Show UMAP</button>
+      </div>
+    </section>
 
-    <section class="-mt-8">
+    <section>
       <h3>CAM</h3>
       <hr class="my-2" />
 
@@ -163,7 +210,7 @@
           <RangeSlider
             name="range-slider"
             min={0} max={100} step={1} bind:value={ opacity }
-            disabled={ !result.cam_image }
+            disabled={ !result.cam }
           ></RangeSlider>
         </div>
       </div>
@@ -205,7 +252,7 @@
 
       <div class="flex flex-row my-2">
         <div class="w-24 min-w-24 font-semibold">Size</div>
-        <div>{ imageWidth } × { imageHeight }px </div>
+        <div>{ naturalWidth } × { naturalHeight }px </div>
       </div>
 
       <div class="flex flex-row my-2">

@@ -1,6 +1,7 @@
 <script>
   import format from 'date-fns/format'
   import { goto } from '$app/navigation';
+  import { browser } from '$app/environment'
 	import { page } from '$app/stores'
   import { getContext  } from 'svelte'
   import {
@@ -81,7 +82,9 @@
     } else {
       query.set('sort', sort);
     }
-    goto(`?${query.toString()}`)
+    if (browser) {
+      goto(`?${query.toString()}`, { replaceState: true })
+    }
   }
 
   $: {
@@ -91,33 +94,36 @@
     } else {
       query.set('mode', mode);
     }
-    goto(`?${query.toString()}`)
+    if (browser) {
+      goto(`?${query.toString()}`, { replaceState: true })
+    }
   }
 </script>
 
-<RadioGroup>
-  <RadioItem bind:group={sort} name="sort" value="descending">
-    <span class="i-mdi-sort-descending rotate-180 align-middle text-lg"></span>
-  </RadioItem>
+<div class="my-4 flex flex-row gap-4">
+  <RadioGroup>
+    <RadioItem bind:group={sort} name="sort" value="descending">
+      <span class="i-mdi-sort-descending rotate-180 align-middle text-lg"></span>
+    </RadioItem>
 
-  <RadioItem bind:group={sort} name="sort" value="ascending">
-    <span class="i-mdi-sort-ascending align-middle text-lg"></span>
-  </RadioItem>
-</RadioGroup>
+    <RadioItem bind:group={sort} name="sort" value="ascending">
+      <span class="i-mdi-sort-ascending align-middle text-lg"></span>
+    </RadioItem>
+  </RadioGroup>
 
-<RadioGroup>
-  <RadioItem bind:group={mode} name="mode" value="card">
-    <span class="i-mdi-view-grid rotate-180 align-middle text-lg"></span>
-  </RadioItem>
+  <RadioGroup>
+    <RadioItem bind:group={mode} name="mode" value="card">
+      <span class="i-mdi-view-grid rotate-180 align-middle text-lg"></span>
+    </RadioItem>
 
-  <RadioItem bind:group={mode} name="mode" value="table">
-    <span class="i-mdi-view-sequential align-middle text-lg"></span>
-  </RadioItem>
-</RadioGroup>
+    <RadioItem bind:group={mode} name="mode" value="table">
+      <span class="i-mdi-view-sequential align-middle text-lg"></span>
+    </RadioItem>
+  </RadioGroup>
+</div>
 
 {#if mode === 'card'}
-
-  <div class="grid lg:grid-cols-2 gap-4 mt-2">
+  <div class="grid lg:grid-cols-2 gap-4">
     {#each $status.bt_results as _result, _i}
       {@const i = sort === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
       {@const result = $status.bt_results[i]}
@@ -130,7 +136,7 @@
         </button>
         <section class="xl:w-2/3 md:w-1/2 w-full flex justify-center items-center max-h-96">
           <img
-            src={`${STATIC_BASE}/uploads/${result.original_image}`}
+            src={`${STATIC_BASE}/thumbs/${result.timestamp}.jpg`}
             alt={result.timestamp}
             class="object-contain block w-full h-full" />
         </section>
@@ -153,7 +159,7 @@
 
           <hr class="my-2" />
           <div>
-            {#if result.cam_image }
+            {#if result.cam }
               <span class="chip variant-filled">With CAM</span>
             {:else}
               <span class="chip variant-filled chip-disabled">No CAM</span>
@@ -176,15 +182,15 @@
 
 {:else if mode === 'table'}
 
-  <div class="table-container mt-2">
+  <div class="table-container">
     <table class="table table-compact ">
       <thead>
         <tr>
           <th>ID</th>
           <th>Image</th>
-          <th>PIE</th>
+          <th>Model</th>
           <th>Predictions</th>
-          <th></th>
+          <th>CAM</th>
           <th></th>
         </tr>
       </thead>
@@ -194,30 +200,45 @@
           {@const result = $status.bt_results[i]}
           <tr>
             <td>
+              <p><strong>{ result.name }</strong></p>
               <p>{ timestampToTitle(result.timestamp) }</p>
-              <p></p>
             </td>
-            <!-- <td>{result.hash}</td> -->
+
             <td>
-              <img
-                src={`${STATIC_BASE}/uploads/${result.original_image}`}
-                alt={result.timestamp}
-                class="max-h-32"
-              />
+              <a href="/results/bt/{result.timestamp}">
+                <img
+                  src={`${STATIC_BASE}/thumbs/${result.timestamp}.jpg`}
+                  alt={result.timestamp}
+                  class="max-h-32"
+                />
+              </a>
             </td>
+
             <td>
-              <BtResultCircle result={ result }></BtResultCircle>
+              { weightNameToLabel(result.weight) }
             </td>
-            <td class="items-center align-middle">
-              <BtResultPredictions result={ result }></BtResultPredictions>
+
+            <td>
+              <div class="flex flex-row gap-4">
+                <BtResultCircle result={ result }></BtResultCircle>
+
+                <BtResultPredictions result={ result }></BtResultPredictions>
+              </div>
             </td>
+
+            <td>
+              {#if result.cam }
+                <span class="chip variant-filled">With CAM</span>
+              {:else}
+                <span class="chip variant-filled chip-disabled">No CAM</span>
+              {/if}
+            </td>
+
             <td>
               <a href="/results/bt/{result.timestamp}" class="btn variant-filled">Detail</a>
-            </td>
-            <td>
               <button type="button" on:click={()=>{ handleDeleteClicked(result) }} class="btn variant-filled-error">Delete</button>
             </td>
-            <!-- <td>{result.B}</td> -->
+
           </tr>
         {/each}
       </tbody>

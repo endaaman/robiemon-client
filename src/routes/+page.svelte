@@ -97,13 +97,12 @@
 
 
   function openPredictModal(imageURI) {
-    const m = modalStore.trigger({
+    modalStore.trigger({
       type: 'component',
       component: 'predict',
       imageURI: imageURI,
       response: onModalResponded,
     })
-    console.log(m)
   }
 
   async function handlePredictClicked() {

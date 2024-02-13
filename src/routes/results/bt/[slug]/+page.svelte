@@ -15,15 +15,16 @@
   })
 </script>
 
-
-<a href="/results/bt" class="btn variant-ghost-surface">
-	<span class="i-mdi-format-list-bulleted-square"></span>
-	<span>Back to list</span>
-</a>
+<div class="mt-4">
+  <a href="/results/bt" class="btn variant-ghost-surface">
+    <span class="i-mdi-format-list-bulleted-square"></span>
+    <span>Back to list</span>
+  </a>
+</div>
 
 {#if result }
   <Loaded { result }></Loaded>
 {:else}
-	{ loading }
-	<p>Not found</p>
+  { loading }
+  <p>Not found</p>
 {/if}

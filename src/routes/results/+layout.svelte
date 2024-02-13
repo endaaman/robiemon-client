@@ -20,12 +20,6 @@
 		}
 		return current.startsWith(href)
 	}
-
-  const connection = getContext('connection')
-
-	async function handleReconnectClick() {
-		$connection.connect()
-	}
 </script>
 
 
@@ -38,22 +32,6 @@
 		{/each}
 	</TabGroup>
 
-	<div class="mt-4">
-		{#if $connection.status === C.CONNECTION_PENDING }
-
-			<p>Loading..</p>
-
-		{:else if $connection.status === C.CONNECTION_DISCONNECTED }
-
-			<p>Failed to connect server.</p>
-			<p>Please notice to the system administrator.</p>
-			<button class="btn variant-filled" on:click={ handleReconnectClick }>Re-connect server</button>
-
-		{:else if $connection.status === C.CONNECTION_CONNECTED }
-
-			<slot></slot>
-
-		{/if}
-	</div>
+  <slot></slot>
 
 </div>

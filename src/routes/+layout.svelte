@@ -162,6 +162,10 @@
 		}
 	}
 
+	async function handleReconnectClick() {
+		$connection.connect()
+	}
+
 	onMount(async () => {
 		$connection.connect()
 	})
@@ -255,7 +259,15 @@
 	<!-- (sidebarRight) -->
 	<!-- (pageHeader) -->
 
-  <slot />
+  {#if $connection.status === C.CONNECTION_DISCONNECTED }
+    <div class="p-4">
+      <p>Failed to connect server.</p>
+      <p>Please notice to the system administrator.</p>
+      <button class="btn variant-filled" on:click={ handleReconnectClick }>Re-connect server</button>
+    </div>
+  {:else if $connection.status === C.CONNECTION_CONNECTED }
+    <slot></slot>
+  {/if}
 
 	<svelte:fragment slot="pageFooter">
 		<div class="hidden md:block">

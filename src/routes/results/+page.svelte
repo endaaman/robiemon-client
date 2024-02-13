@@ -58,22 +58,26 @@
     } else {
       query.set('sort', sort);
     }
-    goto(`?${query.toString()}`)
+    if (browser) {
+      goto(`?${query.toString()}`, { replaceState: true })
+    }
   }
 
 </script>
 
-<RadioGroup>
-  <RadioItem bind:group={sort} name="sort" value="descending">
-    <span class="i-mdi-sort-descending rotate-180 align-middle text-lg"></span>
-  </RadioItem>
+<div class="my-4 flex flex-row gap-4">
+  <RadioGroup>
+    <RadioItem bind:group={sort} name="sort" value="descending">
+      <span class="i-mdi-sort-descending rotate-180 align-middle text-lg"></span>
+    </RadioItem>
 
-  <RadioItem bind:group={sort} name="sort" value="ascending">
-    <span class="i-mdi-sort-ascending align-middle text-lg"></span>
-  </RadioItem>
-</RadioGroup>
+    <RadioItem bind:group={sort} name="sort" value="ascending">
+      <span class="i-mdi-sort-ascending align-middle text-lg"></span>
+    </RadioItem>
+  </RadioGroup>
+</div>
 
-<div class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 auto-rows-min gap-4">
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 auto-rows-min gap-4">
   {#if $status.tasks.length === 0}
     <p>No tasks there.</p>
   {/if}
@@ -101,7 +105,7 @@
       </header>
       <section class="px-4 py-2 flex justify-center items-center grow max-h-96">
         <img
-          src={`${STATIC_BASE}/uploads/${task.image}`}
+          src={`${STATIC_BASE}/thumbs/${task.timestamp}.jpg`}
           alt={task.timestamp}
           class="h-full object-scale-down"
         />
