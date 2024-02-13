@@ -2,4 +2,5 @@
 .sveltekit
 build
 README.md
+node_modules
 Dockerfile
