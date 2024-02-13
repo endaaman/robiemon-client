@@ -46,7 +46,13 @@
 			weight: browser ? localStorage.getItem(LS_PRED_BT_WEIGHT) : '',
 		}
 	}
-	let scale = browser ? parseFloat(localStorage.getItem(LS_PRED_SCALE)) : 1.0
+  let scale = 1.0
+  if (browser) {
+    const s = parseFloat(localStorage.getItem(LS_PRED_SCALE))
+    if (s) {
+      scale = s
+    }
+  }
 
 	let imageWidth
 	let imageHeight
