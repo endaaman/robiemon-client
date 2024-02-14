@@ -13,6 +13,6 @@ RUN npm run build
 
 ENV PUBLIC_UPSTREAM_URL_BASE http://robiemon-server:3000
 
-EXPOSE 5174
+EXPOSE 8000
 
 CMD ["npm", "run", "serve"]
