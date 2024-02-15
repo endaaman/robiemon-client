@@ -65,6 +65,16 @@
 
 </script>
 
+<style>
+.disabled-card {
+  pointer-events: none;
+}
+
+.disabled-card button {
+  pointer-events: auto;
+}
+</style>
+
 <div class="my-4 flex flex-row gap-4">
   <RadioGroup>
     <RadioItem bind:group={sort} name="sort" value="descending">
@@ -87,7 +97,7 @@
     <a
       href="/results/{task.mode}/{task.timestamp}" class="card flex flex-col relative"
       class:opacity-75={ task.status === 'pending' }
-      class:pointer-events-none={ task.status !== 'done' }
+      class:disabled-card={ task.status !== 'done' }
     >
       <button
         on:click|preventDefault={ ()=> handleDeleteClicked(task) }
@@ -130,7 +140,7 @@
               </span>
             {:else if task.status === 'too_large'}
               <span class="badge variant-ringed-warning text-warning-500">
-                Too Large <span class="i-mdi-warning-outline align-middle ml-1"></span>
+                Too large <span class="i-mdi-warning-outline align-middle ml-1"></span>
               </span>
             {:else if task.status === 'error'}
               <span class="badge variant-ringed-error text-error-500">

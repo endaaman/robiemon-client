@@ -176,74 +176,79 @@
           <!-- </div> -->
         </section>
       </a>
-
+    {:else}
+      <p>No results to show</p>
     {/each}
   </div>
 
 {:else if mode === 'table'}
 
-  <div class="table-container">
-    <table class="table table-compact ">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Image</th>
-          <th>Model</th>
-          <th>Predictions</th>
-          <th>CAM</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each $status.bt_results as _result, _i}
-          {@const i = sort === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
-          {@const result = $status.bt_results[i]}
+  {#if $status.bt_results.length === 0}
+    <p>No results to show</p>
+  {:else}
+    <div class="table-container">
+      <table class="table table-compact ">
+        <thead>
           <tr>
-            <td>
-              <p><strong>{ result.name }</strong></p>
-              <p>{ timestampToTitle(result.timestamp) }</p>
-            </td>
-
-            <td>
-              <a href="/results/bt/{result.timestamp}">
-                <img
-                  src={`${STATIC_BASE}/thumbs/${result.timestamp}.jpg`}
-                  alt={result.timestamp}
-                  class="max-h-32"
-                />
-              </a>
-            </td>
-
-            <td>
-              { weightNameToLabel(result.weight) }
-            </td>
-
-            <td>
-              <div class="flex flex-row gap-4">
-                <BtResultCircle result={ result }></BtResultCircle>
-
-                <BtResultPredictions result={ result }></BtResultPredictions>
-              </div>
-            </td>
-
-            <td>
-              {#if result.cam }
-                <span class="chip variant-filled">With CAM</span>
-              {:else}
-                <span class="chip variant-filled chip-disabled">No CAM</span>
-              {/if}
-            </td>
-
-            <td>
-              <a href="/results/bt/{result.timestamp}" class="btn variant-filled">Detail</a>
-              <button type="button" on:click={()=>{ handleDeleteClicked(result) }} class="btn variant-filled-error">Delete</button>
-            </td>
-
+            <th>ID</th>
+            <th>Image</th>
+            <th>Model</th>
+            <th>Predictions</th>
+            <th>CAM</th>
+            <th></th>
           </tr>
-        {/each}
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          {#each $status.bt_results as _result, _i}
+            {@const i = sort === 'ascending' ? _i : $status.bt_results.length - 1 - _i }
+            {@const result = $status.bt_results[i]}
+            <tr>
+              <td>
+                <p><strong>{ result.name }</strong></p>
+                <p>{ timestampToTitle(result.timestamp) }</p>
+              </td>
+
+              <td>
+                <a href="/results/bt/{result.timestamp}">
+                  <img
+                    src={`${STATIC_BASE}/thumbs/${result.timestamp}.jpg`}
+                    alt={result.timestamp}
+                    class="max-h-32"
+                  />
+                </a>
+              </td>
+
+              <td>
+                { weightNameToLabel(result.weight) }
+              </td>
+
+              <td>
+                <div class="flex flex-row gap-4">
+                  <BtResultCircle result={ result }></BtResultCircle>
+
+                  <BtResultPredictions result={ result }></BtResultPredictions>
+                </div>
+              </td>
+
+              <td>
+                {#if result.cam }
+                  <span class="chip variant-filled">With CAM</span>
+                {:else}
+                  <span class="chip variant-filled chip-disabled">No CAM</span>
+                {/if}
+              </td>
+
+              <td>
+                <a href="/results/bt/{result.timestamp}" class="btn variant-filled">Detail</a>
+                <button type="button" on:click={()=>{ handleDeleteClicked(result) }} class="btn variant-filled-error">Delete</button>
+              </td>
+
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {/if}
 
 {:else}
 
