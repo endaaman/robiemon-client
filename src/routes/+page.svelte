@@ -70,14 +70,6 @@
   }
 
   function onModalResponded(result) {
-    if (result === 'error') {
-      toastStore.trigger({
-        message: 'Error: Something went wrong.',
-        timeout: 5000,
-        background: 'variant-filled-error',
-      })
-    }
-
     if (result) {
       toastStore.trigger({
         message: `The task was accepted as "${result.name}"`,
@@ -93,6 +85,12 @@
       })
       return
     }
+
+    toastStore.trigger({
+      message: 'Error: Something went wrong.',
+      timeout: 5000,
+      background: 'variant-filled-error',
+    })
   }
 
 
