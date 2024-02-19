@@ -44,26 +44,29 @@
   let processing = false
   let progress = 0
 
+  const imageURIs = $modalStore[0].imageURIs
+
+  async function predictImage(imageURI) {
+    const blob = await fetch(imageURI).then(res => res.blob())
+    const formData = new FormData()
+    formData.append('file', blob, 'image.png')
+    formData.append('scale', 1.0)
+    for (const [key, value] of Object.entries(extra[mode])) {
+      formData.append(key, value);
+    }
+    const response = await fetch(`${API_BASE}/predict/${mode}`, {
+      method: 'POST',
+      body: formData,
+    })
+    return await response.json()
+  }
+
   async function onFormSubmit() {
     processing = true
 
     const tasks = []
     try {
-      for (const imageURI of $modalStore[0].imageURIs) {
-        const blob = await fetch(imageURI).then(res => res.blob())
-        const formData = new FormData()
-        formData.append('file', blob, 'image.png')
-        formData.append('scale', 1.0)
-        for (const [key, value] of Object.entries(extra[mode])) {
-          formData.append(key, value);
-        }
-        const response = await fetch(`${API_BASE}/predict/${mode}`, {
-          method: 'POST',
-          body: formData,
-        })
-        tasks.push(await response.json())
-        await new Promise(resolve => setTimeout(resolve, 2000))
-      }
+      const tasks = await Promise.all(imageURIs.map((i) => predictImage(i)))
       // console.log(tasks)
       $modalStore[0].response(tasks)
     } catch (error) {
@@ -87,6 +90,10 @@
 		<header class="mb-4 flex flex-row align-middle items-center">
 			<h3 class="text-2xl font-bold">Multiple prediction</h3>
     </header>
+
+    <article>
+      <p>{imageURIs.length} images selected.</p>
+    </article>
 
     <form class="modal-form space-y-4 ">
 

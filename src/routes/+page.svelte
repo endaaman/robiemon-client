@@ -70,6 +70,15 @@
   }
 
   function onModalResponded(r) {
+    if (r === 'error') {
+      toastStore.trigger({
+        message: 'Error: Something went wrong.',
+        timeout: 5000,
+        background: 'variant-filled-error',
+      })
+      return
+    }
+
     if (r) {
       const message = Array.isArray(r)
         ? `The tasks was accepted`
@@ -87,14 +96,6 @@
         }
       })
       return
-    }
-
-    if (r === 'error') {
-      toastStore.trigger({
-        message: 'Error: Something went wrong.',
-        timeout: 5000,
-        background: 'variant-filled-error',
-      })
     }
   }
 
@@ -230,7 +231,7 @@
         <svelte:fragment slot="lead">
           <span class="text-4xl i-mdi-file-image"></span>
         </svelte:fragment>
-        <svelte:fragment slot="message"><strong>Upload a file</strong> or drag and drop</svelte:fragment>
+        <svelte:fragment slot="message"><strong>Upload a file(s)</strong> or drag and drop</svelte:fragment>
         <svelte:fragment slot="meta">PNG, JPG, and GIF allowed.</svelte:fragment>
       </FileDropzone>
     </div>

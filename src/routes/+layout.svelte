@@ -111,10 +111,9 @@
 			})
 
 			eventSource.onmessage = function(event) {
-				console.log('status updated')
 				const data = JSON.parse(event.data)
 				status.set(data)
-				console.log(data)
+				console.log('status updated', data)
 			}
 
 			eventSource.onerror = async function (err) {
