@@ -9,7 +9,7 @@
 	} from '@skeletonlabs/skeleton'
 	import {
 		Modal, Toast, Drawer,
-		initializeStores, getToastStore, getDrawerStore, storePopup
+		initializeStores, getToastStore, getModalStore, getDrawerStore, storePopup
 	} from '@skeletonlabs/skeleton'
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 
@@ -18,6 +18,7 @@
 	import * as C from '$lib/const'
 
 	import ModalPredict from '$lib/modals/predict.svelte'
+	import ModalPredictMulti from '$lib/modals/predict_multi.svelte'
 	import Title from '$lib/components/title.svelte'
 	import Footer from '$lib/components/footer.svelte'
 	import ConnectionButton from '$lib/components/connection_button.svelte'
@@ -67,9 +68,11 @@
 
 	const modalRegistry = {
 		predict: { ref: ModalPredict },
+		predictMulti: { ref: ModalPredictMulti },
 	}
 
 	const toastStore = getToastStore()
+	const modalStore = getModalStore()
 
 	function matchHref(href, current) {
 		if (href === '/') {
@@ -128,7 +131,7 @@
 						response: async () => {
 							setTimeout(() => {
 								$connection.connect()
-							}, 1000)
+							}, 500)
 						}
 					},
 					callback({id, status}) {
@@ -173,11 +176,21 @@
 	onDestroy(async () => {
 		$connection.close()
 	})
+
+  function onKeyDown(e) {
+		if (e.key === 'Escape') {
+			e.preventDefault()
+      console.log('close modal')
+			// $modalStore[0].response(false)
+			modalStore.close()
+		}
+  }
 </script>
 
-
+<svelte:window on:keydown={onKeyDown} />
 <Modal components={modalRegistry} />
 <Toast />
+
 <Drawer>
 	{#if $drawerStore.id === 'menu'}
 		<div class="flex flex-col h-full">

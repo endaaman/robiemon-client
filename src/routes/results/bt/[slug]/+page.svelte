@@ -25,6 +25,5 @@
 {#if result }
   <Loaded { result }></Loaded>
 {:else}
-  { loading }
   <p>Not found</p>
 {/if}

@@ -177,7 +177,7 @@
         </section>
       </a>
     {:else}
-      <p>No results to show</p>
+      <p>No results to show.</p>
     {/each}
   </div>
 

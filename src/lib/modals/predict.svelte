@@ -40,25 +40,18 @@
 	let imageElement
   let processing = false
 	let mode = 'bt'
+  let scale = browser && parseFloat(localStorage.getItem(LS_PRED_SCALE)) || 1.0
 	let extra = {
 		bt: {
-			cam: browser ? localStorage.getItem(LS_PRED_BT_CAM) === 'on' : false,
-			weight: browser ? localStorage.getItem(LS_PRED_BT_WEIGHT) : '',
+			cam: browser && localStorage.getItem(LS_PRED_BT_CAM) === 'on' || false,
+			weight: browser && localStorage.getItem(LS_PRED_BT_WEIGHT) || $status.bt_weights[0].weight,
 		}
 	}
-  let scale = 1.0
-  if (browser) {
-    const s = parseFloat(localStorage.getItem(LS_PRED_SCALE))
-    if (s) {
-      scale = s
-    }
-  }
 
 	let imageWidth
 	let imageHeight
 
 	const modalStore = getModalStore()
-
 
   function handleImageLoaded() {
     if (imageElement) {
@@ -105,7 +98,7 @@
 		updateCropper()
 	}
 
-	$: localStorage.setItem(LS_PRED_BT_WEIGHT, extra.bt.weight)
+	$: if (extra.bt.weight) localStorage.setItem(LS_PRED_BT_WEIGHT, extra.bt.weight)
 	$: localStorage.setItem(LS_PRED_BT_CAM, extra.bt.cam ? 'on' : 'off')
 	$: localStorage.setItem(LS_PRED_SCALE, ''+scale)
 	function handleScaleSelected(e) {
@@ -119,22 +112,14 @@
 		let task = null
     try {
 			task = await predictImage()
+      $modalStore[0].response(task)
     } catch (error) {
 			$modalStore[0].response('error')
     } finally {
       processing = false
     }
-		$modalStore[0].response(task)
 		modalStore.close()
 	}
-
-  function onKeyDown(e) {
-		if (e.key === 'Escape') {
-			e.preventDefault()
-			$modalStore[0].response(false)
-			modalStore.close()
-		}
-  }
 
   async function predictImage() {
 		let canvas = cropper.getCroppedCanvas()
@@ -182,15 +167,14 @@
 	}
 </style>
 
-<svelte:window on:keydown={onKeyDown} />
-
 {#if $modalStore[0]}
 	<!-- <div class="card p-4 shadow-xl" > -->
 	<div id="pred-modal" class="card p-4 shadow-xl max-w-full h-max w-modal-wide" style="max-height: calc(100vh - 80px);">
 		<header class="mb-4 flex flex-row align-middle items-center">
-			<h3 class="text-2xl font-bold">Image prediction</h3>
+			<h3 class="text-2xl font-bold">Prediction</h3>
 
 			<div class="ml-auto flex flex-row gap-4">
+        <!-- <p class="align-middle">{ imageWidth } × { imageHeight } px</p> -->
 				<label class="label">
 					<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
 						<div class="input-group-shim">Scale</div>

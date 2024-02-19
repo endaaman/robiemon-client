@@ -70,7 +70,7 @@
   pointer-events: none;
 }
 
-.disabled-card button {
+.disabled-card > * {
   pointer-events: auto;
 }
 </style>
@@ -89,7 +89,7 @@
 
 <div class="grid sm:grid-cols-2 lg:grid-cols-3 auto-rows-min gap-4">
   {#if $status.tasks.length === 0}
-    <p>No tasks there.</p>
+    <p>No tasks to show.</p>
   {/if}
   {#each $status.tasks as _task, _i}
     {@const i = sort === 'ascending' ? _i : $status.tasks.length - 1 - _i }

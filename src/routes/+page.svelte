@@ -69,10 +69,13 @@
     }
   }
 
-  function onModalResponded(result) {
-    if (result) {
+  function onModalResponded(r) {
+    if (r) {
+      const message = Array.isArray(r)
+        ? `The tasks was accepted`
+        : `The task was accepted as "${r.name}"`
       toastStore.trigger({
-        message: `The task was accepted as "${result.name}"`,
+        message: message,
         // timeout: 7000,
         autohide: false,
         background: 'variant-filled-primary',
@@ -86,11 +89,13 @@
       return
     }
 
-    toastStore.trigger({
-      message: 'Error: Something went wrong.',
-      timeout: 5000,
-      background: 'variant-filled-error',
-    })
+    if (r === 'error') {
+      toastStore.trigger({
+        message: 'Error: Something went wrong.',
+        timeout: 5000,
+        background: 'variant-filled-error',
+      })
+    }
   }
 
 
@@ -117,15 +122,30 @@
     openPredictModal(imageURI)
   }
 
+  function readFileToURI(image) {
+    return new Promise((resolve) => {
+      let reader = new FileReader()
+      reader.readAsDataURL(image)
+      reader.onload = e => resolve(e.target.result)
+    })
+  }
 
-  function handleFilesSelected(e) {
-    let image = e.target.files[0]
-    let reader = new FileReader()
-    reader.readAsDataURL(image)
-    reader.onload = e => {
-      const imageURI = e.target.result
+  async function handleFilesSelected(e) {
+    if (e.target.files.length === 1) {
+      const imageURI = await readFileToURI(e.target.files[0])
       openPredictModal(imageURI)
+      return
     }
+
+    const imageURIs = await Promise.all(Array.from(e.target.files).map((f) => readFileToURI(f)))
+
+    console.log(imageURIs)
+    modalStore.trigger({
+      type: 'component',
+      component: 'predictMulti',
+      imageURIs: imageURIs,
+      response: onModalResponded,
+    })
   }
 
   if (browser) {
@@ -206,7 +226,7 @@
 
   {#if data.mode === 'file'}
     <div class="p-4">
-      <FileDropzone name="files" bind:files={files} on:change={handleFilesSelected} accept="image/*">
+      <FileDropzone name="files" bind:files={files} on:change={handleFilesSelected} accept="image/*" multiple>
         <svelte:fragment slot="lead">
           <span class="text-4xl i-mdi-file-image"></span>
         </svelte:fragment>
