@@ -13,28 +13,6 @@
 
   const status = getContext('status')
 
-	const scales = [
-		{
-			label: 'VS x20 440nm/px',
-			scale: 1.0,
-		}, {
-			label: '10人鏡 x20',
-			scale: 0.941,
-		}, {
-			label: '10人鏡 x10',
-			scale: 1.8813,
-		}, {
-			label: 'HY-2307 x40',
-			scale: 1.093,
-		}, {
-			label: 'HY-2307 x20',
-			scale: 2.185,
-		}, {
-			label: 'HY-2307 x10',
-			scale: 4.371,
-		},
-	]
-
 	export let parent
 	let cropper
 	let imageElement
@@ -181,8 +159,10 @@
 						<input id="input-scale" type="number" placeholder="Scale" class="w-[120px]" step='0.001'
 							bind:value={ scale } />
 						<select on:change={ handleScaleSelected }>
-							{#each scales as s}
-								<option value={s.scale} selected={scale == s.scale}>{s.label} ({s.scale})</option>
+							{#each $status.scales as s}
+                {#if s.enabled}
+                  <option value={s.scale} selected={scale == s.scale}>{s.label} ({s.scale})</option>
+                {/if}
 							{/each}
 						</select>
 					</div>

@@ -17,8 +17,8 @@
 
 	const status = getContext('status')
 
-  const imagePath = `${STATIC_BASE}/uploads/${result.timestamp}.png`
-  const camPath = result.cam ? `${STATIC_BASE}/cams/${result.timestamp}.png` : ""
+  const imagePath = `${STATIC_BASE}/results/bt/${result.timestamp}/original.png`
+  const camPath = result.with_cam ? `${STATIC_BASE}/results/bt/${result.timestamp}/cam.png` : ""
 
   const toastStore = getToastStore()
   const modalStore = getModalStore()
@@ -210,7 +210,7 @@
           <RangeSlider
             name="range-slider"
             min={0} max={100} step={1} bind:value={ opacity }
-            disabled={ !result.cam }
+            disabled={ !result.with_cam }
           ></RangeSlider>
         </div>
       </div>

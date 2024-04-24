@@ -115,7 +115,7 @@
       </header>
       <section class="px-4 py-2 flex justify-center items-center grow max-h-96">
         <img
-          src={`${STATIC_BASE}/thumbs/${task.timestamp}.jpg`}
+          src={`${STATIC_BASE}/results/bt/${task.timestamp}/thumb.png`}
           alt={task.timestamp}
           class="h-full object-scale-down"
         />

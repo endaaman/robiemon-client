@@ -45,7 +45,7 @@
           return
         }
         try {
-          const response = await fetch(`${API_BASE}/results/bt/${result.id}`, {
+          const response = await fetch(`${API_BASE}/results/bt/${result.timestamp}`, {
             method: 'DELETE',
           })
           toastStore.trigger({
@@ -136,7 +136,7 @@
         </button>
         <section class="xl:w-2/3 md:w-1/2 w-full flex justify-center items-center max-h-96">
           <img
-            src={`${STATIC_BASE}/thumbs/${result.timestamp}.jpg`}
+            src={`${STATIC_BASE}/results/bt/${result.timestamp}/thumb.png`}
             alt={result.timestamp}
             class="object-contain block w-full h-full" />
         </section>
@@ -159,7 +159,7 @@
 
           <hr class="my-2" />
           <div>
-            {#if result.cam }
+            {#if result.with_cam }
               <span class="chip variant-filled">With CAM</span>
             {:else}
               <span class="chip variant-filled chip-disabled">No CAM</span>
@@ -211,7 +211,7 @@
               <td>
                 <a href="/results/bt/{result.timestamp}">
                   <img
-                    src={`${STATIC_BASE}/thumbs/${result.timestamp}.jpg`}
+                    src={`${STATIC_BASE}/results/bt/${result.timestamp}/thumb.png`}
                     alt={result.timestamp}
                     class="max-h-32"
                   />
@@ -231,7 +231,7 @@
               </td>
 
               <td>
-                {#if result.cam }
+                {#if result.with_cam }
                   <span class="chip variant-filled">With CAM</span>
                 {:else}
                   <span class="chip variant-filled chip-disabled">No CAM</span>
