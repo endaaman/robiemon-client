@@ -1,11 +1,11 @@
-import fs from 'fs';
-import { purgeCss } from 'vite-plugin-tailwind-purgecss';
-import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import fs from 'fs'
+import { purgeCss } from 'vite-plugin-tailwind-purgecss'
+import { sveltekit } from '@sveltejs/kit/vite'
+import { defineConfig } from 'vite'
 
 
 const KEY_FILE = './certs/localhost-key.pem'
-const CERT_FILE = './certs/localhost.pem'
+const CERT_FILE = './certs/localhost-cert.pem'
 const ssl = fs.existsSync(CERT_FILE) && fs.existsSync(KEY_FILE)
 
 export default defineConfig({
