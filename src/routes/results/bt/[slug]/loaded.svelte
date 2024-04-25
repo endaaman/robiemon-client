@@ -17,7 +17,7 @@
 
 	const status = getContext('status')
 
-  const imagePath = `${STATIC_BASE}/results/bt/${result.timestamp}/original.png`
+  const imagePath = `${STATIC_BASE}/results/bt/${result.timestamp}/original.jpg`
   const camPath = result.with_cam ? `${STATIC_BASE}/results/bt/${result.timestamp}/cam.png` : ""
 
   const toastStore = getToastStore()
@@ -50,7 +50,7 @@
 
   async function patchResult(body) {
     try {
-      await fetch(`${API_BASE}/results/bt/${result.id}`, {
+      await fetch(`${API_BASE}/results/bt/${result.timestamp}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
