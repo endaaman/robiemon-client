@@ -23,12 +23,12 @@
   let sort = data.sort
   let mode = data.mode
 
-  function weightNameToLabel(weight) {
-    const m = $status.bt_weights.find((m)=> m.weight === weight)
+  function modelNameToLabel(name) {
+    const m = $status.bt_models.find((m)=> m.name === name)
     if (m) {
       return m.label
     }
-    return weight
+    return name
   }
 
   function timestampToTitle(timestamp) {
@@ -39,13 +39,13 @@
     modalStore.trigger({
       type: 'confirm',
       title: 'Delete confirm',
-      body: 'Are you sure you wish to proceed?',
+      body: 'Are you sure to delete?',
       response: async (r) => {
         if (!r) {
           return
         }
         try {
-          const response = await fetch(`${API_BASE}/results/bt/${result.timestamp}`, {
+          const response = await fetch(`${API_BASE}/bt/results/${result.timestamp}`, {
             method: 'DELETE',
           })
           toastStore.trigger({
@@ -165,7 +165,7 @@
               <span class="chip variant-filled chip-disabled">No CAM</span>
             {/if}
 
-            <span class="chip variant-soft">{ weightNameToLabel(result.weight) }</span>
+            <span class="chip variant-soft">{ modelNameToLabel(result.model) }</span>
           </div>
 
           <!-- <hr class="mb-1 mt-auto" /> -->
@@ -219,7 +219,7 @@
               </td>
 
               <td>
-                { weightNameToLabel(result.weight) }
+                { modelNameToLabel(result.model) }
               </td>
 
               <td>

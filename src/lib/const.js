@@ -7,6 +7,6 @@ export const LS_BRIGHTNESS = 'brightness'
 
 export const LS_PRED_SCALE = 'pred_scale'
 
-export const LS_PRED_BT_WEIGHT = 'pred_bt_weight'
+export const LS_PRED_BT_MODEL = 'pred_bt_model'
 export const LS_PRED_BT_CAM = 'pred_bt_cam'
 

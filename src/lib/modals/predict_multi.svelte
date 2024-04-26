@@ -4,7 +4,7 @@
   import { ProgressBar, SlideToggle } from '@skeletonlabs/skeleton'
   import { API_BASE } from '$lib/config'
 	import { getContext } from 'svelte'
-	import { LS_PRED_BT_WEIGHT, LS_PRED_BT_CAM, LS_PRED_SCALE } from '$lib/const'
+	import { LS_PRED_BT_MODEL, LS_PRED_BT_CAM, LS_PRED_SCALE } from '$lib/const'
 
 	const modalStore = getModalStore()
 	export let parent
@@ -15,7 +15,7 @@
   let extra = {
     bt: {
       cam: browser && localStorage.getItem(LS_PRED_BT_CAM) === 'on' || false,
-      weight: browser && localStorage.getItem(LS_PRED_BT_WEIGHT) || $status.bt_weights[0].weight,
+      model: browser && localStorage.getItem(LS_PRED_BT_MODEL) || $status.bt_models[0].name,
     }
   }
 
@@ -32,7 +32,7 @@
     for (const [key, value] of Object.entries(extra[mode])) {
       formData.append(key, value);
     }
-    const response = await fetch(`${API_BASE}/predict/${mode}`, {
+    const response = await fetch(`${API_BASE}/${mode}/predict`, {
       method: 'POST',
       body: formData,
     })
@@ -102,9 +102,9 @@
           <!-- <pre>{ JSON.stringify(extra, 0, 2) }</pre> -->
           <label class="label">
             Model
-            <select class="select" bind:value={extra.bt.weight}>
-              {#each $status.bt_weights as m}
-                <option value={m.weight}>{m.label}</option>
+            <select class="select" bind:value={extra.bt.model}>
+              {#each $status.bt_models as m}
+                <option value={m.name}>{m.label}</option>
               {/each}
             </select>
           </label>

@@ -19,6 +19,7 @@
 
 	import ModalPredict from '$lib/modals/predict.svelte'
 	import ModalPredictMulti from '$lib/modals/predict_multi.svelte'
+	import ModalUMAP from '$lib/modals/umap.svelte'
 	import Title from '$lib/components/title.svelte'
 	import Footer from '$lib/components/footer.svelte'
 	import ConnectionButton from '$lib/components/connection_button.svelte'
@@ -69,6 +70,7 @@
 	const modalRegistry = {
 		predict: { ref: ModalPredict },
 		predictMulti: { ref: ModalPredictMulti },
+		umap: { ref: ModalUMAP },
 	}
 
 	const toastStore = getToastStore()
@@ -85,7 +87,7 @@
 	let eventSource = null
   const status = writable()
 	setContext('status', status)
-  status.set(data.status || {tasks: [], bt_results: [], bt_weights: []})
+  status.set(data.status || {tasks: [], bt_results: [], bt_models: []})
 
   const connection = writable()
   setContext('connection', connection),

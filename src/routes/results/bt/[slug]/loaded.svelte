@@ -14,14 +14,17 @@
 
 	export let result;
 
-
 	const status = getContext('status')
-
-  const imagePath = `${STATIC_BASE}/results/bt/${result.timestamp}/original.jpg`
-  const camPath = result.with_cam ? `${STATIC_BASE}/results/bt/${result.timestamp}/cam.png` : ""
 
   const toastStore = getToastStore()
   const modalStore = getModalStore()
+
+  let imagePath = null
+  let camPath = null
+  $: {
+    imagePath = `${STATIC_BASE}/results/bt/${result.timestamp}/original.jpg`
+    camPath = result.with_cam ? `${STATIC_BASE}/results/bt/${result.timestamp}/cam.png` : ""
+  }
 
   let naturalWidth = 0
   let naturalHeight = 0
@@ -35,10 +38,10 @@
   let newName = result.name
   let newMemo = result.memo
 
-  let modelName = result.weight
+  let modelName = result.moden
   $: {
-    const m = $status.bt_weights.find((m)=> m.weight === result.weight)
-    modelName = m ? m.label : result.weight
+    const m = $status.bt_models.find((m)=> m.name === result.model)
+    modelName = m ? m.label : result.model
   }
 
   function handleImageLoaded() {
@@ -50,7 +53,7 @@
 
   async function patchResult(body) {
     try {
-      await fetch(`${API_BASE}/results/bt/${result.timestamp}`, {
+      await fetch(`${API_BASE}/bt/results/${result.timestamp}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -141,6 +144,45 @@
     })
   }
 
+  function handleUMAPClicked() {
+    modalStore.trigger({
+      type: 'component',
+      component: 'umap',
+    })
+  }
+
+  async function handleDeleteClicked() {
+    modalStore.trigger({
+      type: 'confirm',
+      title: 'Delete confirm',
+      body: 'Are you sure to delete?',
+      response: async (r) => {
+        if (!r) {
+          return
+        }
+        try {
+          await fetch(`${API_BASE}/bt/results/${result.timestamp}`, {
+            method: 'DELETE',
+          })
+          toastStore.trigger({
+            message: `Result deleted.`,
+            timeout: 5000,
+            background: 'variant-filled',
+          })
+          goto('/results/bt')
+        } catch (error) {
+          console.log(error)
+          toastStore.trigger({
+            message: 'Error: Failed to connect server.',
+            timeout: 5000,
+            background: 'variant-filled-error',
+          })
+        } finally {
+        }
+      },
+    })
+  }
+
 	onMount(async () => {
 		if (browser) {
       window.addEventListener('resize', handleImageLoaded)
@@ -153,6 +195,7 @@
 
 <!-- <pre>{ JSON.stringify(data, 0, 2) }</pre> -->
 <!-- <pre>{ JSON.stringify($page, 0, 2) }</pre> -->
+
 
 <div class="grid grid-cols-3 gap-4 mt-4">
   <div class="col-span-2">
@@ -195,8 +238,15 @@
       <hr class="my-2" />
 
       <div class="flex flex-row w-full gap-2">
-        <button class="btn btn-sm variant-filled block" on:click={ handleRepredictClicked }>Re-predict</button>
-        <button class="btn btn-sm variant-filled block" disabled>Show UMAP</button>
+        <button class="btn btn-sm variant-filled block" on:click={ handleRepredictClicked }>
+          Re-predict
+        </button>
+        <button class="btn btn-sm variant-filled block" on:click={ handleUMAPClicked }>
+          Show UMAP
+        </button>
+        <button class="btn btn-sm variant-filled-error block" on:click={ handleDeleteClicked }>
+          Delete
+        </button>
       </div>
     </section>
 

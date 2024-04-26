@@ -7,7 +7,7 @@
 	import { browser } from '$app/environment'
 	import { debounce } from '$lib'
 	import Divider from '$lib/components/divider.svelte'
-	import { LS_PRED_BT_WEIGHT, LS_PRED_BT_CAM, LS_PRED_SCALE } from '$lib/const'
+	import { LS_PRED_BT_MODEL, LS_PRED_BT_CAM, LS_PRED_SCALE } from '$lib/const'
   import { API_BASE } from '$lib/config'
 
 
@@ -22,7 +22,7 @@
 	let extra = {
 		bt: {
 			cam: browser && localStorage.getItem(LS_PRED_BT_CAM) === 'on' || false,
-			weight: browser && localStorage.getItem(LS_PRED_BT_WEIGHT) || $status.bt_weights[0].weight,
+			model: browser && localStorage.getItem(LS_PRED_BT_MODEL) || $status.bt_models[0].name,
 		}
 	}
 
@@ -76,7 +76,7 @@
 		updateCropper()
 	}
 
-	$: if (extra.bt.weight) localStorage.setItem(LS_PRED_BT_WEIGHT, extra.bt.weight)
+	$: if (extra.bt.model) localStorage.setItem(LS_PRED_BT_MODEL, extra.bt.model)
 	$: localStorage.setItem(LS_PRED_BT_CAM, extra.bt.cam ? 'on' : 'off')
 	$: localStorage.setItem(LS_PRED_SCALE, ''+scale)
 	function handleScaleSelected(e) {
@@ -111,7 +111,7 @@
     formData.append('file', blob, 'webcam.png');
     formData.append('scale', scale);
 
-		const response = await fetch(`${API_BASE}/predict/${mode}`, {
+		const response = await fetch(`${API_BASE}/${mode}/predict`, {
 			method: 'POST',
 			body: formData,
 		})
@@ -178,7 +178,7 @@
 					<!-- </div> -->
 				</label>
 
-				<button class="btn variant-filled-surface" on:click={ handleResetClicked }>Reset</button>
+				<button class="btn variant-ghost-surface" on:click={ handleResetClicked }>Reset</button>
 			</div>
 		</header>
 
@@ -208,9 +208,9 @@
 			{#if mode === 'bt'}
 				<!-- <pre>{ JSON.stringify(extra, 0, 2) }</pre> -->
 				<label class="label">
-					<select class="select" bind:value={extra.bt.weight}>
-						{#each $status.bt_weights as m}
-							<option value={m.weight}>{m.label}</option>
+					<select class="select" bind:value={extra.bt.model}>
+						{#each $status.bt_models as m}
+							<option value={m.name}>{m.label}</option>
 						{/each}
 					</select>
 				</label>
