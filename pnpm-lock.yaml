@@ -50,6 +50,9 @@ dependencies:
   autoprefixer:
     specifier: 10.4.17
     version: 10.4.17(postcss@8.4.33)
+  chroma-js:
+    specifier: ^2.4.2
+    version: 2.4.2
   cropperjs:
     specifier: ^1.6.1
     version: 1.6.1
@@ -982,6 +985,10 @@ packages:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.3
+    dev: false
+
+  /chroma-js@2.4.2:
+    resolution: {integrity: sha512-U9eDw6+wt7V8z5NncY2jJfZa+hUH8XEj8FQHgFJTrUFnJfXYf4Ml4adI2vXZOjqRDpFWtYVWypDfZwnJ+HIR4A==}
     dev: false
 
   /code-red@1.0.4:

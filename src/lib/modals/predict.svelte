@@ -152,7 +152,7 @@
 			<h3 class="text-2xl font-bold">Prediction</h3>
 
 			<div class="ml-auto flex flex-row gap-4">
-        <!-- <p class="align-middle">{ imageWidth } × { imageHeight } px</p> -->
+        <p class="align-middle">{ imageWidth } × { imageHeight } px</p>
 				<label class="label">
 					<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
 						<div class="input-group-shim">Scale</div>

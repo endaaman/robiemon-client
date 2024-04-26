@@ -148,6 +148,7 @@
     modalStore.trigger({
       type: 'component',
       component: 'umap',
+      result: result,
     })
   }
 
