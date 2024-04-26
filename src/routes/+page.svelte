@@ -61,6 +61,9 @@
   }
 
   function closeStream() {
+    if (!videoElement) {
+      return
+    }
     const stream = videoElement.srcObject;
     if (!stream) {
       return

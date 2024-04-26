@@ -3,7 +3,8 @@
   import { Chart } from 'svelte-echarts'
   import { API_BASE, STATIC_BASE } from '$lib/config'
 	import { COLORS_BY_DIAGS } from '$lib/const'
-  import chroma from "chroma-js"
+  import chroma from 'chroma-js'
+  import { cache } from './umap_store.js'
 
 	export let parent
 
@@ -11,9 +12,16 @@
   const result = $modalStore[0].result
 
   async function fetchData() {
-    const res = await fetch(`${API_BASE}/bt/umap/${result.timestamp}`, { method: 'POST', })
-		const data = await res.json()
-    const points = data.embeddings.map((v, i) => {
+    console.log($cache)
+    if (!$cache[result.model]) {
+      const res = await fetch(`${API_BASE}/bt/umap/embeddings/${result.model}`)
+      $cache[result.model] = await res.json()
+    } else {
+      console.log('restore cache')
+    }
+    const embeddings = $cache[result.model]
+
+    const points = embeddings.map((v, i) => {
       // {
       //     "correct": false,
       //     "diag": "G",
@@ -37,6 +45,9 @@
       }
     })
 
+    const res = await fetch(`${API_BASE}/bt/umap/${result.timestamp}`, { method: 'POST', })
+		const pos = await res.json()
+
     const keys = 'LMGB'.split('')
     let pred = keys[0]
     keys.forEach(key => {
@@ -47,7 +58,7 @@
     const text = keys.map((k) => `${k}:${Math.round(result[k]*100)}%`).join(' ')
 
     points.push({
-      value: [data.x, data.y],
+      value: [pos.x, pos.y],
       symbol: 'pin',
       symbolSize: 30,
       itemStyle: {
