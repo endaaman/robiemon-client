@@ -12,10 +12,12 @@
   import { LS_BRIGHTNESS } from '$lib/const'
 	import { page } from '$app/stores'
 
+	export let data
 
   const modalStore = getModalStore()
   const toastStore = getToastStore()
 
+  let mode = data.mode
   let videoElement = null
   let currentCameraId = null
   let cameras = []
@@ -23,10 +25,18 @@
   let files = []
   let brightness = 100
 
-  $: if (currentCameraId && videoElement) {
-    videoElement.style.filter = `brightness(${brightness}%)`
-    localStorage.setItem(LS_BRIGHTNESS, brightness)
-	}
+  $: {
+    console.log('data.mode', data.mode)
+    if (data.mode == 'default') {
+      mode = cameras.length > 0 ? 'webcam' : 'file'
+    } else {
+      mode = data.mode
+    }
+    if (currentCameraId && videoElement) {
+      videoElement.style.filter = `brightness(${brightness}%)`
+      localStorage.setItem(LS_BRIGHTNESS, brightness)
+    }
+  }
 
   async function getCameras() {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -167,8 +177,6 @@
       closeStream()
     })
   }
-
-	export let data
 </script>
 
 
@@ -182,14 +190,14 @@
 
   <div class="flex">
     <AppRail class="flex-none" slot="sidebar">
-      <AppRailAnchor selected={ data.mode === 'webcam' } href="/">
+      <AppRailAnchor selected={ mode === 'webcam' } href="/?mode=webcam">
         <svelte:fragment slot="lead">
           <span class="i-mdi-camera"></span>
         </svelte:fragment>
         <span>Camera</span>
       </AppRailAnchor>
 
-      <AppRailAnchor selected={ data.mode === 'file' } href="/?mode=file">
+      <AppRailAnchor selected={ mode === 'file' } href="/?mode=file">
         <svelte:fragment slot="lead">
           <span class="i-mdi-file-image"></span>
         </svelte:fragment>
@@ -198,34 +206,38 @@
     </AppRail>
   </div>
 
-  <div class="p-4 grow h-full flex flex-col" class:hidden={ data.mode !== 'webcam'}>
-    <video bind:this={videoElement} autoplay class="object-left-top" style="max-height: calc(100vh - 160px);">
-      <track kind="captions">
-    </video>
-    <canvas bind:this={canvas} class="hidden"></canvas>
+  <div class="p-4 grow h-full flex flex-col" class:hidden={ mode !== 'webcam'}>
 
-    <div class="flex flex-row gap-4 mt-4 items-center">
-      <label class="label">
-        <select class="select" on:change={ handleCameraChanged }>
-          {#each cameras as camera}
-            <option value={camera.deviceId}>{camera.label || 'Camera ' + camera.deviceId}</option>
-          {/each}
-        </select>
-      </label>
+    {#if cameras.length > 0}
+      <video bind:this={videoElement} autoplay class="object-left-top" style="max-height: calc(100vh - 160px);">
+        <track kind="captions">
+      </video>
+      <canvas bind:this={canvas} class="hidden"></canvas>
 
-      <RangeSlider
-        name="range-slider"
-        min={0} max={200} step={1} bind:value={ brightness }
-      ></RangeSlider>
+      <div class="flex flex-row gap-4 mt-4 items-center">
+        <label class="label">
+          <select class="select" on:change={ handleCameraChanged }>
+            {#each cameras as camera}
+              <option value={camera.deviceId}>{camera.label || 'Camera ' + camera.deviceId}</option>
+            {/each}
+          </select>
+        </label>
 
-      <button type="button" class="btn variant-filled" on:click={handlePredictClicked}>
-        Predict
-      </button>
-    </div>
+        <RangeSlider
+          name="range-slider"
+          min={0} max={200} step={1} bind:value={ brightness }
+        ></RangeSlider>
+
+        <button type="button" class="btn variant-filled" on:click={handlePredictClicked}>
+          Predict
+        </button>
+      </div>
+    {:else}
+      <p>No cameras detected</p>
+    {/if}
   </div>
 
-
-  {#if data.mode === 'file'}
+  {#if mode === 'file'}
     <div class="p-4">
       <FileDropzone name="files" bind:files={files} on:change={handleFilesSelected} accept="image/*" multiple>
         <svelte:fragment slot="lead">
