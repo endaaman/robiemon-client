@@ -2,6 +2,7 @@
   import format from 'date-fns/format'
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation';
+  import { navigating } from '$app/stores'
 	import { getContext, onMount, onDestroy, tick } from 'svelte'
   import {
       RangeSlider, ConicGradient, getToastStore, getModalStore,
@@ -19,30 +20,38 @@
   const toastStore = getToastStore()
   const modalStore = getModalStore()
 
+  let imageElement
+  let editNameElement
+  let editMemoElement
+
   let imagePath = null
   let camPath = null
+  let newName = result.name
+  let newMemo = result.memo
+  let modelName = result.moden
+  let editingName = false
+  let editingMemo = false
+  let opacity = 0
   $: {
     imagePath = `${STATIC_BASE}/results/bt/${result.timestamp}/original.jpg`
     camPath = result.with_cam ? `${STATIC_BASE}/results/bt/${result.timestamp}/cam.png` : ""
+
+    const m = $status.bt_models.find((m)=> m.name === result.model)
+    modelName = m ? m.label : result.model
+  }
+  $: if($navigating) {
+    newName = result.name
+    newMemo = result.memo
+    editingName = false
+    editingMemo = false
+    // あえて更新しない
+    // opacity = 0
   }
 
   let naturalWidth = 0
   let naturalHeight = 0
-
-  let imageElement
-  let opacity = 0
   let imageWidth = 0
   let imageHeight = 0
-  let editingName = false
-  let editingMemo = false
-  let newName = result.name
-  let newMemo = result.memo
-
-  let modelName = result.moden
-  $: {
-    const m = $status.bt_models.find((m)=> m.name === result.model)
-    modelName = m ? m.label : result.model
-  }
 
   function handleImageLoaded() {
     if (imageElement) {
@@ -77,70 +86,111 @@
     }
   }
 
-  function toggleEditingName() {
-    // if (!editingName) {
-    //   newName = result.name
-    // }
+  //////////
+  //* Name
+  async function saveName() {
+    if (!newName) {
+      toastStore.trigger({
+        message: 'Warning: Name should not be empty.',
+        timeout: 5000,
+        background: 'variant-filled-warning',
+      })
+      newName = result.name
+      return
+    }
+    await patchResult({ name: newName })
+    editingName = false
+  }
+
+  async function toggleEditingName() {
     editingName = !editingName
+    if (editingName) {
+      setTimeout(function() {
+        editNameElement.focus()
+        editNameElement.select()
+      }, 1)
+    } else {
+      await saveName()
+    }
+  }
+
+  function handleNameBlur() {
+    setTimeout(function() {
+      editingName = false
+    }, 100)
   }
 
   function handleNameKeydown(e) {
     if (e.code === 'Enter') {
       saveName()
       e.preventDefault()
-    }
-  }
-
-  async function saveName() {
-    console.log('saveName')
-    await patchResult({ name: newName })
-    editingName = false
-  }
-
-  function toggleEditingMemo() {
-    // if (!editingMemo) {
-    //   newMemo = result.memo
-    // }
-    editingMemo = !editingMemo
-  }
-
-  async function saveMemo() {
-    await patchResult({ memo: newMemo })
-    editingMemo = false
-  }
-
-  function onModalResponded(result) {
-    if (result === 'error') {
-      toastStore.trigger({
-        message: 'Error: Something went wrong.',
-        timeout: 5000,
-        background: 'variant-filled-error',
-      })
-    }
-
-    if (result) {
-      toastStore.trigger({
-        message: `The task was accepted as "${result.name}"`,
-        // timeout: 7000,
-        autohide: false,
-        background: 'variant-filled-primary',
-        action: {
-          label: 'See tasks',
-          response: () => {
-            goto('/results')
-          }
-        }
-      })
       return
     }
+		if (e.key === 'Escape') {
+      editingName = false
+      e.preventDefault()
+      return
+		}
   }
+
+  //////////
+  //* MEMO
+  async function toggleEditingMemo() {
+    editingMemo = !editingMemo
+    if (editingMemo) {
+      setTimeout(function() {
+        editMemoElement.focus()
+        editMemoElement.select()
+      }, 1)
+    } else {
+      await patchResult({ memo: newMemo })
+      editingMemo = false
+    }
+  }
+
+  function handleMemoBlur() {
+    setTimeout(function() {
+      editingMemo = false
+    }, 100)
+    console.log('BLURRR')
+  }
+
+  function handleMemoKeydown(e) {
+		if (e.key === 'Escape') {
+      editingMemo = false
+      e.preventDefault()
+		}
+  }
+
 
   function handleRepredictClicked(e) {
     modalStore.trigger({
       type: 'component',
       component: 'predict',
       imageURI: imagePath,
-      response: onModalResponded,
+      response: function (result) {
+        if (result === 'error') {
+          toastStore.trigger({
+            message: 'Error: Something went wrong.',
+            timeout: 5000,
+            background: 'variant-filled-error',
+          })
+          return
+        }
+        if (result) {
+          toastStore.trigger({
+            message: `The task was accepted as "${result.name}"`,
+            timeout: 5000,
+            autohide: true,
+            background: 'variant-filled-primary',
+            action: {
+              label: 'See tasks',
+              response: () => goto('/results')
+            }
+          })
+          return
+        }
+      }
     })
   }
 
@@ -275,28 +325,30 @@
 
       <div class="flex flex-row my-2">
         <div class="w-24 min-w-24 font-semibold">Name</div>
-        {#if editingName}
-          <div class="grow">
-            <input
-              type="text"
-              class="p-0 block w-full"
-              bind:value={ newName }
-              on:keydown={ handleNameKeydown }
-            >
-          </div>
-          <button on:click={ saveName } class="block">
-            <span class="i-mdi-check text-lg"></span>
-          </button>
-        {:else}
-          <div class="grow">
-            <button class="text-left block" on:click={ toggleEditingName }>{ result.name }</button>
-          </div>
-        {/if}
+
+        <!-- BEGIN EDITING -->
+        <div class="grow" class:hidden={!editingName}>
+          <input
+            type="text"
+            class="p-0 block w-full"
+            bind:value={ newName }
+            bind:this={ editNameElement }
+            on:blue={ handleNameBlur }
+            on:keydown={ handleNameKeydown }
+          >
+        </div>
+        <!-- END EDITING -->
+
+        <!-- BEGIN NOT EDITING -->
+        <div class="grow" class:hidden={editingName}>
+          <button class="text-left block" on:click={ toggleEditingName }>{ result.name }</button>
+        </div>
+        <!-- END NOT EDITING -->
 
         <button on:click={ toggleEditingName } class="block">
           <span class="text-lg i-mdi-pencil"
             class:i-mdi-pencil={ !editingName }
-            class:i-mdi-close={ editingName }
+            class:i-mdi-check={ editingName }
           ></span>
         </button>
       </div>
@@ -320,21 +372,26 @@
         <div class="w-24 min-w-24 font-semibold">Memo</div>
 
         <div class="grow">
-          {#if editingMemo}
-            <textarea
-              class="w-full block p-0"
-              rows="3" bind:value={newMemo}
-            ></textarea>
 
-            <div class="mt-1 flex flex-row">
-              <button class="btn btn-sm variant-soft w-1/2" on:click={ ()=>{ newMemo = '' } }>Clear</button>
-              <button class="btn btn-sm variant-soft-primary w-1/2" on:click={ saveMemo }>Save</button>
-            </div>
-          {:else}
+          <!-- BEGIN EDITING -->
+          <textarea
+            class="w-full block p-0"
+            class:hidden={ !editingMemo }
+            bind:this={ editMemoElement }
+            on:blur={ handleMemoBlur }
+            rows="3" bind:value={newMemo} on:keydown={ handleMemoKeydown }
+          ></textarea>
+          <!-- BEGIN EDITING -->
+          {#if !editingMemo}
             {#if result.memo}
               <button class="block text-left" on:click={ toggleEditingMemo }>{ result.memo }</button>
             {:else}
-              <button class="text-surface-500 grow" on:click={ toggleEditingMemo }>Click to add memo...</button>
+              <button
+                class="text-surface-500 grow"
+                on:click={ toggleEditingMemo }
+              >
+                [Click to add memo]
+              </button>
             {/if}
           {/if}
         </div>
@@ -343,7 +400,7 @@
           <span class="block align-text-top h-full">
             <span class="text-lg"
               class:i-mdi-pencil={ !editingMemo }
-              class:i-mdi-close={ editingMemo }
+              class:i-mdi-check={ editingMemo }
             ></span>
           </span>
         </button>

@@ -83,12 +83,15 @@
 		return current.startsWith(href)
 	}
 
+  // const noscroll = writable()
+	// setContext('noscroll', noscroll)
+  // noscroll.set(false)
 
-	let eventSource = null
   const status = writable()
 	setContext('status', status)
   status.set(data.status || {tasks: [], bt_results: [], bt_models: []})
 
+	let eventSource = null
   const connection = writable()
   setContext('connection', connection),
   // pending, error, connected
@@ -181,12 +184,14 @@
   function onKeyDown(e) {
 		if (e.key === 'Escape') {
 			e.preventDefault()
-      console.log('close modal')
 			// $modalStore[0].response(false)
 			modalStore.close()
 		}
   }
 </script>
+
+<style global>
+</style>
 
 <svelte:window on:keydown={onKeyDown} />
 <Modal components={modalRegistry} />
