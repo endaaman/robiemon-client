@@ -21,7 +21,27 @@
     }
     const embeddings = $cache[result.model]
 
-    const points = embeddings.map((v, i) => {
+    const DIAG2NAME = {
+      L: 'Lymphoma',
+      M: 'Brain metastasis',
+      G: 'Glioblastoma',
+      A: 'Astrocytoma',
+      O: 'Oligodendroglioma',
+      B: 'Brain tissue',
+    }
+
+    const seriesMap = {}
+    'LMGAOB'.split('').forEach((v, i)=> {
+      seriesMap[v] = {
+        name: v,
+        type: 'scatter',
+        data: [],
+        itemStyle: {
+          color: COLORS_BY_DIAGS[v],
+        },
+      }
+    })
+    embeddings.forEach((v, i) => {
       // {
       //     "correct": false,
       //     "diag": "G",
@@ -33,16 +53,13 @@
       //     "y": 3.976931571960449
       // }
       // {value: [13.0, 7.58], symbol: 'circle', symbolSize: 20, itemStyle: {color: '#ffd700'}},
-      return {
+      seriesMap[v.diag_org].data.push({
         value: [v.x, v.y],
-        symbol: v.correct ? 'circle' : 'triangle',
-        symbolSize: v.correct ? 4 : 7,
-        itemStyle: {
-          color: COLORS_BY_DIAGS[v.diag_org]
-        },
         imageUri: `${STATIC_BASE}/umap_tiles/${v.diag_org}_${v.name}_${v.filename}`,
         text: `GT:${v.diag_org} pred:${v.pred}`,
-      }
+        symbol: v.correct ? 'circle' : 'triangle',
+        symbolSize: v.correct ? 5 : 10,
+      })
     })
 
     const res = await fetch(`${API_BASE}/bt/umap/${result.timestamp}`, { method: 'POST', })
@@ -57,53 +74,63 @@
     })
     const text = keys.map((k) => `${k}:${Math.round(result[k]*100)}%`).join(' ')
 
-    points.push({
-      value: [pos.x, pos.y],
-      symbol: 'pin',
-      symbolSize: 30,
-      itemStyle: {
-        color: chroma(COLORS_BY_DIAGS[pred]).darken(2).css(),
-        // color: '#000',
-      },
-      imageUri: `${STATIC_BASE}/results/bt/${result.timestamp}/thumb.png`,
-      text: text,
+    const series = Object.values(seriesMap)
+    series.push({
+      name: pred,
+      type: 'scatter',
+      data: [
+        {
+          value: [pos.x, pos.y],
+          imageUri: `${STATIC_BASE}/results/bt/${result.timestamp}/thumb.png`,
+          text: text,
+          itemStyle: {
+            color: chroma(COLORS_BY_DIAGS[pred]).darken(2).css(),
+          },
+          symbol: 'pin',
+          symbolSize: 36,
+        }
+      ],
+      z: 100,
     })
 
     return {
-      options: {
-        tooltip: {
-          formatter: function (p) {
-            return `<p>${p.data.text}</p><img src="${p.data.imageUri}" style="width: 25vw; height: auto;" />`
-          }
-        },
-        xAxis: {},
-        yAxis: {},
-        dataZoom: [
-          {
-            type: 'slider',
-            xAxisIndex: 0,
-            filterMode: 'filter'
-          }, {
-            type: 'slider',
-            yAxisIndex: 0,
-            filterMode: 'filter'
-          }, {
-            type: 'inside',
-            // xAxisIndex: [0],
-            // yAxisIndex: [0],
-            // start: 0,
-            // end: 100,
-            zoomOnMouseWheel: true,
-            moveOnMouseMove: true,
-            moveOnMouseWheel: true
-          }
-        ],
-        series: [{
-          symbolSize: 5,
-          data: points,
-          type: 'scatter',
-        }],
-      }
+      xAxis: {},
+      yAxis: {},
+      legend: {
+        data: ['L', 'M', 'G', 'A', 'O', 'B'],
+      },
+      tooltip: {
+        formatter: function (p) {
+          return `<p>${p.data.text}</p><img src="${p.data.imageUri}" style="width: 25vw; height: auto;" />`
+        }
+      },
+      dataZoom: [
+        {
+          type: 'slider',
+          xAxisIndex: 0,
+          filterMode: 'filter'
+        }, {
+          type: 'slider',
+          yAxisIndex: 0,
+          filterMode: 'filter'
+        }, {
+          type: 'inside',
+          // xAxisIndex: [0],
+          // yAxisIndex: [0],
+          // start: 0,
+          // end: 100,
+          zoomOnMouseWheel: true,
+          moveOnMouseMove: true,
+          moveOnMouseWheel: true
+        }
+      ],
+      series: series,
+      // series: [{
+      //   type: 'scatter',
+      //   name: 'L',
+      //   symbolSize: 5,
+      //   data: points,
+      // }],
     }
   }
 </script>
@@ -115,8 +142,8 @@
 	<div class="card p-4 shadow-xl max-w-full max-h-[96vh] h-[64rem] w-[64rem]">
     {#await fetchData()}
       <p>ロード中</p>
-    {:then data}
-      <Chart options={ data.options } />
+    {:then options}
+      <Chart {options} />
     {/await}
 	</div>
 {/if}
