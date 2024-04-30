@@ -1,4 +1,5 @@
 <script>
+	import { fade } from 'svelte/transition'
 	import { getModalStore } from '@skeletonlabs/skeleton'
   import { Chart } from 'svelte-echarts'
   import { API_BASE, STATIC_BASE } from '$lib/config'
@@ -6,13 +7,13 @@
   import chroma from 'chroma-js'
   import { cache } from './umap_store.js'
 
+
 	export let parent
 
 	const modalStore = getModalStore()
   const result = $modalStore[0].result
 
   async function fetchData() {
-    console.log($cache)
     if (!$cache[result.model]) {
       const res = await fetch(`${API_BASE}/bt/umap/embeddings/${result.model}`)
       $cache[result.model] = await res.json()
@@ -21,14 +22,14 @@
     }
     const embeddings = $cache[result.model]
 
-    const DIAG2NAME = {
-      L: 'Lymphoma',
-      M: 'Brain metastasis',
-      G: 'Glioblastoma',
-      A: 'Astrocytoma',
-      O: 'Oligodendroglioma',
-      B: 'Brain tissue',
-    }
+    // const DIAG2NAME = {
+    //   L: 'Lymphoma',
+    //   M: 'Brain metastasis',
+    //   G: 'Glioblastoma',
+    //   A: 'Astrocytoma',
+    //   O: 'Oligodendroglioma',
+    //   B: 'Brain tissue',
+    // }
 
     const seriesMap = {}
     'LMGAOB'.split('').forEach((v, i)=> {
@@ -42,7 +43,7 @@
       }
     })
     embeddings.forEach((v, i) => {
-      // {
+      // Example: {
       //     "correct": false,
       //     "diag": "G",
       //     "diag_org": "O",
@@ -52,7 +53,6 @@
       //     "x": 2.619306564331055,
       //     "y": 3.976931571960449
       // }
-      // {value: [13.0, 7.58], symbol: 'circle', symbolSize: 20, itemStyle: {color: '#ffd700'}},
       seriesMap[v.diag_org].data.push({
         value: [v.x, v.y],
         imageUri: `${STATIC_BASE}/umap_tiles/${v.diag_org}_${v.name}_${v.filename}`,
@@ -100,6 +100,8 @@
         data: ['L', 'M', 'G', 'A', 'O', 'B'],
       },
       tooltip: {
+        // position: 'top',
+        transitionDuration: 0.0,
         formatter: function (p) {
           return `<p>${p.data.text}</p><img src="${p.data.imageUri}" style="width: 25vw; height: auto;" />`
         }
@@ -125,12 +127,6 @@
         }
       ],
       series: series,
-      // series: [{
-      //   type: 'scatter',
-      //   name: 'L',
-      //   symbolSize: 5,
-      //   data: points,
-      // }],
     }
   }
 </script>
@@ -139,12 +135,14 @@
 </style>
 
 {#if $modalStore[0]}
-	<div class="card p-4 shadow-xl max-w-full max-h-[96vh] h-[64rem] w-[64rem]">
+  <div class="card shadow-xl max-w-full max-h-[96vh] h-[64rem] w-[64rem] overflow-hidden">
     {#await fetchData()}
-      <p>ロード中</p>
+      <div class="p-4 flex h-full justify-center items-center" transition:fade={{ delay: 250, duration: 300 }}>
+        <span class="i-mdi-loading animate-spin text-[180px] text-secondary-300"></span>
+      </div>
     {:then options}
       <Chart {options} />
     {/await}
-	</div>
+  </div>
 {/if}
 
