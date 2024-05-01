@@ -17,21 +17,23 @@
   const modalStore = getModalStore()
   const toastStore = getToastStore()
 
-  let mode = data.mode
+  let mode = ''
   let videoElement = null
   let currentCameraId = null
-  let cameras = []
+  let cameras = null
   let canvas
   let files = []
   let brightness = 100
 
   $: {
-    console.log('data.mode', data.mode)
-    if (data.mode == 'default') {
-      mode = cameras.length > 0 ? 'webcam' : 'file'
-    } else {
-      mode = data.mode
+    if (cameras) {
+      if (data.mode == 'default') {
+        mode = cameras.length > 0 ? 'webcam' : 'file'
+      } else {
+        mode = data.mode
+      }
     }
+
     if (currentCameraId && videoElement) {
       videoElement.style.filter = `brightness(${brightness}%)`
       localStorage.setItem(LS_BRIGHTNESS, brightness)
@@ -182,15 +184,7 @@
   }
 </script>
 
-
-<style lang="scss">
-</style>
-
-<!-- <pre>{ JSON.stringify($page, 0, 2) }</pre> -->
-<!-- <pre>{ JSON.stringify(data, 0, 2) }</pre> -->
-
 <div class="flex h-full">
-
   <div class="flex">
     <AppRail class="flex-none" slot="sidebar">
       <AppRailAnchor selected={ mode === 'webcam' } href="/?mode=webcam">
@@ -210,8 +204,7 @@
   </div>
 
   <div class="p-4 grow h-full flex flex-col" class:hidden={ mode !== 'webcam'}>
-
-    {#if cameras.length > 0}
+    {#if cameras && cameras.length > 0}
       <video bind:this={videoElement} autoplay class="object-left-top" style="max-height: calc(100vh - 160px);">
         <track kind="captions">
       </video>

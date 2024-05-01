@@ -3,9 +3,9 @@
   import { browser } from '$app/environment'
   import { setContext, onMount, onDestroy, tick } from 'svelte'
   import { writable } from 'svelte/store'
+  import { fade } from 'svelte/transition'
   import {
-    AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
-    Avatar, LightSwitch,
+    AppShell, AppBar, LightSwitch,
   } from '@skeletonlabs/skeleton'
   import {
     Modal, Toast, Drawer,
@@ -24,23 +24,33 @@
   import Footer from '$lib/components/footer.svelte'
   import ConnectionButton from '$lib/components/connection_button.svelte'
 
+  export let data;
+
   initializeStores()
 
-
-  storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow })
-
-  const drawerStore = getDrawerStore()
-
-  let currentToast = null
-  let drawerOpen = false
-
-  $: {
-    if ($page) drawerStore.close()
+  // MODAL
+  const modalStore = getModalStore()
+  const modalRegistry = {
+    predict: { ref: ModalPredict },
+    predictMulti: { ref: ModalPredictMulti },
+    umap: { ref: ModalUMAP },
   }
 
+  // TOAST
+  const toastStore = getToastStore()
+  let currentToast = null
+
+  // POPUP
+  storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow })
+
+  // DRAWER
+  let drawerOpen = false
+  const drawerStore = getDrawerStore()
   drawerStore.subscribe((v) => {
     drawerOpen = v.open
   })
+  $: if ($page) drawerStore.close()
+
 
   const links = [
     {
@@ -65,17 +75,6 @@
     // },
   ]
 
-  export let data;
-
-  const modalRegistry = {
-    predict: { ref: ModalPredict },
-    predictMulti: { ref: ModalPredictMulti },
-    umap: { ref: ModalUMAP },
-  }
-
-  const toastStore = getToastStore()
-  const modalStore = getModalStore()
-
   function matchHref(href, current) {
     if (href === '/') {
       return current === href
@@ -86,6 +85,8 @@
   // const noscroll = writable()
   // setContext('noscroll', noscroll)
   // noscroll.set(false)
+
+  let loading = false
 
   const status = writable()
   setContext('status', status)
@@ -104,7 +105,7 @@
       }
       eventSource = new EventSource(`${API_BASE}/status_sse`)
 
-      eventSource.addEventListener('open', (e) => {
+      eventSource.onopen = (e) => {
         $connection.status = C.CONNECTION_CONNECTED
 
         toastStore.trigger({
@@ -113,12 +114,16 @@
           timeout: 2000,
           autohide: true,
         })
-      })
+      }
 
       eventSource.onmessage = function(event) {
+        loading = true
         const data = JSON.parse(event.data)
         status.set(data)
         console.log('status updated', data)
+        setTimeout(function() {
+          loading = false
+        }, 1000)
       }
 
       eventSource.onerror = async function (err) {
@@ -150,6 +155,9 @@
     close() {
       if (eventSource) {
         eventSource.close()
+        eventSource.onopen = null
+        eventSource.onmessage = null
+        eventSource.onerror = null
         eventSource = null
       }
       $connection.status = C.CONNECTION_DISCONNECTED
@@ -169,7 +177,11 @@
     }
   }
 
-  async function handleReconnectClick() {
+  function handleClickConnect() {
+    if ($connection.status === C.CONNECTION_CONNECTED) {
+      $connection.close()
+      return
+    }
     $connection.connect()
   }
 
@@ -219,7 +231,7 @@
 
       <div class="mt-auto">
         <div class="flex flex-row gap-4 justify-center my-4">
-          <ConnectionButton></ConnectionButton>
+          <ConnectionButton handler={ handleClickConnect }></ConnectionButton>
           <LightSwitch />
         </div>
 
@@ -230,8 +242,6 @@
     </div>
   {/if}
 </Drawer>
-
-<!-- <pre>{ JSON.stringify($status, 0, 2) }</pre> -->
 
 <AppShell>
   <svelte:fragment slot="header">
@@ -252,7 +262,7 @@
         {/each}
 
         <div class="inline-block min-h-[1em] w-px self-stretch bg-surface-300"></div>
-        <ConnectionButton></ConnectionButton>
+        <ConnectionButton handler={ handleClickConnect } { loading }></ConnectionButton>
         <LightSwitch />
       </svelte:fragment>
     </AppBar>
@@ -281,16 +291,21 @@
     <div class="p-4">
       <p>Failed to connect server.</p>
       <p>Please notice to the system administrator.</p>
-      <button class="btn variant-filled" on:click={ handleReconnectClick }>Re-connect server</button>
+      <button class="btn variant-filled" on:click={ $connection.connect() }>Re-connect server</button>
     </div>
   {:else if $connection.status === C.CONNECTION_CONNECTED }
     <slot></slot>
   {/if}
 
   <svelte:fragment slot="pageFooter">
-    <div class="hidden md:block">
+    <div class="hidden md:block relative">
       <hr>
-      <Footer class="p-4"></Footer>
+      <!-- <Footer class="p-4"></Footer> -->
+      <div class="p-4 w-full mx-auto max-w-screen-xl md:flex md:items-center md:justify-between">
+        <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">
+          (C) Department of Cancer Pathology, Faculty of Medicine, Hokkaido University All rights reserverd.
+        </span>
+      </div>
     </div>
   </svelte:fragment>
 </AppShell>

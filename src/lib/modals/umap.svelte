@@ -1,6 +1,7 @@
 <script>
   import { fade } from 'svelte/transition'
   import { getModalStore } from '@skeletonlabs/skeleton'
+  import { onMount } from 'svelte'
   import { Chart } from 'svelte-echarts'
   import { API_BASE, STATIC_BASE } from '$lib/config'
   import { COLORS_BY_DIAGS } from '$lib/const'
@@ -13,7 +14,11 @@
   const modalStore = getModalStore()
   const result = $modalStore[0].result
 
-  async function fetchData() {
+  let options = null
+  let loadingMessage = 'Preparing'
+
+  onMount(async function() {
+    loadingMessage = 'Loading the background embeddings..'
     if (!$cache[result.model]) {
       const res = await fetch(`${API_BASE}/bt/umap/embeddings/${result.model}`)
       $cache[result.model] = await res.json()
@@ -62,6 +67,8 @@
       })
     })
 
+    loadingMessage = `Calculating the embeddings of ${result.name}...`
+
     const res = await fetch(`${API_BASE}/bt/umap/${result.timestamp}`, { method: 'POST', })
     const pos = await res.json()
 
@@ -93,7 +100,7 @@
       z: 100,
     })
 
-    return {
+    options = {
       xAxis: {},
       yAxis: {},
       legend: {
@@ -128,7 +135,8 @@
       ],
       series: series,
     }
-  }
+  })
+
 </script>
 
 <style global>
@@ -136,13 +144,15 @@
 
 {#if $modalStore[0]}
   <div class="card shadow-xl max-w-full max-h-[96vh] h-[64rem] w-[64rem] overflow-hidden">
-    {#await fetchData()}
-      <div class="p-4 flex h-full justify-center items-center" transition:fade={{ delay: 250, duration: 300 }}>
+    {#if !options}
+
+      <div class="p-4 flex flex-col h-full justify-center items-center" transition:fade={{ duration: 300 }}>
         <span class="i-mdi-loading animate-spin text-[180px] text-secondary-300"></span>
+        <p class="mt-8 text-center text-surface-400">{ loadingMessage }</p>
       </div>
-    {:then options}
+    {:else}
       <Chart {options} />
-    {/await}
+    {/if}
   </div>
 {/if}
 
