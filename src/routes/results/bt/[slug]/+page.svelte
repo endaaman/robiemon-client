@@ -32,9 +32,12 @@
   }
 
   function handleKeydown(e) {
+    if (['INPUT', 'TEXTAREA','SELECT'].includes(e.target.tagName)) {
+      return
+    }
     if (e.key == 'ArrowLeft') {
       if (newerResult) {
-        goto(`/results/bt/${olderResult.timestamp}`)
+        goto(`/results/bt/${newerResult.timestamp}`)
       }
     }
     if (e.key == 'ArrowRight') {
