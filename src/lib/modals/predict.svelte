@@ -197,7 +197,6 @@
     {/if}
 
     <footer class="modal-footer mt-4 flex flex-row align-middle items-center gap-4">
-
       <label class="label">
         <select class="select variant-ghost-surface" bind:value={mode}>
           <option value="bt">Brain tumor</option>
