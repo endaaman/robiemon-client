@@ -1,14 +1,14 @@
 <script>
   import { browser } from '$app/environment'
-	import { getModalStore } from '@skeletonlabs/skeleton';
+  import { getModalStore } from '@skeletonlabs/skeleton';
   import { ProgressBar, SlideToggle } from '@skeletonlabs/skeleton'
   import { API_BASE } from '$lib/config'
-	import { getContext } from 'svelte'
-	import { LS_PRED_BT_MODEL, LS_PRED_BT_CAM, LS_PRED_SCALE } from '$lib/const'
+  import { getContext } from 'svelte'
+  import { LS_PRED_BT_MODEL, LS_PRED_BT_CAM, LS_PRED_SCALE } from '$lib/const'
 
-	const modalStore = getModalStore()
-	export let parent
-	let mode = 'bt'
+  const modalStore = getModalStore()
+  export let parent
+  let mode = 'bt'
   const status = getContext('status')
 
   let scale = browser && parseFloat(localStorage.getItem(LS_PRED_SCALE)) || 1.0
@@ -64,9 +64,9 @@
 
 
 {#if $modalStore[0]}
-	<div id="pred-modal" class="card p-4 shadow-xl">
-		<header class="mb-4 flex flex-row align-middle items-center">
-			<h3 class="text-2xl font-bold">Multiple prediction</h3>
+  <div id="pred-modal" class="card p-4 shadow-xl">
+    <header class="mb-4 flex flex-row align-middle items-center">
+      <h3 class="text-2xl font-bold">Multiple prediction</h3>
     </header>
 
     <article>
@@ -97,7 +97,7 @@
       </label>
 
 
-			{#if mode === 'bt'}
+      {#if mode === 'bt'}
         <div class="border border-surface-300 p-4 space-y-4 rounded-container-token">
           <!-- <pre>{ JSON.stringify(extra, 0, 2) }</pre> -->
           <label class="label">
@@ -112,21 +112,21 @@
             bind:checked={ extra.bt.cam }
           >CAM</SlideToggle>
         </div>
-			{/if}
+      {/if}
 
-		</form>
+    </form>
 
     <hr class="my-4">
 
-		<footer class="flex flex-row">
-			<button class="btn {parent.buttonNeutral}" on:click={parent.onClose}>{parent.buttonTextCancel}</button>
-			<button class="btn {parent.buttonPositive} w-24 ml-auto" on:click={onFormSubmit}>
+    <footer class="flex flex-row">
+      <button class="btn {parent.buttonNeutral}" on:click={parent.onClose}>{parent.buttonTextCancel}</button>
+      <button class="btn {parent.buttonPositive} w-24 ml-auto" on:click={onFormSubmit}>
         {#if processing}
           <span class="i-mdi-loading animate-spin"></span>
         {:else}
           Predict
         {/if}
-			</button>
-		</footer>
-	</div>
+      </button>
+    </footer>
+  </div>
 {/if}

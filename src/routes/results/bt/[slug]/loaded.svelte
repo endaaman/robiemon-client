@@ -3,19 +3,19 @@
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation';
   import { navigating } from '$app/stores'
-	import { getContext, onMount, onDestroy, tick } from 'svelte'
+  import { getContext, onMount, onDestroy, tick } from 'svelte'
   import {
       RangeSlider, ConicGradient, getToastStore, getModalStore,
   } from '@skeletonlabs/skeleton'
   import { API_BASE, STATIC_BASE } from '$lib/config'
-	import { debounce } from '$lib'
+  import { debounce } from '$lib'
 
   import BtResultCircle from '$lib/components/bt_result_circle.svelte';
   import BtResultPredictions from '$lib/components/bt_result_predictions.svelte';
 
-	export let result;
+  export let result;
 
-	const status = getContext('status')
+  const status = getContext('status')
 
   const toastStore = getToastStore()
   const modalStore = getModalStore()
@@ -126,11 +126,11 @@
       e.preventDefault()
       return
     }
-		if (e.key === 'Escape') {
+    if (e.key === 'Escape') {
       editingName = false
       e.preventDefault()
       return
-		}
+    }
   }
 
   //////////
@@ -156,10 +156,10 @@
   }
 
   function handleMemoKeydown(e) {
-		if (e.key === 'Escape') {
+    if (e.key === 'Escape') {
       editingMemo = false
       e.preventDefault()
-		}
+    }
   }
 
 
@@ -234,10 +234,10 @@
     })
   }
 
-	onMount(async () => {
-		if (browser) {
+  onMount(async () => {
+    if (browser) {
       window.addEventListener('resize', handleImageLoaded)
-		}
+    }
   })
 </script>
 
@@ -246,7 +246,6 @@
 
 <!-- <pre>{ JSON.stringify(data, 0, 2) }</pre> -->
 <!-- <pre>{ JSON.stringify($page, 0, 2) }</pre> -->
-
 
 <div class="grid grid-cols-3 gap-4 mt-4">
   <div class="col-span-2">
@@ -333,7 +332,7 @@
             class="p-0 block w-full"
             bind:value={ newName }
             bind:this={ editNameElement }
-            on:blue={ handleNameBlur }
+            on:blur={ handleNameBlur }
             on:keydown={ handleNameKeydown }
           >
         </div>

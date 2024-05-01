@@ -1,192 +1,192 @@
 <script>
-	import '../app.postcss';
+  import '../app.postcss';
   import { browser } from '$app/environment'
-	import { setContext, onMount, onDestroy, tick } from 'svelte'
-	import { writable } from 'svelte/store'
-	import {
-		AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
-		Avatar, LightSwitch,
-	} from '@skeletonlabs/skeleton'
-	import {
-		Modal, Toast, Drawer,
-		initializeStores, getToastStore, getModalStore, getDrawerStore, storePopup
-	} from '@skeletonlabs/skeleton'
-	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
+  import { setContext, onMount, onDestroy, tick } from 'svelte'
+  import { writable } from 'svelte/store'
+  import {
+    AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
+    Avatar, LightSwitch,
+  } from '@skeletonlabs/skeleton'
+  import {
+    Modal, Toast, Drawer,
+    initializeStores, getToastStore, getModalStore, getDrawerStore, storePopup
+  } from '@skeletonlabs/skeleton'
+  import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 
-	import { page } from '$app/stores'
-	import { API_BASE } from '$lib/config'
-	import * as C from '$lib/const'
+  import { page } from '$app/stores'
+  import { API_BASE } from '$lib/config'
+  import * as C from '$lib/const'
 
-	import ModalPredict from '$lib/modals/predict.svelte'
-	import ModalPredictMulti from '$lib/modals/predict_multi.svelte'
-	import ModalUMAP from '$lib/modals/umap.svelte'
-	import Title from '$lib/components/title.svelte'
-	import Footer from '$lib/components/footer.svelte'
-	import ConnectionButton from '$lib/components/connection_button.svelte'
+  import ModalPredict from '$lib/modals/predict.svelte'
+  import ModalPredictMulti from '$lib/modals/predict_multi.svelte'
+  import ModalUMAP from '$lib/modals/umap.svelte'
+  import Title from '$lib/components/title.svelte'
+  import Footer from '$lib/components/footer.svelte'
+  import ConnectionButton from '$lib/components/connection_button.svelte'
 
-	initializeStores()
+  initializeStores()
 
 
-	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow })
+  storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow })
 
-	const drawerStore = getDrawerStore()
+  const drawerStore = getDrawerStore()
 
-	let currentToast = null
-	let drawerOpen = false
+  let currentToast = null
+  let drawerOpen = false
 
-	$: {
-		if ($page) drawerStore.close()
-	}
+  $: {
+    if ($page) drawerStore.close()
+  }
 
-	drawerStore.subscribe((v) => {
-		drawerOpen = v.open
-	})
+  drawerStore.subscribe((v) => {
+    drawerOpen = v.open
+  })
 
-	const links = [
-		{
-			icon: 'home',
-			label: 'Home',
-			href: '/',
-		},
-		// {
-		// 	icon: 'predict',
-		// 	label: 'Predict',
-		// 	href: '/predict',
-		// },
-		{
-			icon: 'table',
-			label: 'Result',
-			href: '/results',
-		},
-		// {
-		// 	icon: 'setting',
-		// 	label: 'Setting',
-		// 	href: '/setting',
-		// },
-	]
+  const links = [
+    {
+      icon: 'home',
+      label: 'Home',
+      href: '/',
+    },
+    // {
+    //  icon: 'predict',
+    //  label: 'Predict',
+    //  href: '/predict',
+    // },
+    {
+      icon: 'table',
+      label: 'Result',
+      href: '/results',
+    },
+    // {
+    //  icon: 'setting',
+    //  label: 'Setting',
+    //  href: '/setting',
+    // },
+  ]
 
-	export let data;
+  export let data;
 
-	const modalRegistry = {
-		predict: { ref: ModalPredict },
-		predictMulti: { ref: ModalPredictMulti },
-		umap: { ref: ModalUMAP },
-	}
+  const modalRegistry = {
+    predict: { ref: ModalPredict },
+    predictMulti: { ref: ModalPredictMulti },
+    umap: { ref: ModalUMAP },
+  }
 
-	const toastStore = getToastStore()
-	const modalStore = getModalStore()
+  const toastStore = getToastStore()
+  const modalStore = getModalStore()
 
-	function matchHref(href, current) {
-		if (href === '/') {
-			return current === href
-		}
-		return current.startsWith(href)
-	}
+  function matchHref(href, current) {
+    if (href === '/') {
+      return current === href
+    }
+    return current.startsWith(href)
+  }
 
   // const noscroll = writable()
-	// setContext('noscroll', noscroll)
+  // setContext('noscroll', noscroll)
   // noscroll.set(false)
 
   const status = writable()
-	setContext('status', status)
+  setContext('status', status)
   status.set(data.status || {tasks: [], bt_results: [], bt_models: []})
 
-	let eventSource = null
+  let eventSource = null
   const connection = writable()
   setContext('connection', connection),
   // pending, error, connected
-	connection.set({
-		status: C.CONNECTION_PENDING,
-		connect() {
-			if (currentToast) {
-				toastStore.close(currentToast)
-				currentToast = null
-			}
-			eventSource = new EventSource(`${API_BASE}/status_sse`)
+  connection.set({
+    status: C.CONNECTION_PENDING,
+    connect() {
+      if (currentToast) {
+        toastStore.close(currentToast)
+        currentToast = null
+      }
+      eventSource = new EventSource(`${API_BASE}/status_sse`)
 
-			eventSource.addEventListener('open', (e) => {
-				$connection.status = C.CONNECTION_CONNECTED
+      eventSource.addEventListener('open', (e) => {
+        $connection.status = C.CONNECTION_CONNECTED
 
-				toastStore.trigger({
-					message: 'Connected to the AI server',
-					background: 'variant-filled-primary',
-					timeout: 2000,
-					autohide: true,
-				})
-			})
+        toastStore.trigger({
+          message: 'Connected to the AI server',
+          background: 'variant-filled-primary',
+          timeout: 2000,
+          autohide: true,
+        })
+      })
 
-			eventSource.onmessage = function(event) {
-				const data = JSON.parse(event.data)
-				status.set(data)
-				console.log('status updated', data)
-			}
+      eventSource.onmessage = function(event) {
+        const data = JSON.parse(event.data)
+        status.set(data)
+        console.log('status updated', data)
+      }
 
-			eventSource.onerror = async function (err) {
-				console.error('EventSource failed:', err)
-				$connection.close()
+      eventSource.onerror = async function (err) {
+        console.error('EventSource failed:', err)
+        $connection.close()
 
-				currentToast = toastStore.trigger({
-					message: 'Failed to connect server.',
-					background: 'variant-filled-error',
-					autohide: false,
-					hideDismiss: false,
-					action: {
-						label: 'Re-connect',
-						response: async () => {
-							setTimeout(() => {
-								$connection.connect()
-							}, 500)
-						}
-					},
-					callback({id, status}) {
-						// if (status === 'closed') {
-						// 	currentToast = null
-						// }
-						// console.log(id, status)
-					}
-				})
-			}
-		},
-		close() {
-			if (eventSource) {
-				eventSource.close()
-				eventSource = null
-			}
-			$connection.status = C.CONNECTION_DISCONNECTED
-		}
-	})
+        currentToast = toastStore.trigger({
+          message: 'Failed to connect server.',
+          background: 'variant-filled-error',
+          autohide: false,
+          hideDismiss: false,
+          action: {
+            label: 'Re-connect',
+            response: async () => {
+              setTimeout(() => {
+                $connection.connect()
+              }, 500)
+            }
+          },
+          callback({id, status}) {
+            // if (status === 'closed') {
+            //  currentToast = null
+            // }
+            // console.log(id, status)
+          }
+        })
+      }
+    },
+    close() {
+      if (eventSource) {
+        eventSource.close()
+        eventSource = null
+      }
+      $connection.status = C.CONNECTION_DISCONNECTED
+    }
+  })
 
 
-	function handleMenuClicked() {
-		if (drawerOpen) {
-			drawerStore.close()
-		} else {
-			drawerStore.open({
-				id: 'menu',
-				position: 'left',
-				width: 'w-[280px] md:w-[480px]',
-			})
-		}
-	}
+  function handleMenuClicked() {
+    if (drawerOpen) {
+      drawerStore.close()
+    } else {
+      drawerStore.open({
+        id: 'menu',
+        position: 'left',
+        width: 'w-[280px] md:w-[480px]',
+      })
+    }
+  }
 
-	async function handleReconnectClick() {
-		$connection.connect()
-	}
+  async function handleReconnectClick() {
+    $connection.connect()
+  }
 
-	onMount(async () => {
-		$connection.connect()
-	})
+  onMount(async () => {
+    $connection.connect()
+  })
 
-	onDestroy(async () => {
-		$connection.close()
-	})
+  onDestroy(async () => {
+    $connection.close()
+  })
 
   function onKeyDown(e) {
-		if (e.key === 'Escape') {
-			e.preventDefault()
-			// $modalStore[0].response(false)
-			modalStore.close()
-		}
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      // $modalStore[0].response(false)
+      modalStore.close()
+    }
   }
 </script>
 
@@ -198,84 +198,84 @@
 <Toast />
 
 <Drawer>
-	{#if $drawerStore.id === 'menu'}
-		<div class="flex flex-col h-full">
-			<nav class="list-nav p-4">
-				<ul>
-					{#each links as link}
-					  <li class="my-4">
-							<a
-								class="btn text-lg"
-								class:variant-soft-primary={ matchHref(link.href, $page.url.pathname) }
-								href={link.href}
-							>
-								{link.label}
-							</a>
-						</li>
-					{/each}
-				</ul>
-			</nav>
+  {#if $drawerStore.id === 'menu'}
+    <div class="flex flex-col h-full">
+      <nav class="list-nav p-4">
+        <ul>
+          {#each links as link}
+            <li class="my-4">
+              <a
+                class="btn text-lg"
+                class:variant-soft-primary={ matchHref(link.href, $page.url.pathname) }
+                href={link.href}
+              >
+                {link.label}
+              </a>
+            </li>
+          {/each}
+        </ul>
+      </nav>
 
 
-			<div class="mt-auto">
-				<div class="flex flex-row gap-4 justify-center my-4">
-					<ConnectionButton></ConnectionButton>
-					<LightSwitch />
-				</div>
+      <div class="mt-auto">
+        <div class="flex flex-row gap-4 justify-center my-4">
+          <ConnectionButton></ConnectionButton>
+          <LightSwitch />
+        </div>
 
-				<hr />
+        <hr />
 
-				<Footer class="p-4"></Footer>
-			</div>
-		</div>
-	{/if}
+        <Footer class="p-4"></Footer>
+      </div>
+    </div>
+  {/if}
 </Drawer>
 
 <!-- <pre>{ JSON.stringify($status, 0, 2) }</pre> -->
 
 <AppShell>
-	<svelte:fragment slot="header">
-		<AppBar class="hidden md:block">
-			<svelte:fragment slot="lead">
-				<Title></Title>
-			</svelte:fragment>
+  <svelte:fragment slot="header">
+    <AppBar class="hidden md:block">
+      <svelte:fragment slot="lead">
+        <Title></Title>
+      </svelte:fragment>
 
-			<svelte:fragment slot="trail">
-				{#each links as link}
-					<a
-						class="btn text-lg hover:variant-soft-primary"
-						class:variant-soft-primary={ matchHref(link.href, $page.url.pathname) }
-						href={link.href}
-					>
-						<span class="i-mdi-{link.icon} align-middle"></span> {link.label}
-					</a>
-				{/each}
+      <svelte:fragment slot="trail">
+        {#each links as link}
+          <a
+            class="btn text-lg hover:variant-soft-primary"
+            class:variant-soft-primary={ matchHref(link.href, $page.url.pathname) }
+            href={link.href}
+          >
+            <span class="i-mdi-{link.icon} align-middle"></span> {link.label}
+          </a>
+        {/each}
 
-				<div class="inline-block min-h-[1em] w-px self-stretch bg-surface-300"></div>
-				<ConnectionButton></ConnectionButton>
-				<LightSwitch />
-			</svelte:fragment>
-		</AppBar>
+        <div class="inline-block min-h-[1em] w-px self-stretch bg-surface-300"></div>
+        <ConnectionButton></ConnectionButton>
+        <LightSwitch />
+      </svelte:fragment>
+    </AppBar>
 
-		<AppBar class="block md:hidden">
-			<svelte:fragment slot="lead">
-				<Title></Title>
-			</svelte:fragment>
+    <AppBar class="block md:hidden">
+      <svelte:fragment slot="lead">
+        <Title></Title>
+      </svelte:fragment>
 
-			<svelte:fragment slot="trail">
-				<button class="btn hover:variant-ringed rounded-none" on:click={ handleMenuClicked }>
-					<span class="text-3xl"
-						class:i-mdi-menu={!drawerOpen}
-						class:i-mdi-close={drawerOpen}
-					></span>
-				</button>
-			</svelte:fragment>
-		</AppBar>
+      <svelte:fragment slot="trail">
+        <button class="btn hover:variant-ringed rounded-none" on:click={ handleMenuClicked }>
+          <span class="text-3xl"
+            class:i-mdi-menu={!drawerOpen}
+            class:i-mdi-close={drawerOpen}
+          ></span>
+        </button>
+      </svelte:fragment>
+    </AppBar>
 
-	</svelte:fragment>
+  </svelte:fragment>
 
-	<!-- (sidebarRight) -->
-	<!-- (pageHeader) -->
+  <!-- (sidebarRight) -->
+  <!-- (pageHeader) -->
 
   {#if $connection.status === C.CONNECTION_DISCONNECTED }
     <div class="p-4">
@@ -287,10 +287,10 @@
     <slot></slot>
   {/if}
 
-	<svelte:fragment slot="pageFooter">
-		<div class="hidden md:block">
-			<hr>
-			<Footer class="p-4"></Footer>
-		</div>
-	</svelte:fragment>
+  <svelte:fragment slot="pageFooter">
+    <div class="hidden md:block">
+      <hr>
+      <Footer class="p-4"></Footer>
+    </div>
+  </svelte:fragment>
 </AppShell>

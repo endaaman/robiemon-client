@@ -3,16 +3,16 @@
   import { goto } from '$app/navigation';
   import { browser } from '$app/environment'
   import { onMount, onDestroy, tick, afterUpdate } from 'svelte'
-	import {
+  import {
     AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
     FileDropzone, Avatar, LightSwitch, RangeSlider,
     getModalStore, getToastStore,
-	} from '@skeletonlabs/skeleton'
+  } from '@skeletonlabs/skeleton'
 
   import { LS_BRIGHTNESS } from '$lib/const'
-	import { page } from '$app/stores'
+  import { page } from '$app/stores'
 
-	export let data
+  export let data
 
   const modalStore = getModalStore()
   const toastStore = getToastStore()

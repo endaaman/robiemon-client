@@ -1,16 +1,16 @@
 <script>
-	import { fade } from 'svelte/transition'
-	import { getModalStore } from '@skeletonlabs/skeleton'
+  import { fade } from 'svelte/transition'
+  import { getModalStore } from '@skeletonlabs/skeleton'
   import { Chart } from 'svelte-echarts'
   import { API_BASE, STATIC_BASE } from '$lib/config'
-	import { COLORS_BY_DIAGS } from '$lib/const'
+  import { COLORS_BY_DIAGS } from '$lib/const'
   import chroma from 'chroma-js'
   import { cache } from './umap_store.js'
 
 
-	export let parent
+  export let parent
 
-	const modalStore = getModalStore()
+  const modalStore = getModalStore()
   const result = $modalStore[0].result
 
   async function fetchData() {
@@ -63,7 +63,7 @@
     })
 
     const res = await fetch(`${API_BASE}/bt/umap/${result.timestamp}`, { method: 'POST', })
-		const pos = await res.json()
+    const pos = await res.json()
 
     const keys = 'LMGB'.split('')
     let pred = keys[0]

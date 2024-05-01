@@ -9,17 +9,17 @@ const CERT_FILE = './certs/localhost-cert.pem'
 const ssl = fs.existsSync(CERT_FILE) && fs.existsSync(KEY_FILE)
 
 export default defineConfig({
-	plugins: [sveltekit(), purgeCss()],
-	server: {
-		proxy: {
-			'/static': 'http://localhost:3000',
-			'/api': 'http://localhost:3000',
-		},
+  plugins: [sveltekit(), purgeCss()],
+  server: {
+    proxy: {
+      '/static': 'http://localhost:3000',
+      '/api': 'http://localhost:3000',
+    },
     ...(ssl && {
       https: {
         key: fs.readFileSync(KEY_FILE),
         cert: fs.readFileSync(CERT_FILE),
       },
     })
-	},
+  },
 })

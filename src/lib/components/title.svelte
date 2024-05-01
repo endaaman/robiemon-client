@@ -1,5 +1,5 @@
 <script>
-	import { Avatar } from '@skeletonlabs/skeleton'
+  import { Avatar } from '@skeletonlabs/skeleton'
 </script>
 
 <a href="/" class="flex justify-left gap-4 align-middle items-center md:text-xl text-md">

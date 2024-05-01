@@ -1,5 +1,5 @@
 <script>
-	import { COLORS_BY_DIAGS } from '$lib/const'
+  import { COLORS_BY_DIAGS } from '$lib/const'
   const labels = ['L', 'M', 'G', 'B']
   export let result
 </script>

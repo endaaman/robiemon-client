@@ -2,14 +2,14 @@
   import format from 'date-fns/format'
   import { goto } from '$app/navigation';
   import { onMount, onDestroy, tick, setContext, getContext  } from 'svelte'
-	import { writable } from 'svelte/store'
+  import { writable } from 'svelte/store'
   import {
     getToastStore, getModalStore,
     RadioGroup, RadioItem,
     tableSourceMapper, tableMapperValues
   } from '@skeletonlabs/skeleton';
   import { API_BASE, STATIC_BASE } from '$lib/config'
-	import { page } from '$app/stores'
+  import { page } from '$app/stores'
   import { browser } from '$app/environment'
 
   const toastStore = getToastStore()

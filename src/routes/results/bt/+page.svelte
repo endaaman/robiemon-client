@@ -2,7 +2,7 @@
   import format from 'date-fns/format'
   import { goto } from '$app/navigation';
   import { browser } from '$app/environment'
-	import { page } from '$app/stores'
+  import { page } from '$app/stores'
   import { getContext  } from 'svelte'
   import {
     RadioGroup, RadioItem, ListBox, ListBoxItem,

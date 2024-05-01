@@ -1,15 +1,15 @@
 <script>
-	import { page } from '$app/stores'
+  import { page } from '$app/stores'
   import { getContext } from 'svelte'
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation';
-	import Divider from '$lib/components/divider.svelte'
+  import Divider from '$lib/components/divider.svelte'
   import Loaded from './loaded.svelte'
-	import { onMount, onDestroy } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
 
-	const status = getContext('status')
+  const status = getContext('status')
 
-	let result = null
+  let result = null
   let newerResult = null
   let olderResult = null
 
