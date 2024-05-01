@@ -253,8 +253,8 @@
 <!-- <pre>{ JSON.stringify(data, 0, 2) }</pre> -->
 <!-- <pre>{ JSON.stringify($page, 0, 2) }</pre> -->
 
-<div class="grid grid-cols-3 gap-4 mt-4">
-  <div class="col-span-2">
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+  <div class="md:grid-cols-1 lg:col-span-2">
     <div class="relative w-full">
       <img
         src={imagePath}
@@ -274,8 +274,7 @@
 
   </div>
 
-  <div class="flex flex-col gap-6">
-
+  <div class="flex flex-col grid-cols-1 gap-6">
     <section>
       <h3>Prediction</h3>
       <hr class="my-2" />

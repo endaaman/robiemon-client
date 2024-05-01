@@ -57,15 +57,15 @@
   }
 </script>
 
-<div class="mt-4 flex gap-4">
-  <a href="/results/bt" class="btn variant-ghost-surface">
+<div class="flex overflow-x-auto mt-4 flex gap-4">
+  <a href="/results/bt" class="btn variant-ghost-surface flex-none">
     <span class="i-mdi-format-list-bulleted-square"></span>
     <span>Back to list</span>
   </a>
   {#if result }
-    <Divider color='surface-400' />
+    <Divider color="surface-400 flex-none" />
 
-    <div class="btn-group variant-ringed-surface">
+    <div class="btn-group variant-ringed-surface flex-none">
       {#if newerResult}
         <a href="/results/bt/{newerResult.timestamp}">
           <span class="i-mdi-chevron-left"></span>
@@ -94,7 +94,6 @@
       {/if}
     </div>
   {/if}
-
 </div>
 
 {#if result }
