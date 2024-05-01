@@ -1,8 +1,11 @@
 <script>
 	import { page } from '$app/stores'
   import { getContext } from 'svelte'
+  import { browser } from '$app/environment'
+  import { goto } from '$app/navigation';
 	import Divider from '$lib/components/divider.svelte'
   import Loaded from './loaded.svelte'
+	import { onMount, onDestroy } from 'svelte'
 
 	const status = getContext('status')
 
@@ -25,6 +28,28 @@
           newerResult = $status.bt_results[i+1]
         }
       }
+    })
+  }
+
+  function handleKeydown(e) {
+    if (e.key == 'ArrowLeft') {
+      if (newerResult) {
+        goto(`/results/bt/${olderResult.timestamp}`)
+      }
+    }
+    if (e.key == 'ArrowRight') {
+      if (olderResult) {
+        goto(`/results/bt/${olderResult.timestamp}`)
+      }
+    }
+  }
+
+  if (browser) {
+    onMount(async () => {
+      document.addEventListener('keydown', handleKeydown)
+    })
+    onDestroy(() => {
+      document.removeEventListener('keydown', handleKeydown)
     })
   }
 </script>
