@@ -15,6 +15,10 @@
 
   export let result;
 
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   const status = getContext('status')
 
   const toastStore = getToastStore()
@@ -74,7 +78,6 @@
         timeout: 2000,
         background: 'variant-filled',
       })
-
     } catch (error) {
       console.log(error)
       toastStore.trigger({
@@ -83,6 +86,12 @@
         background: 'variant-filled-error',
       })
     } finally {
+      if (body.name) {
+        editingName = false
+      }
+      if (body.memo) {
+        editingMemo = false
+      }
     }
   }
 
@@ -99,22 +108,21 @@
       return
     }
     await patchResult({ name: newName })
-    editingName = false
   }
 
   async function toggleEditingName() {
-    editingName = !editingName
     if (editingName) {
-      setTimeout(function() {
-        editNameElement.focus()
-        editNameElement.select()
-      }, 1)
-    } else {
       await saveName()
+      editingName = false
+    } else {
+      editingName = true
+      await delay(1)
+      editNameElement.focus()
+      editNameElement.select()
     }
   }
 
-  function handleNameBlur() {
+  async function handleNameBlur() {
     setTimeout(function() {
       editingName = false
     }, 100)
@@ -136,15 +144,15 @@
   //////////
   //* MEMO
   async function toggleEditingMemo() {
-    editingMemo = !editingMemo
+    console.log('CLICK')
     if (editingMemo) {
-      setTimeout(function() {
-        editMemoElement.focus()
-        editMemoElement.select()
-      }, 1)
-    } else {
       await patchResult({ memo: newMemo })
-      editingMemo = false
+      console.log('UPDATED')
+    } else {
+      editingMemo = true
+      await delay(1)
+      editMemoElement.focus()
+      editMemoElement.select()
     }
   }
 
@@ -152,7 +160,6 @@
     setTimeout(function() {
       editingMemo = false
     }, 100)
-    console.log('BLURRR')
   }
 
   function handleMemoKeydown(e) {
@@ -161,7 +168,6 @@
       e.preventDefault()
     }
   }
-
 
   function handleRepredictClicked(e) {
     modalStore.trigger({
@@ -284,7 +290,7 @@
     </section>
 
     <section>
-      <h3>UMAP Presentasion</h3>
+      <h3>Actions</h3>
       <hr class="my-2" />
 
       <div class="flex flex-row w-full gap-2">
