@@ -332,7 +332,7 @@
 
       <label class="flex items-center space-x-1">
         <input class="checkbox" type="checkbox" bind:checked={showIncorrect} on:change={ updateOptions }/>
-        <p>Show incorrect {showIncorrect}</p>
+        <p>Show incorrect</p>
       </label>
     </header>
 
