@@ -22,18 +22,12 @@
 
   export let parent
 
-  const codes = 'BLMGAO'.split('')
+  const codes = 'LMGAOB'.split('')
 
   const modalStore = getModalStore()
   const result = $modalStore[0].result
 
   const keys = 'LMGB'.split('')
-  let pred = keys[0]
-  keys.forEach(key => {
-    if (result[key] > result[pred]) {
-      pred = key
-    }
-  })
   const predText = keys.map((k) => `${k}:${Math.round(result[k]*100)}%`).join(' ')
 
   const modes = [
@@ -51,20 +45,18 @@
     {
       type: 'slider',
       xAxisIndex: 0,
-      filterMode: 'filter'
-    }, {
+      filterMode: 'weakFilter'
+    },
+    {
       type: 'slider',
       yAxisIndex: 0,
-      filterMode: 'filter'
-    }, {
+      filterMode: 'weakFilter'
+    },
+    {
       type: 'inside',
-      // xAxisIndex: [0],
-      // yAxisIndex: [0],
-      // start: 0,
-      // end: 100,
-      zoomOnMouseWheel: true,
       moveOnMouseMove: true,
-      moveOnMouseWheel: true
+      // zoomOnMouseWheel: true,
+      // moveOnMouseWheel: true
     }
   ]
 
@@ -73,6 +65,8 @@
   let echartsInstance = null
   let echartsElement = null
   let options = null
+  let currentLegendSelected = null
+  let currentDataZoom = null
 
   let mode = modes[0].value
   let symbolSize = 5
@@ -139,7 +133,7 @@
       name: resultName,
       type: 'scatter',
       itemStyle: {
-        color: COLORS_BY_DIAGS[pred],
+        color: COLORS_BY_DIAGS[result.pred],
       },
       data: [
         {
@@ -151,7 +145,7 @@
           itemStyle: {
             borderWidth: 1.5,
             borderType: 'solid',
-            borderColor: chroma(COLORS_BY_DIAGS[pred]).saturate(2).darken(2).css(),
+            borderColor: chroma(COLORS_BY_DIAGS[result.pred]).saturate(2).darken(2).css(),
           }
         }
       ],
@@ -164,9 +158,12 @@
         data: [resultName, ...codes],
         orient: 'vertical',
         top: 'middle',
-        left: 'left'
+        left: 'left',
+        selected: currentLegendSelected,
       },
-      tooltip, dataZoom, series,
+      dataZoom: currentDataZoom || dataZoom,
+      tooltip,
+      series,
     }
   }
 
@@ -191,15 +188,16 @@
       }
       const seriesKey = `${v.origin}_${v.correct ? 1 : 0}`
       if (!seriesMap[seriesKey]) {
-        if (!showIncorrect && !v.correct) {
-          return
-        }
+        origins[v.origin] = 0
         seriesMap[seriesKey] = {
           name: v.origin,
           type: 'scatter',
           data: [],
         }
-        origins[v.origin] = 0
+      }
+      origins[v.origin] += 1
+      if (!showIncorrect && !v.correct) {
+        return
       }
       seriesMap[seriesKey].data.push({
         value: [v.x, v.y],
@@ -208,7 +206,7 @@
         symbol: v.correct ? 'circle' : 'triangle',
         symbolSize: v.correct ? symbolSize : symbolSize+5,
       })
-      origins[v.origin] += 1
+
     })
 
     const series = Object.values(seriesMap)
@@ -216,6 +214,9 @@
     series.push({
       name: resultName,
       type: 'scatter',
+      itemStyle: {
+        color: COLORS_BY_DIAGS[result.pred],
+      },
       data: [
         {
           value: [position.x, position.y],
@@ -224,9 +225,9 @@
           symbol: 'pin',
           symbolSize: 36,
           itemStyle: {
-            borderWidth: 1,
+            borderWidth: 1.5,
             borderType: 'solid',
-            borderColor: '#000',
+            borderColor: chroma(COLORS_BY_DIAGS[result.pred]).saturate(2).darken(2).css(),
           },
         }
       ],
@@ -249,9 +250,12 @@
         data: [resultName, ...legends.map((v)=> v[0])],
         orient: 'vertical',
         top: 'middle',
-        left: 'left'
+        left: 'left',
+        selected: currentLegendSelected,
       },
-      tooltip, dataZoom, series,
+      dataZoom: currentDataZoom || dataZoom,
+      tooltip,
+      series,
     }
   }
 
@@ -262,6 +266,13 @@
       meta: generateMetaOptions,
     }[mode])()
     echartsInstance.setOption(options, true)
+  }
+
+  function handleModeChanged(e) {
+    mode = e.target.value
+    currentLegendSelected = null
+    currentDataZoom = null
+    updateOptions()
   }
 
   function handleSymbolSizeChanged(e) {
@@ -298,6 +309,14 @@
     loadingMessage = `Done.`
     updateOptions()
 
+    echartsInstance.on('legendselectchanged', function (params) {
+      currentLegendSelected = params.selected
+    })
+
+    echartsInstance.on('datazoom', function (params) {
+      currentDataZoom = echartsInstance.getOption().dataZoom
+    })
+
     window.addEventListener('resize', handleResized)
   })
 
@@ -309,15 +328,12 @@
   })
 </script>
 
-<style global>
-</style>
-
 {#if $modalStore[0]}
   <div class="card relative shadow-xl max-w-full max-h-[96vh] h-[64rem] w-[64rem] overflow-hidden bg-white">
     <header class="absolute p-2 z-10 flex gap-2 bg-surface-50 w-full text-sm">
       <div class="flex space-x-1 items-center">
         <label for="mode">Mode</label>
-        <select id="mode" class="select text-xs p-1 w-[120px]" bind:value={mode} on:change={ updateOptions }>
+        <select id="mode" class="select text-xs p-1 w-[120px]" on:change={ handleModeChanged }>
           {#each modes as m}
             <option value={m.value}>{m.label}</option>
           {/each}
@@ -337,10 +353,10 @@
     </header>
 
     {#if !options}
-    <div class="p-4 flex flex-col h-full justify-center items-center" transition:fade={{ duration: 300 }}>
-      <span class="i-mdi-loading animate-spin text-[180px] text-secondary-300"></span>
-      <p class="mt-8 text-center text-surface-400">{ loadingMessage }</p>
-    </div>
+      <div class="p-4 flex flex-col h-full justify-center items-center" transition:fade={{ duration: 300 }}>
+        <span class="i-mdi-loading animate-spin text-[180px] text-secondary-300"></span>
+        <p class="mt-8 text-center text-surface-400">{ loadingMessage }</p>
+      </div>
     {/if}
     <div bind:this={ echartsElement } style="height: 100%; width: 100%;"></div>
   </div>

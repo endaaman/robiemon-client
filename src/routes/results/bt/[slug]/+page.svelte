@@ -1,8 +1,8 @@
 <script>
-
   import format from 'date-fns/format'
   import { browser } from '$app/environment'
-  import { goto } from '$app/navigation';
+  import { goto } from '$app/navigation'
+  import { page } from '$app/stores'
   import { navigating } from '$app/stores'
   import { getContext, onMount, onDestroy, tick } from 'svelte'
   import {
@@ -26,7 +26,6 @@
 
   export let data
   let result = data.result
-  $: result
 
   $: if($navigating) {
     result = data.result
@@ -54,6 +53,11 @@
   let opacity = 0
 
   $: {
+    if ($status.bt_results.length > 0) {
+      result = $status.bt_results.find((r) => {
+        return r.timestamp === parseInt($page.params.slug)
+      })
+    }
     newerResult = null
     olderResult = null
     $status.bt_results.forEach((r, i) => {
