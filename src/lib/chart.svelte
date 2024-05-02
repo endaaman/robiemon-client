@@ -16,7 +16,7 @@
       ...echartOptions,
     }
     const echartsInstance = echarts.init(element, theme, { renderer })
-    echartsInstance.setOption(options, true)
+    echartsInstance.setOption(options)
 
     function handleResize() {
       echartsInstance.resize()
@@ -33,7 +33,7 @@
         echartsInstance.setOption({
           ...echartOptions.options,
           ...newOptions.options,
-        })
+        }, false)
       },
     }
   }

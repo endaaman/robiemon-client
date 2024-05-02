@@ -2,15 +2,13 @@
   import '../app.postcss';
   import { goto } from '$app/navigation';
   import { browser } from '$app/environment'
-  import { onMount, onDestroy, tick, afterUpdate } from 'svelte'
+  import { onMount, onDestroy, tick, } from 'svelte'
   import {
-    AppShell, AppBar, AppRail, AppRailAnchor, AppRailTile,
-    FileDropzone, Avatar, LightSwitch, RangeSlider,
+    AppRail, AppRailAnchor, FileDropzone,  RangeSlider,
     getModalStore, getToastStore,
   } from '@skeletonlabs/skeleton'
 
   import { LS_BRIGHTNESS } from '$lib/const'
-  import { page } from '$app/stores'
 
   export let data
 
@@ -133,7 +131,7 @@
 
     const imageURI = canvas.toDataURL('image/png')
 
-    await tick();
+    await tick()
 
     openPredictModal(imageURI)
   }
