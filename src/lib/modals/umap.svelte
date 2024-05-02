@@ -93,7 +93,10 @@
       //     "x": 2.619306564331055,
       //     "y": 3.976931571960449
       // }
-      let text = `${v.name}<br>GT:${v.diag_org} pred:${v.pred}`
+      let text = `${v.name} ${v.diag_org}`
+      if (!v.correct) {
+        text += `(pred:${v.pred})`
+      }
       if (v.diag_org === 'M') {
         text += ` origin:${v.origin}`
       }
@@ -166,7 +169,7 @@
       seriesMap[v.origin].data.push({
         value: [v.x, v.y],
         imageUri: `${STATIC_BASE}/umap_tiles/${v.diag_org}_${v.name}_${v.filename}`,
-        text: `GT:${v.diag_org} pred:${v.pred} origin:${v.origin}`,
+        text: `${v.name} ${v.diag_org}<br>pred:${v.pred} origin:${v.origin}`,
         symbol: v.correct ? 'circle' : 'triangle',
         symbolSize: v.correct ? 5 : 10,
       })

@@ -6,17 +6,19 @@
   import Divider from '$lib/components/divider.svelte'
   import Loaded from './loaded.svelte'
   import { onMount, onDestroy } from 'svelte'
+  // import { status } from '$lib/store'
 
   const status = getContext('status')
 
-  let result = null
+  export let data
+  $: result = data.result
+  // $: result = $status.bt_results.find((r) => {
+  //   return r.timestamp === parseInt($page.params.slug)
+  // })
+
   let newerResult = null
   let olderResult = null
-
   $: {
-    result = $status.bt_results.find((r) => {
-      return r.timestamp === parseInt($page.params.slug)
-    })
     newerResult = null
     olderResult = null
     $status.bt_results.forEach((r, i) => {

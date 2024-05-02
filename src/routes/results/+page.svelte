@@ -95,7 +95,8 @@
     {@const i = sort === 'ascending' ? _i : $status.tasks.length - 1 - _i }
     {@const task = $status.tasks[i]}
     <a
-      href="/results/{task.mode}/{task.timestamp}" class="card flex flex-col relative"
+      href={task.status === 'done' ? `/results/${task.mode}/${task.timestamp}` : '#'}
+      class="card flex flex-col relative"
       class:opacity-75={ task.status === 'pending' }
       class:disabled-card={ task.status !== 'done' }
     >
