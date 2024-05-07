@@ -1,7 +1,6 @@
 <script>
   let clazz = ''
   export let color = 'surface-300'
-  console.log(color)
   export {clazz as class};
 </script>
 

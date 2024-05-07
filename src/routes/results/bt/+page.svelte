@@ -4,11 +4,7 @@
   import { browser } from '$app/environment'
   import { page } from '$app/stores'
   import { getContext  } from 'svelte'
-  import {
-    RadioGroup, RadioItem, ListBox, ListBoxItem,
-    getModalStore, getToastStore,
-    popup
-  } from '@skeletonlabs/skeleton'
+  import { RadioGroup, RadioItem, getModalStore, getToastStore } from '@skeletonlabs/skeleton'
   import { API_BASE, STATIC_BASE } from '$lib/config'
 
   import BtResultCircle from '$lib/components/bt_result_circle.svelte';
@@ -22,6 +18,22 @@
 
   let sort = data.sort
   let mode = data.mode
+  $: {
+    let query = new URLSearchParams($page.url.searchParams.toString())
+    if (sort === 'descending') {
+      query.delete('sort');
+    } else {
+      query.set('sort', sort);
+    }
+    if (mode === 'card') {
+      query.delete('mode');
+    } else {
+      query.set('mode', mode);
+    }
+    if (browser) {
+      goto(`?${query.toString()}`, { replaceState: true })
+    }
+  }
 
   function modelNameToLabel(name) {
     const m = $status.bt_models.find((m)=> m.name === name)
@@ -45,7 +57,7 @@
           return
         }
         try {
-          const response = await fetch(`${API_BASE}/bt/results/${result.timestamp}`, {
+          await fetch(`${API_BASE}/bt/results/${result.timestamp}`, {
             method: 'DELETE',
           })
           toastStore.trigger({
@@ -67,37 +79,13 @@
     })
   }
 
-  function withQuery(base, k, v) {
-    const url = new URL(base)
-    const params = url.searchParams
-    params.append(k, v);
-    url.search = params.toString()
-    return url.toString()
-  }
-
-  $: {
-    let query = new URLSearchParams($page.url.searchParams.toString())
-    if (sort === 'descending') {
-      query.delete('sort');
-    } else {
-      query.set('sort', sort);
-    }
-    if (browser) {
-      goto(`?${query.toString()}`, { replaceState: true })
-    }
-  }
-
-  $: {
-    let query = new URLSearchParams($page.url.searchParams.toString())
-    if (mode === 'card') {
-      query.delete('mode');
-    } else {
-      query.set('mode', mode);
-    }
-    if (browser) {
-      goto(`?${query.toString()}`, { replaceState: true })
-    }
-  }
+  // function withQuery(base, k, v) {
+  //   const url = new URL(base)
+  //   const params = url.searchParams
+  //   params.append(k, v);
+  //   url.search = params.toString()
+  //   return url.toString()
+  // }
 </script>
 
 <div class="my-4 flex flex-row gap-4">

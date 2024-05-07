@@ -51,7 +51,6 @@
   })
   $: if ($page) drawerStore.close()
 
-
   const links = [
     {
       icon: 'home',
@@ -293,7 +292,7 @@
       <p>Please notice to the system administrator.</p>
       <button class="btn variant-filled" on:click={ $connection.connect() }>Re-connect server</button>
     </div>
-  {:else if $connection.status === C.CONNECTION_CONNECTED }
+  {:else }
     <slot></slot>
   {/if}
 

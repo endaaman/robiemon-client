@@ -21,43 +21,29 @@
   const toastStore = getToastStore()
   const modalStore = getModalStore()
 
-
   const status = getContext('status')
+  let result = $status.bt_results.find((r) => {
+    return r.timestamp === parseInt($page.params.slug)
+  })
 
-  export let data
-  let result = data.result
-
-  $: if($navigating) {
-    result = data.result
-    newName = result.name
-    newMemo = result.memo
-    editingName = false
-    editingMemo = false
-    // あえて更新しない
-    // opacity = 0
-  }
+  let imageElement = null
+  let editNameElement = null
+  let editMemoElement = null
 
   let newerResult = null
   let olderResult = null
-
-  let imageElement
-  let editNameElement
-  let editMemoElement
+  let modelName = result.moden
   let imagePath = null
   let camPath = null
-  let newName = result.name
-  let newMemo = result.memo
-  let modelName = result.moden
+
   let editingName = false
   let editingMemo = false
+  let newName = result.name
+  let newMemo = result.memo
   let opacity = 0
+  let initial = true
 
-  $: {
-    if ($status.bt_results.length > 0) {
-      result = $status.bt_results.find((r) => {
-        return r.timestamp === parseInt($page.params.slug)
-      })
-    }
+  function updateResult() {
     newerResult = null
     olderResult = null
     $status.bt_results.forEach((r, i) => {
@@ -70,11 +56,30 @@
         }
       }
     })
+    editingName = false
+    editingMemo = false
+    newName = result.name
+    newMemo = result.memo
+    // あえて更新しない
+    // opacity = 0
+
     imagePath = `${STATIC_BASE}/results/bt/${result.timestamp}/original.jpg`
     camPath = result.with_cam ? `${STATIC_BASE}/results/bt/${result.timestamp}/cam.png` : ""
-
     const m = $status.bt_models.find((m)=> m.name === result.model)
     modelName = m ? m.label : result.model
+  }
+
+  updateResult()
+
+  $: {
+    result = $status.bt_results.find((r) => {
+      return r.timestamp === parseInt($page.params.slug)
+    })
+    if ($navigating) {
+      updateResult()
+    }
+
+    handleImageLoaded()
   }
 
   let naturalWidth = 0
@@ -86,6 +91,8 @@
     if (imageElement) {
       imageWidth = imageElement.clientWidth
       imageHeight = imageElement.clientHeight
+      naturalWidth = imageElement.naturalWidth
+      naturalHeight = imageElement.naturalHeight
     }
   }
 
@@ -338,10 +345,8 @@
       <img
         src={imagePath}
         alt="original_{result.timestamp}"
-        on:load={ handleImageLoaded }
         bind:this={ imageElement }
-        bind:naturalWidth={ naturalWidth }
-        bind:naturalHeight={ naturalHeight }
+        on:load={ handleImageLoaded }
       >
       {#if camPath}
         <div
@@ -438,7 +443,9 @@
 
       <div class="flex flex-row my-2">
         <div class="w-24 min-w-24 font-semibold">Size</div>
-        <div>{ naturalWidth } × { naturalHeight }px </div>
+        {#if naturalWidth}
+          <div>{ naturalWidth } × { naturalHeight }px </div>
+        {/if}
       </div>
 
       <div class="flex flex-row my-2">
