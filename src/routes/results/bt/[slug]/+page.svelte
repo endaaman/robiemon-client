@@ -18,6 +18,22 @@
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  const camTypes = {
+    normal: {
+      filename: 'cam.png',
+      blendMode: 'hard-light',
+      // blendMode: 'multiply',
+    },
+    jet: {
+      filename: 'cam_jet.png',
+      blendMode: 'hard-light',
+    },
+    inferno: {
+      filename: 'cam_inferno.png',
+      blendMode: 'hard-light',
+    },
+  }
+
   const toastStore = getToastStore()
   const modalStore = getModalStore()
 
@@ -29,6 +45,7 @@
   let imageElement = null
   let editNameElement = null
   let editMemoElement = null
+  let camType = 'normal'
 
   let newerResult = null
   let olderResult = null
@@ -41,8 +58,8 @@
   let newName = result.name
   let newMemo = result.memo
   let opacity = 0
-  let initial = true
 
+  let camMode = 'normal'
   function updateResult() {
     newerResult = null
     olderResult = null
@@ -64,7 +81,6 @@
     // opacity = 0
 
     imagePath = `${STATIC_BASE}/results/bt/${result.timestamp}/original.jpg`
-    camPath = result.with_cam ? `${STATIC_BASE}/results/bt/${result.timestamp}/cam.png` : ""
     const m = $status.bt_models.find((m)=> m.name === result.model)
     modelName = m ? m.label : result.model
   }
@@ -79,6 +95,9 @@
       updateResult()
     }
 
+    camPath = result.with_cam
+      ? `${STATIC_BASE}/results/bt/${result.timestamp}/${camTypes[camType].filename}`
+      : ''
     handleImageLoaded()
   }
 
@@ -350,8 +369,8 @@
       >
       {#if camPath}
         <div
-          class="absolute left-0 top-0 mix-blend-multiply"
-          style="background-size: 100% 100%; background-image: url({camPath}); opacity: {opacity/100}; width: {imageWidth}px; height: {imageHeight}px;"
+          class="absolute left-0 top-0"
+          style="background-size: 100% 100%; background-image: url({camPath}); opacity: {opacity/100}; width: {imageWidth}px; height: {imageHeight}px; mix-blend-mode: {camTypes[camType].blendMode};"
         ></div>
       {/if}
     </div>
@@ -393,15 +412,21 @@
       <h3>CAM</h3>
       <hr class="my-2" />
 
-      <div class="flex flex-row">
-        <div class="w-24 font-semibold">Opacity</div>
-        <div class="w-full">
-          <RangeSlider
-            name="range-slider"
-            min={0} max={100} step={1} bind:value={ opacity }
-            disabled={ !result.with_cam }
-          ></RangeSlider>
-        </div>
+      <div class="flex space-x-3 items-center">
+
+        <div class="font-semibold">Opacity</div>
+        <RangeSlider
+          name="range-slider"
+          min={0} max={100} step={1} bind:value={ opacity }
+          disabled={ !result.with_cam }
+          class="flex-grow"
+        ></RangeSlider>
+
+        <select class="select text-sm p-1 w-24" bind:value={camType}>
+          {#each Object.keys(camTypes) as c}}
+            <option value={c}>{c}</option>
+          {/each}
+        </select>
       </div>
     </section>
 
