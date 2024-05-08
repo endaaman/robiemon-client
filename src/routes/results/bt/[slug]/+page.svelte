@@ -454,7 +454,7 @@
 
         <!-- BEGIN NOT EDITING -->
         <div class="grow" class:hidden={editingName}>
-          <button class="text-left block" on:click={ toggleEditingName }>{ result.name }</button>
+          <button class="text-left block w-full" on:click={ toggleEditingName }>{ result.name }</button>
         </div>
         <!-- END NOT EDITING -->
 
@@ -502,7 +502,7 @@
               <button class="block text-left" on:click={ toggleEditingMemo }>{ result.memo }</button>
             {:else}
               <button
-                class="text-surface-500 grow"
+                class="text-surface-500 w-full text-left"
                 on:click={ toggleEditingMemo }
               >
                 [Click to add memo]
