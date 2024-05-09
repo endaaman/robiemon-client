@@ -6,17 +6,13 @@
   import { navigating } from '$app/stores'
   import { getContext, onMount, onDestroy, tick } from 'svelte'
   import {
-      RangeSlider, ConicGradient, getToastStore, getModalStore,
+      RangeSlider, getToastStore, getModalStore,
   } from '@skeletonlabs/skeleton'
 
   import { API_BASE, STATIC_BASE } from '$lib/config'
   import Divider from '$lib/components/divider.svelte'
   import BtResultCircle from '$lib/components/bt_result_circle.svelte';
   import BtResultPredictions from '$lib/components/bt_result_predictions.svelte';
-
-  function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
 
   const camTypes = {
     normal: {
@@ -43,8 +39,10 @@
   })
 
   let imageElement = null
-  let editNameElement = null
-  let editMemoElement = null
+  let nameButtonElement = null
+  let nameInputElement = null
+  let memoButtonElement = null
+  let memoTextareaElement = null
   let camType = 'normal'
 
   let newerResult = null
@@ -59,7 +57,6 @@
   let newMemo = result.memo
   let opacity = 0
 
-  let camMode = 'normal'
   function updateResult() {
     newerResult = null
     olderResult = null
@@ -159,23 +156,21 @@
       return
     }
     await patchResult({ name: newName })
+    result.name = newName
   }
 
-  async function toggleEditingName() {
-    if (editingName) {
-      await saveName()
-      editingName = false
-    } else {
-      editingName = true
-      await delay(1)
-      editNameElement.focus()
-      editNameElement.select()
-    }
+  function handleNameInputFocus() {
+    editingName = true
   }
 
-  async function handleNameBlur() {
-    setTimeout(function() {
-      editingName = false
+  function handleNameInputBlur() {
+    editingName = false
+    setTimeout(async function() {
+      if (document.activeElement === nameButtonElement) {
+        await saveName()
+      } else {
+        newName = result.name
+      }
     }, 100)
   }
 
@@ -183,6 +178,7 @@
     if (e.code === 'Enter') {
       saveName()
       e.preventDefault()
+      nameInputElement.blur()
       return
     }
     if (e.key === 'Escape') {
@@ -194,21 +190,29 @@
 
   //////////
   //* MEMO
-  async function toggleEditingMemo() {
-    console.log('CLICK')
-    if (editingMemo) {
-      await patchResult({ memo: newMemo })
-      console.log('UPDATED')
-    } else {
-      editingMemo = true
-      await delay(1)
-      editMemoElement.focus()
-      editMemoElement.select()
-    }
+  async function saveMemo() {
+    await patchResult({ memo: newMemo })
+    result.memo = newMemo
   }
 
-  function handleMemoBlur() {
-    setTimeout(function() {
+  async function handleMemoClicked() {
+    editingMemo = true
+    await tick()
+    memoTextareaElement.focus()
+  }
+
+  function handleMemoFocus() {
+    editingMemo = true
+  }
+
+  async function handleMemoBlur() {
+    setTimeout(async function() {
+      console.log(document.activeElement)
+      if (document.activeElement === memoButtonElement) {
+        await saveMemo()
+      } else {
+        newMemo = result.memo
+      }
       editingMemo = false
     }, 100)
   }
@@ -439,31 +443,28 @@
       <div class="flex flex-row my-2">
         <div class="w-24 min-w-24 font-semibold">Name</div>
 
-        <!-- BEGIN EDITING -->
-        <div class="grow" class:hidden={!editingName}>
+        <div class="grow relative items-center">
           <input
             type="text"
-            class="p-0 block w-full"
+            class="p-0 block w-full border-none bg-transparent focus:bg-white"
+            class:cursor-pointer={ !editingName }
             bind:value={ newName }
-            bind:this={ editNameElement }
-            on:blur={ handleNameBlur }
+            bind:this={ nameInputElement }
+            on:focus={ handleNameInputFocus }
+            on:blur={ handleNameInputBlur }
             on:keydown={ handleNameKeydown }
           >
+          <button
+            bind:this={ nameButtonElement }
+            class="block absolute top-[2px] right-0"
+            class:pointer-events-none={ !editingName }
+          >
+            <span class="text-lg i-mdi-pencil"
+              class:i-mdi-pencil={ !editingName }
+              class:i-mdi-check={ editingName }
+            ></span>
+          </button>
         </div>
-        <!-- END EDITING -->
-
-        <!-- BEGIN NOT EDITING -->
-        <div class="grow" class:hidden={editingName}>
-          <button class="text-left block w-full" on:click={ toggleEditingName }>{ result.name }</button>
-        </div>
-        <!-- END NOT EDITING -->
-
-        <button on:click={ toggleEditingName } class="block">
-          <span class="text-lg i-mdi-pencil"
-            class:i-mdi-pencil={ !editingName }
-            class:i-mdi-check={ editingName }
-          ></span>
-        </button>
       </div>
 
       <div class="flex flex-row my-2">
@@ -486,39 +487,41 @@
       <div class="flex flex-row my-2">
         <div class="w-24 min-w-24 font-semibold">Memo</div>
 
-        <div class="grow">
+        {#if !editingMemo}
+          <div class="flex space-x-1 w-full">
+            <button
+              class="block w-full text-left grow"
+              class:text-surface-500={ !result.memo }
+              on:click={ handleMemoClicked }
+            >
+              { result.memo ? result.memo : '[Click to add memo]'}
+            </button>
 
-          <!-- BEGIN EDITING -->
-          <textarea
-            class="w-full block p-0"
-            class:hidden={ !editingMemo }
-            bind:this={ editMemoElement }
-            on:blur={ handleMemoBlur }
-            rows="3" bind:value={newMemo} on:keydown={ handleMemoKeydown }
-          ></textarea>
-          <!-- BEGIN EDITING -->
-          {#if !editingMemo}
-            {#if result.memo}
-              <button class="block text-left" on:click={ toggleEditingMemo }>{ result.memo }</button>
-            {:else}
-              <button
-                class="text-surface-500 w-full text-left"
-                on:click={ toggleEditingMemo }
-              >
-                [Click to add memo]
-              </button>
-            {/if}
-          {/if}
-        </div>
+            <button
+              class="block align-top flex items-start text-lg"
+              class:cursor-pointer={ editingMemo }
+              on:click={ handleMemoClicked }
+            >
+              <span class="i-mdi-pencil"></span>
+            </button>
+          </div>
+        {:else}
+          <div class="flex space-x-1 grow">
+            <textarea
+              rows="3"
+              class="w-full grow block p-0"
+              bind:this={ memoTextareaElement }
+              bind:value={newMemo}
+              on:focus={ handleMemoFocus }
+              on:blur={ handleMemoBlur }
+              on:keydown={ handleMemoKeydown }
+            ></textarea>
+            <button class="block align-top flex items-start text-lg" bind:this={ memoButtonElement }>
+              <span class="i-mdi-check"></span>
+            </button>
+          </div>
+        {/if}
 
-        <button on:click={ toggleEditingMemo } class="block">
-          <span class="block align-text-top h-full">
-            <span class="text-lg"
-              class:i-mdi-pencil={ !editingMemo }
-              class:i-mdi-check={ editingMemo }
-            ></span>
-          </span>
-        </button>
       </div>
     </section>
 
