@@ -26,6 +26,13 @@
 
   export let data;
 
+  if (browser) {
+    document.querySelector('html').className = 'light'
+		if (!('modeCurrent' in localStorage)) {
+      localStorage.setItem('modeCurrent', true)
+		}
+  }
+
   initializeStores()
 
   // MODAL
@@ -86,6 +93,8 @@
   // noscroll.set(false)
 
   let loading = false
+
+  setContext('currentCameraId', writable())
 
   const status = writable()
   setContext('status', status)

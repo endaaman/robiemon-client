@@ -1,8 +1,10 @@
 <script>
   import '../app.postcss';
   import { goto } from '$app/navigation';
+  import { getContext } from 'svelte';
   import { browser } from '$app/environment'
   import { onMount, onDestroy, tick, } from 'svelte'
+  import { fade } from 'svelte/transition'
   import {
     AppRail, AppRailAnchor, FileDropzone,  RangeSlider,
     getModalStore, getToastStore,
@@ -17,11 +19,13 @@
 
   let mode = ''
   let videoElement = null
-  let currentCameraId = null
   let cameras = null
   let canvas
   let files = []
   let brightness = 100
+  let mediaAllowed = null
+
+  const currentCameraId = getContext('currentCameraId')
 
   $: {
     if (cameras) {
@@ -32,7 +36,7 @@
       }
     }
 
-    if (currentCameraId && videoElement) {
+    if ($currentCameraId && videoElement) {
       videoElement.style.filter = `brightness(${brightness}%)`
       localStorage.setItem(LS_BRIGHTNESS, brightness)
     }
@@ -45,15 +49,21 @@
 
   async function updateStream(cameraId) {
     try {
+      const q = cameraId
+        ? { deviceId: { exact: cameraId } }
+        : { audio: false }
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: cameraId } }
+        video: q
       })
+      cameras = await getCameras()
+      mediaAllowed = true
       videoElement.srcObject = stream
-      currentCameraId = cameraId
+      $currentCameraId = cameraId || cameras[0].deviceId
     } catch (error) {
-      console.error('Error accessing the webcam', error);
+      mediaAllowed = false
+      console.log('ERROR', error)
       toastStore.trigger({
-        message: 'Warning: Failed to access any webcam',
+        message: 'Failed to access any webcam. Please check browser settings for this site.',
         timeout: 5000,
         background: 'variant-filled-warning',
       })
@@ -76,8 +86,7 @@
 
   function handleCameraChanged(e) {
     const cameraId = e.target.value
-    if (cameraId != currentCameraId) {
-      closeStream()
+    if (cameraId != $currentCameraId) {
       updateStream(cameraId)
     }
   }
@@ -153,7 +162,6 @@
 
     const imageURIs = await Promise.all(Array.from(e.target.files).map((f) => readFileToURI(f)))
 
-    console.log(imageURIs)
     modalStore.trigger({
       type: 'component',
       component: 'predictMulti',
@@ -167,13 +175,10 @@
       if (localStorage.hasOwnProperty(LS_BRIGHTNESS)) {
         brightness = localStorage.getItem(LS_BRIGHTNESS)
       }
-
-      // afterUpdate(async () => {
-      cameras = await getCameras();
+      cameras = await getCameras()
       if (cameras.length > 0) {
-        updateStream(cameras[0].deviceId)
+        updateStream($currentCameraId)
       }
-
     })
 
     onDestroy(async function() {
@@ -202,32 +207,53 @@
   </div>
 
   <div class="p-4 grow h-full flex flex-col" class:hidden={ mode !== 'webcam'}>
-    {#if cameras && cameras.length > 0}
-      <video bind:this={videoElement} autoplay class="object-left-top" style="max-height: calc(100vh - 160px);">
-        <track kind="captions">
-      </video>
-      <canvas bind:this={canvas} class="hidden"></canvas>
+    <video
+      bind:this={videoElement}
+      autoplay
+      class="object-left-top"
+      class:hidden={!( mediaAllowed && cameras && cameras.length>0 )}
+      style="max-height: calc(100vh - 160px);">
+      <track kind="captions">
+    </video>
 
-      <div class="flex flex-row gap-4 mt-4 items-center">
-        <label class="label">
-          <select class="select" on:change={ handleCameraChanged }>
-            {#each cameras as camera}
-              <option value={camera.deviceId}>{camera.label || 'Camera ' + camera.deviceId}</option>
-            {/each}
-          </select>
-        </label>
+    {#if mediaAllowed === true}
+      {#if cameras}
+        {#if cameras.length > 0 }
+          <canvas bind:this={canvas} class="hidden"></canvas>
 
-        <RangeSlider
-          name="range-slider"
-          min={0} max={200} step={1} bind:value={ brightness }
-        ></RangeSlider>
+          <div class="flex flex-row gap-4 mt-4 items-center">
+            <label class="label">
+              <select class="select" on:change={ handleCameraChanged }>
+                {#each cameras as camera}
+                  <option value={camera.deviceId}>{camera.label || 'Camera ' + camera.deviceId}</option>
+                {/each}
+              </select>
+            </label>
 
-        <button type="button" class="btn variant-filled" on:click={handlePredictClicked}>
-          Predict
-        </button>
-      </div>
+            <RangeSlider
+              name="range-slider"
+              min={0} max={200} step={1} bind:value={ brightness }
+            ></RangeSlider>
+
+            <button type="button" class="btn variant-filled" on:click={handlePredictClicked}>
+              Predict
+            </button>
+          </div>
+        {:else if cameras.length === 0 }
+          <p>No cameras detected</p>
+        {/if}
+      {/if}
+    {:else if mediaAllowed === false}
+      <p class="mb-4">Webcam access denied. </p>
+      <p>
+        <button class="btn variant-filled" on:click={ updateStream }>Allow webcam access</button>
+      </p>
     {:else}
-      <p>No cameras detected</p>
+
+      <div class="p-4 flex flex-col h-full justify-center items-center" transition:fade={{ duration: 300 }}>
+        <span class="i-mdi-loading animate-spin text-[180px] text-secondary-300"></span>
+      </div>
+
     {/if}
   </div>
 
