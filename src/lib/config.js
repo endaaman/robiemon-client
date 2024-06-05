@@ -1,7 +1,12 @@
 import { browser } from '$app/environment'
-import {
-    PUBLIC_UPSTREAM_URL_BASE,
-} from '$env/static/public'
 
-export const API_BASE = browser ? '/api' : `${PUBLIC_UPSTREAM_URL_BASE}/api`
+let base
+if (browser) {
+  base = '/api'
+} else {
+  const host = process.env.BACKEND_HOST  || 'localhost:3000'
+  base = `http://${host}/api`
+}
+
+export const API_BASE = base
 export const STATIC_BASE = '/static'

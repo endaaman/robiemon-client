@@ -11,7 +11,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 RUN npm run build
 
-ENV PUBLIC_UPSTREAM_URL_BASE http://robiemon-server:3000
+ENV BACKEND_HOST robiemon-backend:3000
 
 EXPOSE 8000
 
