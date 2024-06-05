@@ -88,19 +88,16 @@
     return current.startsWith(href)
   }
 
-  // const noscroll = writable()
-  // setContext('noscroll', noscroll)
-  // noscroll.set(false)
-
   let loading = false
 
-  setContext('currentCameraId', writable())
+  setContext('currentCameraId', writable(null))
 
-  const status = writable()
+  const status = writable(data.status || {tasks: [], bt_results: [], bt_models: []})
   setContext('status', status)
-  status.set(data.status || {tasks: [], bt_results: [], bt_models: []})
+
 
   let eventSource = null
+
   const connection = writable()
   setContext('connection', connection),
   // pending, error, connected

@@ -177,7 +177,7 @@
       }
       cameras = await getCameras()
       if (cameras.length > 0) {
-        updateStream($currentCameraId)
+        updateStream($currentCameraId || null)
       }
     })
 
