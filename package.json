@@ -6,7 +6,7 @@
     "dev": "vite dev --host 0.0.0.0",
     "build": "vite build --mode production",
     "preview": "vite preview",
-    "serve": "node --env-file .env.production server.js"
+    "serve": "node serve.js"
   },
   "type": "module",
   "dependencies": {
