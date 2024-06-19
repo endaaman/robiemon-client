@@ -17,16 +17,18 @@
   const camTypes = {
     normal: {
       filename: 'cam.png',
-      blendMode: 'hard-light',
-      // blendMode: 'multiply',
+      // blendMode: 'hard-light',
+      blendMode: 'multiply',
     },
     jet: {
       filename: 'cam_jet.png',
-      blendMode: 'hard-light',
+      // blendMode: 'hard-light',
+      blendMode: 'multiply',
     },
     inferno: {
       filename: 'cam_inferno.png',
-      blendMode: 'hard-light',
+      // blendMode: 'hard-light',
+      blendMode: 'multiply',
     },
   }
 
